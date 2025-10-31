@@ -5,7 +5,7 @@ import { UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 
@@ -40,20 +40,15 @@ export default async function RootLayout({
         <UserProvider initialUser={user}>
           <LangageProvider>
             <FormDataProvider>
-              <ReactQueryWrapper>
-
-                {children}
-              </ReactQueryWrapper>
+              <ReactQueryWrapper>{children}</ReactQueryWrapper>
             </FormDataProvider>
           </LangageProvider>
         </UserProvider>
-
       </body>
     </html>
   );
 
-
-/*
+  /*
 ReactQueryDevtoolsPanel:
 This will add a floating Devtools panel to your app, allowing you to inspect queries, cache states, and more.
 
@@ -69,3 +64,4 @@ Retry or refetch queries manually.
 
 Identify stale or inactive queries.
 */
+}
