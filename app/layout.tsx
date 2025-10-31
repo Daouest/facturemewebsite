@@ -5,6 +5,7 @@ import { UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import "./globals.css";
 
