@@ -1,8 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { insertItem, updateItem, getUserInfoByEmail,deleteItemsById } from "@/app/lib/data"
 
-
-
 export async function POST(request: NextRequest) {
 
   try {

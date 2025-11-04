@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { COOKIE_NAME, decrypt, updateSession } from "./app/lib/session";
+import { getSessionFromRequest, updateSession } from "./app/lib/session/session-edge";
 
 //Un middleware nous permet de run du avant de completer une requete
 //On peut ainsi, modifier une response, ou même, redirect si nécéssaire
@@ -10,7 +10,7 @@ import { COOKIE_NAME, decrypt, updateSession } from "./app/lib/session";
 //source : https://nextjs.org/docs/14/app/building-your-application/routing/middleware
 
 export async function middleware(req: NextRequest) {
-    const { pathname } = req.nextUrl
+    const pathname = req.nextUrl.pathname
 
     //on skip toutes les public routes (login, logout, etc)
     if (pathname.startsWith("/auth/*") ||
@@ -24,15 +24,13 @@ export async function middleware(req: NextRequest) {
     }
 
     //get les info du cookie
-    const token = req.cookies.get(COOKIE_NAME)?.value
-    const session = token ? await decrypt(token) : null//MIDDLEWARE - session: { user: { id: 25, username: 'ibv' }, iat: 1759939967, exp: 1759940567 }
+    const session = await getSessionFromRequest(req)
 
     //si ya pas un user de connecté dans le cookies
     //on le redirect au login screen
     if (!session) {
         return NextResponse.redirect(new URL("/", req.url))
     }
-   
 
     //on laisse le user accéder à sa requête et on refresh le cookie
     const refresh = await updateSession(req)

@@ -1,9 +1,9 @@
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import {
   getAllFacturesUsers,
   getLastFacture
 } from "@/app/lib/data";
-import { COOKIE_NAME, decrypt } from "@/app/lib/session";
+import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const token = req.cookies.get(COOKIE_NAME)?.value;
     const session = token ? await decrypt(token) : null;
-    const userId = session.idUser ?? 0;
+    const userId = session?.idUser ?? 0;
 
     const isLastFacturesRequested = searchParams.get("lastFactures") === "true";
     const sortBy = searchParams.get("sorted");
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     const factureCount = totalFactures.toString();
 
     //Application des filtres ou tris selon les paramètres
-  if (isLastFacturesRequested) {
+    if (isLastFacturesRequested) {
       factures = await getLastFacture(userId);
     }
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       (!sortBy || sortBy === "false");
 
     if (isCacheValid) {
-      return new NextResponse(null, { status: 304 }); 
+      return new NextResponse(null, { status: 304 });
     }
 
     // Réponse avec les données et les headers de cache

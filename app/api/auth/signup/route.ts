@@ -1,6 +1,3 @@
-//il faut l'inclure pour l'utilisation de bcryptjs
-export const runtime = "nodejs"
-
 import { NextResponse } from "next/server";
 import { z } from "zod"
 import { connectToDatabase } from "@/app/lib/db/mongodb";
@@ -10,6 +7,8 @@ import { SignupSchema } from "@/app/lib/schemas/auth";
 import { APP_URL } from "@/app/lib/schemas/env";
 import { getNextSeq } from "@/app/lib/db/getNextSeq";
 import mongoose from "mongoose";
+
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
     console.log(`[SIGNUP] Starting signup process at ${new Date().toISOString()}`);

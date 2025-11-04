@@ -1,4 +1,7 @@
+import "server-only"
 import mongoose, { Mongoose } from "mongoose";
+import { requireMongoEnv } from "@/app/lib/schemas/env";
+
 //doc pour la connection d'une db avec mongoose
 //source : https://mongoosejs.com/docs/connections.html
 
@@ -10,53 +13,29 @@ if (process.env.NODE_ENV !== "production") {
   //mongoose.set("debug", { shell: true });
 }
 
-const { MONGODB_URI } = process.env;
-
-if (!MONGODB_URI) {
-  throw new Error("Veuillez definir la variable MONGODB_URI");
-}
-
-const EFFECTIVE_DB = "FactureMe";
-
 declare global {
-  var _mongoose:
+  // eslint-disable-next-line no-var
+  var _mongooseCache:
     | { conn: Mongoose | null; promise: Promise<Mongoose> | null }
     | undefined;
 }
-
-let cached = globalThis._mongoose
-
-if (!cached) {
-  cached = globalThis._mongoose = { conn: null, promise: null }
-}
+const cached =
+  (globalThis as any)._mongooseCache ??
+  ((globalThis as any)._mongooseCache = { conn: null, promise: null });
 
 export async function connectToDatabase(): Promise<Mongoose> {
-  if (cached!.conn) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Déjà connecté à la base de données");
-    }
-    return cached!.conn;
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    const { MONGODB_URI, MONGODB_DB_NAME, NODE_ENV } = requireMongoEnv(); // <- validate here
+    const autoIndex = NODE_ENV !== "production";
+
+    cached.promise = mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB_NAME, autoIndex }).then((m) => {
+      if (NODE_ENV !== "production") console.log(`Connected to MongoDB (db="${m.connection.name}")`);
+      return m;
+    });
   }
 
-  if (!cached!.promise) {
-    cached!.promise = mongoose.connect(MONGODB_URI!, {
-      dbName: EFFECTIVE_DB,
-      autoIndex: process.env.NODE_ENV !== "production",
-    })
-  }
-
-  try {
-    cached!.conn = await cached!.promise
-
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`Connecting to (db="${mongoose.connection.name})`)
-    }
-
-    return cached!.conn
-
-  } catch (error) {
-    cached!.promise = null
-    throw error;
-  }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
-

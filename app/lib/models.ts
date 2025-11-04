@@ -1,5 +1,5 @@
-import mongoose, { Schema, Model, InferSchemaType } from "mongoose";
 import 'server-only'
+import mongoose, { Schema, Model, InferSchemaType } from "mongoose";
 
 function getModel<T>(name: string, schema: Schema<T>): Model<T> {
     return (mongoose.models?.[name] as Model<T>) || mongoose.model<T>(name, schema)
@@ -92,7 +92,7 @@ const factureSchema = new Schema({
     isActive: { type: Boolean, required: [true, "Active status is required"] },
     isPaid: { type: Boolean, required: [true, "Paid status is required"] },
     isBusinessInvoice: { type: Boolean, required: [true, "Business invoice status is required"] },
-    idClient: { type: Number, required: [true, "Client ID is required"]},
+    idClient: { type: Number, required: [true, "Client ID is required"] },
 
 }, { collection: 'factures_users' });
 

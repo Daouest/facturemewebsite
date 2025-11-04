@@ -100,7 +100,7 @@ export default function ItemCatalogue() {
               {/* Divider line separating title from body */}
               <div className="my-4 border-t border-gray-300" />
 
-              {isLoading && status !== "error" ? (
+              {isLoading ? (
                 <div className="flex justify-center items-center py-10">
                   <Image
                     src="/Loading_Paperplane.gif"

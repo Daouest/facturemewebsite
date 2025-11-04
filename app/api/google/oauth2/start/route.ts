@@ -1,12 +1,17 @@
+import "server-only"
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
-import { env } from "@/app/lib/schemas/env";
+import { requireGmailEnv } from "@/app/lib/schemas/env";
+
+export const runtime = "nodejs";
 
 export async function GET() {
+    const email = requireGmailEnv()
+
     const oauth2 = new google.auth.OAuth2(
-        env.GMAIL_CLIENT_ID!,
-        env.GMAIL_CLIENT_SECRET!,
-        env.GMAIL_REDIRECT_URI!
+        email.GMAIL_CLIENT_ID!,
+        email.GMAIL_CLIENT_SECRET!,
+        email.GMAIL_REDIRECT_URI!
     )
 
     const url = oauth2.generateAuthUrl({

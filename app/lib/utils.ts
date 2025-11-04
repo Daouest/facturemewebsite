@@ -13,12 +13,25 @@ export function toStringOrEmpty(val: FormDataEntryValue | null): string {
     return typeof val === 'string' ? val : '';
 }
 
-export const formatIntoDecimal = (price: number, local: string, currency: string): string => {
-    return new Intl.NumberFormat(local, {
-        style: 'currency',
-        currency: currency,
-    }).format(price);
+export function formatIntoDecimal(
+    value: number | string,
+    locale = "fr-CA",
+    currency = "CAD"
+): string {
+    const n =
+        typeof value === "number"
+            ? value
+            : Number(String(value).replace(/\s/g, "").replace(",", "."));
+    const safe = Number.isFinite(n) ? n : 0;
+
+    return new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
+    }).format(safe);
 }
+
 
 // Helper function to parse item key
 export function parseItemKey(key: string): ItemIdentifier {

@@ -26,6 +26,11 @@ export async function GET(req: Request) {
     const conn = await connectToDatabase()
     const db = conn.connection.db
 
+    //pour pas que TS panique lors du deployment
+    if (!db) {
+        return NextResponse.json({ error: "erreur lors de la connextion avec la DB" }, { status: 500 })
+    }
+
     const doc = await db.collection("email_token").findOne({ hash, purpose: "email-verify" })
 
     if (!token) {

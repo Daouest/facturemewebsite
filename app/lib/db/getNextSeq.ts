@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import type { Collection, UpdateFilter, WithId } from "mongodb";
 import { connectToDatabase } from "./mongodb";
 
 type CounterDoc = { _id: string; seq: number }
@@ -9,20 +10,26 @@ type CounterDoc = { _id: string; seq: number }
 export async function getNextSeq(seqName: string, startAt = 1): Promise<number> {
     await connectToDatabase()
 
-    const counters = mongoose.connection.collection("counters")
-    const res = await counters.findOneAndUpdate(
-        { _id: seqName },
-        { $inc: { seq: 1 } },
-        // [
-        //     { $set: { seq: { $add: [{ $ifNull: ["$seq", startAt - 1] }, 1] } } }
-        // ],
-        { upsert: true, returnDocument: "after" }
-    )
-
-    if (!res.value) {
-        const doc = await counters.findOne({ _id: seqName })
-        if (!doc) throw new Error("Counter missing after upsert")
-        return doc.seq
+    const db = mongoose.connection.db
+    if (!db) {
+        throw new Error("Erreur lors de la connexion dans avec la DB")
     }
-    return res.value!.seq as number
+
+    const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters")
+
+    const update: UpdateFilter<CounterDoc> = {
+        $inc: { seq: 1 },
+        $setOnInsert: { seq: startAt - 1 },
+    }
+
+    const doc: WithId<CounterDoc> | null = await counters.findOneAndUpdate(
+        { _id: seqName },
+        update,
+        {
+            upsert: true,
+            returnDocument: "after",
+            includeResultMetadata: false,
+        }
+    )
+    return doc?.seq ?? startAt
 }

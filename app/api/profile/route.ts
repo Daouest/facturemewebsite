@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserFromCookies } from "@/app/lib/session";
+import { getUserFromCookies } from "@/app/lib/session/session-node";
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import { DbUsers } from "@/app/lib/models";
 

@@ -3,11 +3,10 @@
 import mongoose from "mongoose";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
 import { InvoiceForm } from "@/app/lib/definitions";
 import { DbFacture, DbObjetFacture, DbTauxHoraireFacture } from "@/app/lib/models";
 import { fetchNextFactureId, validateInvoiceNumber, fetchObjectsByIds, fetchHourlyRatesByIds } from "@/app/lib/data";
-import { getUserFromCookies } from "@/app/lib/session";
+import { getUserFromCookies } from "../session/session-node";
 import { validateFormData, createInvoiceDocuments, validateDocuments, convertToItemTable } from '@/app/lib/invoice-helpers';
 
 export type InvoiceCreationFormState = {

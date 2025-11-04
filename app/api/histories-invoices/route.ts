@@ -5,7 +5,7 @@ import {
   getFacturesUsersByFactureNumber,
   getFacturesUsersPaidInvoice
 } from "@/app/lib/data";
-import { COOKIE_NAME, decrypt } from "@/app/lib/session";
+import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const token = req.cookies.get(COOKIE_NAME)?.value;
     const session = token ? await decrypt(token) : null;
-    const userId = session.idUser ?? 0;
+    const userId = session?.idUser ?? 0;
 
     const sortBy = searchParams.get("sorted");
     const filterByPaid = searchParams.get("isPaid");
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     // });
 
     // Récupération initiale des factures
-  let historiqueFactures = await getAllFacturesUsers(userId,true);
+    let historiqueFactures = await getAllFacturesUsers(userId, true);
 
     // Support filtering by date range to avoid returning a huge pool of invoices.
     // Expected query params: start=YYYY-MM-DD and end=YYYY-MM-DD
@@ -47,12 +47,12 @@ export async function GET(req: NextRequest) {
 
     //Application des filtres ou tris selon les paramètres
     if (sortBy === "factureNumber") {
-      historiqueFactures = await getFacturesUsersByFactureNumber(userId,true);
+      historiqueFactures = await getFacturesUsersByFactureNumber(userId, true);
     } else if (sortBy === "date") {
-      historiqueFactures = await getFacturesUsersByDate(userId,true);
+      historiqueFactures = await getFacturesUsersByDate(userId, true);
     } else if (filterByPaid === "false") {
-      historiqueFactures = await getFacturesUsersPaidInvoice(userId,true);
-    } 
+      historiqueFactures = await getFacturesUsersPaidInvoice(userId, true);
+    }
 
     // Réponse avec les données et les headers de cache
     const response = NextResponse.json(historiqueFactures);

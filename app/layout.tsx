@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { FormDataProvider } from "@/app/context/FormContext";
-import { UserProvider } from "@/app/context/UserContext";
+import { AppUser, UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
-import { getUserFromCookies } from "./lib/session";
+import { getUserFromCookies } from "./lib/session/session-node";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -30,7 +30,17 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   //on get le user du context/cookie
-  const user = await getUserFromCookies();
+  const raw = await getUserFromCookies();
+
+  const user: AppUser | undefined = raw
+    ? {
+        id: String(raw.idUser),
+        username: raw.username,
+        email: raw.email,
+        firstName: raw.firstName,
+        lastName: raw.lastName,
+      }
+    : undefined;
 
   return (
     <html lang="en">

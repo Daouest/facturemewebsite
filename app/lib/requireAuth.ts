@@ -1,4 +1,4 @@
-import { getSession } from "./session";
+import { getSession } from "./session/session-node";
 
 //on force l'utilisateur à avoir un accès avant d'acceder aux pages
 //si ya pas de session, on lance une erreur

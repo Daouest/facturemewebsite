@@ -122,7 +122,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       router.push("/not-found");
     }
   }, [data]);
-  async function updateItemRequest(dataToSend: nay) {
+  async function updateItemRequest(dataToSend: unknown) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -220,58 +220,6 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       console.error("Erreur de suppression :", error);
     },
   });
-
-  //   const sendFormulaire = async (e: React.FormEvent) => {
-  //     e.preventDefault();
-  //     if (!formVerified()) {
-  //       setErrorMessage({
-  //         error: true,
-  //         message: "Erreur dans le formulaire: aucun champs modifié",
-  //       });
-  //       setShowAlert(true);
-  //       setTimeout(() => {
-  //         setShowAlert(false);
-  //         setErrorMessage({ error: false, message: "" });
-  //       }, 3000);
-  //       return;
-  //     }
-  //     setShowAlert(true);
-
-  //     try {
-  //       let numereicPrice;
-  //       let dataToSend = formData;
-  //       if (!fileChanged) {
-  //         numereicPrice = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-  //         dataToSend = { ...formData, prix: numereicPrice };
-  //       }
-  //       await fetch("/api/item", {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           formData: dataToSend,
-  //           userData: user,
-  //         }),
-  //       });
-  //     } catch (err) {
-  //       console.error(
-  //         "Erreur dans l'envoi des données [modification d'un item]",
-  //         err
-  //       );
-  //     } finally {
-  //       setTimeout(() => {
-  //         setShowAlert(false);
-  //         setFormData({
-  //           itemNom: "",
-  //           prix: 0,
-  //           description: "",
-  //           image: "",
-  //           file: "",
-  //         });
-  //         setLastPrice(0);
-  //         router.push("/item/item-catalogue");
-  //       }, 1500);
-  //     }
-  //   };
 
   const deleteItemById = async () => {
     try {

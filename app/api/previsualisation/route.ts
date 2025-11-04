@@ -1,12 +1,12 @@
 
 import { getFactureData, getFactureDetails, fetchBusinessInfo, getUserInfo, getAddressInfo, fetchCustomerInfo, getTaxesArrayForFacture } from "@/app/lib/data";
-import { getSession } from '@/app/lib/session';
+import { getSession } from "@/app/lib/session/session-node";
 
 export async function GET(request: Request) {
 
     const session = await getSession();
     const factureId = session?.factureId;
-      
+
     if (typeof factureId !== "number" || isNaN(factureId)) {
         return new Response(JSON.stringify({ error: 'Invalid or missing factureId parameter' }), { status: 400 });
     }
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         let invoiceInfos;
         let taxesnumbers: { taxName: string; taxNumber: string }[] = [];
 
-        if(factureData && factureData.facture && factureData.facture.idUser != null){
+        if (factureData && factureData.facture && factureData.facture.idUser != null) {
             //  (FIRST) -------- userInfos ------------------------------------------------------------------------------
             //1.    rechercher le user ou la compagnie
             const isBusiness = factureData.facture.isBusinessInvoice;
@@ -31,72 +31,72 @@ export async function GET(request: Request) {
             const userInfoMessage = await getUserInfo(factureData.facture.idUser);
             const userInfo = userInfoMessage.userData;
 
-            if(isBusiness === true){ //TODO: verifier que ca retourne des trucs
+            if (isBusiness === true) { //TODO: verifier que ca retourne des trucs
                 //  chercher les infos de la business
                 //1.2   fetch infos business
-                if(userInfo && userInfo.idBusiness != null){
+                if (userInfo && userInfo.idBusiness != null) {
                     const businessInfoMessage = await fetchBusinessInfo(userInfo.idBusiness);
                     const businessInfo = businessInfoMessage.businessInfo;
                     //1.3 fetch infos addresses
-                    if(businessInfo && businessInfo.idAddress != null){
+                    if (businessInfo && businessInfo.idAddress != null) {
                         //info addresse
                         const addresseInfoMsg = await getAddressInfo(businessInfo.idAddress);
                         const addressInfo = addresseInfoMsg.addressData;
 
                         //info taxes
-                        if(businessInfo.TVHnumber) taxesnumbers.push({"taxName": "TVH", "taxNumber": businessInfo.TVHnumber});
-                        if(businessInfo.TVPnumber) taxesnumbers.push({"taxName": "TVP", "taxNumber": businessInfo.TVPnumber});
-                        if(businessInfo.TVQnumber) taxesnumbers.push({"taxName": "TVQ", "taxNumber": businessInfo.TVQnumber});
-                        if(businessInfo.TVSnumber) taxesnumbers.push({"taxName": "TVS", "taxNumber": businessInfo.TVSnumber});
+                        if (businessInfo.TVHnumber) taxesnumbers.push({ "taxName": "TVH", "taxNumber": businessInfo.TVHnumber });
+                        if (businessInfo.TVPnumber) taxesnumbers.push({ "taxName": "TVP", "taxNumber": businessInfo.TVPnumber });
+                        if (businessInfo.TVQnumber) taxesnumbers.push({ "taxName": "TVQ", "taxNumber": businessInfo.TVQnumber });
+                        if (businessInfo.TVSnumber) taxesnumbers.push({ "taxName": "TVS", "taxNumber": businessInfo.TVSnumber });
 
                         //1.4 assigner les infos
-                        if(addressInfo){
+                        if (addressInfo) {
                             userInfos = {
-                            "name" : businessInfo.businessName,
-                            "address": addressInfo.address,
-                            "city": addressInfo.city,
-                            "province": addressInfo.province,
-                            "zipCode": addressInfo.zipCode 
+                                "name": businessInfo.businessName,
+                                "address": addressInfo.address,
+                                "city": addressInfo.city,
+                                "province": addressInfo.province,
+                                "zipCode": addressInfo.zipCode
                             }
                         }
                     }
 
-                    
+
                 }
-                
+
             } else {
                 //1.2    fetch l'addresse user
-                if(userInfo && userInfo.idAddress != null){
+                if (userInfo && userInfo.idAddress != null) {
 
                     const addressMsg = await getAddressInfo(userInfo.idAddress);
                     const address = addressMsg.addressData;
 
-                    if(address){
+                    if (address) {
                         userInfos = {
                             "name": userInfo.firstName + " " + userInfo.lastName,
                             "address": address.address,
-                            "city" : address.city,
+                            "city": address.city,
                             "province": address.province,
                             "zipCode": address.zipCode
                         }
                     }
                 }
-                
+
             }
 
             //  (SECOND) -------- infoClient  ------------------------------------------------------------------------------
             //2.    chercher infos client
-            if(factureData.facture.idClient != null){
+            if (factureData.facture.idClient != null) {
                 const infoClientMsg = await fetchCustomerInfo(factureData.facture.idClient);
                 const infoClient = infoClientMsg.customerInfo;
 
-                if(infoClient){
+                if (infoClient) {
                     //2.1   chercher les infos du client (addresse)
                     const addClientMsg = await getAddressInfo(infoClient.idAddress);
                     const addClient = addClientMsg.addressData;
 
                     //2.2   mettre les infos dans la variable
-                    if(addClient){
+                    if (addClient) {
                         clientInfos = {
                             "name": infoClient.nomClient,
                             "address": addClient.address,
@@ -110,7 +110,7 @@ export async function GET(request: Request) {
 
             //  (THIRD) -------- infos du invoice  ------------------------------------------------------------------------------
             //1.1   chercher les types
-            if(factureData.facture.typeFacture){
+            if (factureData.facture.typeFacture) {
                 const colonnes = await getFactureDetails(factureId);
 
                 const colH = colonnes.factureDetails?.factureH;
@@ -120,37 +120,37 @@ export async function GET(request: Request) {
                 const colUnitaires = colonnes.factureDetails?.factureU;
 
                 let totalFacture = 0;
-                
+
                 if (colH && Array.isArray(colHoraire)) {
                     colHoraire.forEach(item => {
-                            //calcul du temps 
-                            const start = new Date(item.startTime);
-                            const end = new Date(item.endTime);
+                        //calcul du temps 
+                        const start = new Date(item.startTime);
+                        const end = new Date(item.endTime);
 
-                            const diffMs = end.getTime() - start.getTime(); //en milisecondes
-                            let totalHours = diffMs / (1000 * 60 * 60); //heures
-                            totalHours -= item.lunchTimeInMinutes / 60;
-                            totalHours = Math.round(totalHours * 100) / 100; //avec 2 decimal
+                        const diffMs = end.getTime() - start.getTime(); //en milisecondes
+                        let totalHours = diffMs / (1000 * 60 * 60); //heures
+                        totalHours -= item.lunchTimeInMinutes / 60;
+                        totalHours = Math.round(totalHours * 100) / 100; //avec 2 decimal
 
-                            // Calcul cout total
-                            const total = Math.round(totalHours * item.hourlyRate * 100) / 100;
-                            totalFacture += total;
+                        // Calcul cout total
+                        const total = Math.round(totalHours * item.hourlyRate * 100) / 100;
+                        totalFacture += total;
 
-                            // Ajout des variables a l'Array
-                            item.totalHours = totalHours;
-                            item.total = total;
-                        });
+                        // Ajout des variables a l'Array
+                        item.totalHours = totalHours;
+                        item.total = total;
+                    });
                 }
-                
+
 
                 if (colU && Array.isArray(colUnitaires)) {
                     colUnitaires.forEach(item => {
-                    const quantity = Number(item.quantity) || 0;
-                    const pricePerUnit = Number(item.pricePerUnit) || 0;
+                        const quantity = Number(item.quantity) || 0;
+                        const pricePerUnit = Number(item.pricePerUnit) || 0;
 
-                    const total = Math.round(quantity * pricePerUnit * 100) / 100;
-                    item.total = total;
-                    totalFacture += total;
+                        const total = Math.round(quantity * pricePerUnit * 100) / 100;
+                        item.total = total;
+                        totalFacture += total;
                     });
                 }
 
@@ -164,7 +164,7 @@ export async function GET(request: Request) {
                     "time": new Date(factureData.facture.dateFacture).toLocaleTimeString(),
                     "factureNumber": factureData.facture.factureNumber,
                     "colonnesHoraire": colHoraire,
-                    "colonnesUnitaires" : colUnitaires,
+                    "colonnesUnitaires": colUnitaires,
                     "sousTotal": totalFacture,
                     "taxes": taxesArray,
                     "taxesNumbers": taxesnumbers,

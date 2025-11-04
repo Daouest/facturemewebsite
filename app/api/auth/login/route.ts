@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import { DbUsers } from "@/app/lib/models";
 import { LoginSchema } from "@/app/lib/schemas/auth";
-import { createUserSession, setSessionCookieOnResponse } from "@/app/lib/session";
+import { setSessionCookieOnResponse, createUserSession } from "@/app/lib/session/session-node";
 import mongoose from "mongoose";
 
 export async function POST(req: Request) {

@@ -1,113 +1,120 @@
 
-export const translations = {
-  fr: {
-    hello: "Bonjour",
-    info: "FAQs",
-    historicInvoices: " Historique des factures",
-    sortByDate: "Date",
-    sortByPaidInvoice: "Non payée",
-    sortByNumber: "Numéro",
-    archivedInvoices: "Factures actives",
-    creationItem: "Création d'item",
-    seeItems: "Voir mes items",
-    noData: "Vous n'avez aucune facture active!",
-    clientName: "Nom du client",
-    factureNumber: "Numéro de facture",
-    dateFacture: "Date de la facture",
-    typeFacture: "Type de facture",
-    description: "Description",
-    price: "Prix",
-    image: "Image",
-    productName: "Nom du produit",
-    noFacture: "Vous n'avez aucune facture pour l'instant",
-    welcome: "Bienvenue",
-    dashboard: "Vite fait, bien fait!",
-    // Sidebar
-    invoices: "📄 Mes factures",
-    createItem: "➕ Créer un item",
-    newInvoice: "➕ Nouvelle facture",
-    catalogue: "🔷 Mes items",
-    profile: "😎 Profil",
+const fr = {
+  hello: "Bonjour",
+  info: "FAQs",
+  historicInvoices: " Historique des factures",
+  sortByDate: "Date",
+  sortByPaidInvoice: "Non payée",
+  sortByNumber: "Numéro",
+  archivedInvoices: "Factures actives",
+  creationItem: "Création d'item",
+  seeItems: "Voir mes items",
+  noData: "Vous n'avez aucune facture active!",
+  clientName: "Nom du client",
+  factureNumber: "Numéro de facture",
+  dateFacture: "Date de la facture",
+  typeFacture: "Type de facture",
+  description: "Description",
+  price: "Prix",
+  image: "Image",
+  productName: "Nom du produit",
+  noFacture: "Vous n'avez aucune facture pour l'instant",
+  welcome: "Bienvenue",
+  dashboard: "Vite fait, bien fait!",
+  // Sidebar
+  invoices: "📄 Mes factures",
+  createItem: "➕ Créer un item",
+  newInvoice: "➕ Nouvelle facture",
+  catalogue: "🔷 Mes items",
+  profile: "😎 Profil",
 
-    // Dropdown
-    dropdownTitle: "Next.js Exemple de menu déroulant",
-    chooseOption: "Choisissez une option :",
-    selectPlaceholder: "Sélectionnez une option",
-    languageFrench: "Français",
-    languageEnglish: "Anglais",
+  // Dropdown
+  dropdownTitle: "Next.js Exemple de menu déroulant",
+  chooseOption: "Choisissez une option :",
+  selectPlaceholder: "Sélectionnez une option",
+  languageFrench: "Français",
+  languageEnglish: "Anglais",
 
-    invoice: "Facture",
-    // Factures
-    recentInvoices: "📊 Vos factures récentes",
-    loading: "Chargement...",
-    // Nouveautés
-    news: "🔔 Nouveautés",
-    exportPDF: "📥 Exporter en PDF",
-    onlinePayment: "💳 Paiement en ligne",
-    clientManagement: "👥 Mes clients",
-    calendar: "📅 Calendrier",
+  invoice: "Facture",
+  // Factures
+  recentInvoices: "📊 Vos factures récentes",
+  loading: "Chargement...",
+  // Nouveautés
+  news: "🔔 Nouveautés",
+  exportPDF: "📥 Exporter en PDF",
+  onlinePayment: "💳 Paiement en ligne",
+  clientManagement: "👥 Mes clients",
+  calendar: "📅 Calendrier",
 
-    today: "Aujourd'hui",
+  today: "Aujourd'hui",
 
-    //LANGAGE
-    chooseLanguage: "choisir une langue"
-  },
+  //LANGAGE
+  chooseLanguage: "choisir une langue"
+} as const;
 
-  en: {
-    hello: "Hi",
-    info: "FAQs",
-    historicInvoices: "Invoice histories",
-    sortByDate: "Sort by date",
-    sortByNumber: "Sort by facture number",
-    archivedInvoices: " Actives Invoices ",
-    creationItem: "Creation of item",
-    seeItems: "See my items",
-    noData: "Nothing to see here yet!",
-    clientName: "Client Name",
-    factureNumber: "Facture Number",
-    dateFacture: "Date of the facture",
-    typeFacture: "Type of the facture",
-    description: "Description",
-    price: "Price",
-    image: "Image",
-    productName: "Product Name",
-    noFacture: "Nothing to see here yet!",
 
-    welcome: "Welcome",
-    dashboard: "Nice and easy!",
+const en = {
+  hello: "Hi",
+  info: "FAQs",
+  historicInvoices: "Invoice histories",
+  sortByDate: "Sort by date",
+  sortByNumber: "Sort by facture number",
+  sortByPaidInvoice: "Sort by status",
+  archivedInvoices: " Actives Invoices ",
+  creationItem: "Creation of item",
+  seeItems: "See my items",
+  noData: "Nothing to see here yet!",
+  clientName: "Client Name",
+  factureNumber: "Facture Number",
+  dateFacture: "Date of the facture",
+  typeFacture: "Type of the facture",
+  description: "Description",
+  price: "Price",
+  image: "Image",
+  productName: "Product Name",
+  noFacture: "Nothing to see here yet!",
 
-    // Sidebar
-    invoices: "📄 My invoices",
-    createItem: "➕ Create an item",
-    newInvoice: "➕ New invoice",
-    catalogue: "🔷 My items",
-    profile: "😎 Profile",
+  welcome: "Welcome",
+  dashboard: "Nice and easy!",
 
-    // Dropdown
-    dropdownTitle: "Next.js Select Dropdown Example",
-    chooseOption: "Choose an option:",
-    selectPlaceholder: "Select an option",
-    languageFrench: "French",
-    languageEnglish: "English",
+  // Sidebar
+  invoices: "📄 My invoices",
+  createItem: "➕ Create an item",
+  newInvoice: "➕ New invoice",
+  catalogue: "🔷 My items",
+  profile: "😎 Profile",
 
-    // Invoices
-    recentInvoices: "📊 Your recent invoices",
-    loading: "Loading...",
+  // Dropdown
+  dropdownTitle: "Next.js Select Dropdown Example",
+  chooseOption: "Choose an option:",
+  selectPlaceholder: "Select an option",
+  languageFrench: "French",
+  languageEnglish: "English",
 
-    // News
-    news: "🔔 News",
-    exportPDF: "📥 Export to PDF",
-    onlinePayment: "💳 Online payment",
-    clientManagement: "👥 My clients",
-    calendar: "📅 Calendar",
+  // Invoices
+  recentInvoices: "📊 Your recent invoices",
+  loading: "Loading...",
 
-    today: "Today",
+  // News
+  news: "🔔 News",
+  exportPDF: "📥 Export to PDF",
+  onlinePayment: "💳 Online payment",
+  clientManagement: "👥 My clients",
+  calendar: "📅 Calendar",
 
-    invoice: "Invoice",
-    //langage
-    chooseLanguage: "Choose a language"
-  }
-};
+  today: "Today",
+
+  invoice: "Invoice",
+  //langage
+  chooseLanguage: "Choose a language"
+}
+
+type TranslationKey = keyof typeof fr;
+export const translations: Record<"fr" | "en", Record<TranslationKey, string>> = {
+  fr,
+  en,
+}
+
 
 export const refreshSeconds = {
   seconds: 3600000,

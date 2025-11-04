@@ -9,6 +9,7 @@ export type Facture = {
     isPaid: boolean;
     isBusinessInvoice: boolean;
     idClient: number;
+    nomClient: string;
 };
 
 export type ItemFacture = {
@@ -33,32 +34,32 @@ export type TauxHoraireFacture = {
 };
 
 export type ItemData = {
-  itemNom: string;
-  description: string;
-  prix: number;
-  image?: string;
+    itemNom: string;
+    description: string;
+    prix: number;
+    image?: string;
 };
 
 export type UserData = {
-  id: number;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
-  idAddress?: number;
-  idBusiness?: number;
+    id: number;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    idAddress?: number;
+    idBusiness?: number;
 };
 
 export type Objet = {
-  idObjet: number;
-  idUser: number;
-  productName: string;
-  description: string;
-  price: number;
-  productPhoto: string;
-  enforcementDate: Date;
-  idParent: number | null;
+    idObjet: number;
+    idUser: number;
+    productName: string;
+    description: string;
+    price: number;
+    productPhoto: string;
+    enforcementDate: Date;
+    idParent: number | null;
 };
 
 export type TauxHoraire = {
@@ -74,14 +75,14 @@ export type TauxHoraire = {
 export type ItemTable = (Objet | TauxHoraire)[];
 
 export type TableFactureType = {
-  idFacture: number,
-  idUser: number,
-  dateFacture: Date,
-  typeFacture: 'U' | 'H' | 'P';
-  factureNumber: number,
-  isPaid: boolean,
-  idClient: number,
-  nomClient: string
+    idFacture: number,
+    idUser: number,
+    dateFacture: Date,
+    typeFacture: 'U' | 'H' | 'P';
+    factureNumber: number,
+    isPaid: boolean,
+    idClient: number,
+    nomClient: string
 }
 
 export type Client = {
@@ -98,17 +99,17 @@ export type ClientAffichage = {
 }
 
 export type TableItemType = {
-  idObjet: number,
-  productName: string;
-  description: string;
-  price: number;
-  productPhoto: string;
-  idFacture:number;
+    idObjet: number,
+    productName: string;
+    description: string;
+    price: number;
+    productPhoto: string;
+    idFacture: number;
 }
 
 export type CustomerField = {
-  id: number;
-  name: string;
+    id: number;
+    name: string;
 };
 
 export type ItemField = {
@@ -118,8 +119,8 @@ export type ItemField = {
 };
 
 export type BusinessField = {
-  id: number;
-  name: string;
+    id: number;
+    name: string;
 };
 
 export type InvoiceForm = {
@@ -135,17 +136,17 @@ export type InvoiceFormItem = {
     id: number;
     type: 'product' | 'hourly';
 } & (
-    | {
-        type: 'product';
-        quantity: number;
-    }
-    | {
-        type: 'hourly';
-        breakTime: number;
-        startTime: string;
-        endTime: string;
-    }
-);
+        | {
+            type: 'product';
+            quantity: number;
+        }
+        | {
+            type: 'hourly';
+            breakTime: number;
+            startTime: string;
+            endTime: string;
+        }
+    );
 
 // Add a helper type for unique identification
 export type ItemIdentifier = {

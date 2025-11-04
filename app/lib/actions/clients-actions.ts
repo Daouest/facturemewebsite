@@ -5,7 +5,7 @@ import mongoose from "mongoose"
 import { DbClient, DbAddress } from "@/app/lib/models"
 import { fetchNextAddressId, fetchNextClientId } from '@/app/lib/data'
 import { redirect } from 'next/navigation';
-import { getSession } from '@/app/lib/session'
+import { getSession } from "../session/session-node"
 
 export async function createClient(formData: ClientForm) {
     console.log("action hello", formData);

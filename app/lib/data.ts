@@ -3,7 +3,8 @@ import { DbObjet, DbBusiness, DbTauxHoraire, DbClient, DbFacture, DbObjetFacture
 import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, TauxHoraire } from "@/app/lib/definitions";
 import { ItemData, UserData, Address, Client, ClientAffichage } from "@/app/lib/definitions";
 import { calculateTotalByWorkedHours, calculateTaxes } from "@/app/lib/utils";
-import { getUserFromCookies } from "@/app/lib/session";
+import { getUserFromCookies } from "@/app/lib/session/session-node";
+export const runtime = "nodejs"
 
 export async function fetchCustomers() {
     try {

@@ -1,42 +1,66 @@
-import { google } from 'googleapis'
-import { env } from '@/app/lib/schemas/env'
+import "server-only";
+
+import { gmail_v1, google } from "googleapis";
+import { requireGmailEnv } from "@/app/lib/schemas/env";
 
 export function getGmailClient() {
+    const {
+        GMAIL_CLIENT_ID,
+        GMAIL_CLIENT_SECRET,
+        GMAIL_REFRESH_TOKEN,
+        GMAIL_REDIRECT_URI,
+    } = requireGmailEnv();
+
     const oauth2 = new google.auth.OAuth2(
-        env.GMAIL_CLIENT_ID,
-        env.GMAIL_CLIENT_SECRET,
-        env.GMAIL_REDIRECT_URI
-    )
-    oauth2.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN })
-    return google.gmail({ version: "v1", auth: oauth2 })
+        GMAIL_CLIENT_ID,
+        GMAIL_CLIENT_SECRET,
+        GMAIL_REDIRECT_URI
+    );
+    oauth2.setCredentials({ refresh_token: GMAIL_REFRESH_TOKEN });
+
+    return google.gmail({ version: "v1", auth: oauth2 });
 }
 
 export async function sendHtmlEmail({
     to,
     subject,
     html,
-    from = env.GMAIL_SENDER,
+    from,
 }: {
     to: string;
     subject: string;
     html: string;
     from?: string;
-}) {
+}): Promise<gmail_v1.Schema$Message> {
+    const { GMAIL_SENDER } = requireGmailEnv();
+    const fromHeader = from ?? GMAIL_SENDER;
+
     const raw = [
-        `From: ${from}`,
+        `From: ${fromHeader}`,
         `To: <${to}>`,
         `Subject: ${subject}`,
         `MIME-Version: 1.0`,
         `Content-Type: text/html; charset=UTF-8`,
         ``,
-        html
-    ].join("\r\n")
+        html,
+    ].join("\r\n");
 
-    const gmail = getGmailClient()
+    let encoded: string;
+    try {
+        encoded = Buffer.from(raw).toString("base64url");
+    } catch {
+        encoded = Buffer.from(raw)
+            .toString("base64")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/g, "");
+    }
+
+    const gmail = getGmailClient();
     const res = await gmail.users.messages.send({
         userId: "me",
-        requestBody: { raw: Buffer.from(raw).toString("base64url") },
-    })
+        requestBody: { raw: encoded },
+    });
 
-    return res.data
+    return res.data;
 }
