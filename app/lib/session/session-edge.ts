@@ -1,4 +1,3 @@
-import "server-only"
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_NAME, ACCESS_TTL_MS, encrypt, decrypt, type SessionPayload, } from "./session-crypto";
 
