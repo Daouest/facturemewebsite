@@ -1,51 +1,47 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PUBLIC_PATHS = new Set<string>(["/", "/about", "/favicon.ico"]);
-const PUBLIC_PREFIXES = ["/auth", "/_next", "/api/auth", "/images", "/fonts"];
-
-function isPublic(pathname: string) {
-    if (PUBLIC_PATHS.has(pathname)) return true;
-    return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
-}
-
 export async function middleware(req: NextRequest) {
-    const { COOKIE_NAME, decrypt, updateSession } = await import("@/app/lib/session/session-edge")
+    const { COOKIE_NAME, verifyToken, refreshToken, ACCESS_TTL_MS } =
+        await import("./app/lib/session/session-edge");
+
+    const { pathname } = req.nextUrl;
+    const isPublic =
+        pathname === "/" ||
+        pathname === "/about" ||
+        pathname === "/favicon.ico" ||
+        pathname.startsWith("/auth") ||
+        pathname.startsWith("/_next") ||
+        pathname.startsWith("/api/auth") ||
+        pathname.includes(".");
+
+    if (isPublic) return NextResponse.next();
+
+    const token = req.cookies.get(COOKIE_NAME)?.value;
+    if (!token) return NextResponse.redirect(new URL("/", req.url));
+
+    const session = await verifyToken(token);
+    if (!session) return NextResponse.redirect(new URL("/", req.url));
+
+    // Optional silent refresh
     try {
-        const { pathname } = req.nextUrl;
-
-        // Skip public routes & assets
-        if (isPublic(pathname) || pathname.includes(".")) {
-            return NextResponse.next();
-        }
-
-        // Simple cookie presence check
-        const token = req.cookies.get(COOKIE_NAME)?.value;
-        if (!token) {
-            return NextResponse.redirect(new URL("/", req.url));
-        }
-
-        // verify token (Edge-safe)
-        const session = await decrypt(token);
-        if (!session) {
-            return NextResponse.redirect(new URL("/", req.url));
-        }
-
-        // refresh token (guarded; if it fails, don't crash)
-        try {
-            const refreshed = await updateSession(req);
-            if (refreshed) return refreshed;
-        } catch {
-            // swallow refresh errors in middleware
-        }
-
-        return NextResponse.next();
-    } catch (err) {
-        // Never throw from middleware; allow request to continue
-        // You can log in Vercel logs if needed:
-        // console.error("Middleware error:", err);
-        return NextResponse.next();
+        const renewed = await refreshToken(session);
+        const res = NextResponse.next();
+        res.cookies.set({
+            name: COOKIE_NAME,
+            value: renewed,
+            httpOnly: true,
+            sameSite: "lax",
+            secure: true,
+            path: "/",
+            maxAge: Math.floor(ACCESS_TTL_MS / 1000), // seconds
+        });
+        return res;
+    } catch {
+        // ignore refresh errors
     }
+
+    return NextResponse.next();
 }
 
 export const config = {

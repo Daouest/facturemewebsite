@@ -1,30 +1,38 @@
+// Edge-safe crypto helpers (works in Middleware / Edge Runtime)
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 export const COOKIE_NAME = "fm_session";
+// 100 minutes
 export const ACCESS_TTL_MS = 100 * 60 * 1000;
 
-const secretKey = "secret"
-const key = new TextEncoder().encode(secretKey)
+const secret = new TextEncoder().encode(process.env.JWT_SECRET || "dev-secret");
 
+// payload type
 export type SessionPayload = JWTPayload & {
     idUser: number;
     factureId?: number;
-}
+};
 
-export async function encrypt(payload: SessionPayload, ttlMs = ACCESS_TTL_MS) {
-    const expSeconds = Math.floor((Date.now() + ttlMs) / 1000)
-    return new SignJWT(payload)
+// sign (issue) a token
+export async function encrypt(
+    payload: SessionPayload,
+    ttlMs: number = ACCESS_TTL_MS
+): Promise<string> {
+    const expSeconds = Math.floor((Date.now() + ttlMs) / 1000); // seconds
+    return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime(expSeconds)
-        .sign(key)
+        .setExpirationTime(expSeconds) // seconds
+        .sign(secret);
 }
 
-export async function decrypt(token: string): Promise<SessionPayload | null> {
+export async function decrypt<T extends JWTPayload = SessionPayload>(
+    token: string
+): Promise<T | null> {
     try {
-        const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"] })
-        return payload as SessionPayload
+        const { payload } = await jwtVerify(token, secret, { algorithms: ["HS256"] });
+        return payload as T;
     } catch {
-        return null
+        return null;
     }
 }
