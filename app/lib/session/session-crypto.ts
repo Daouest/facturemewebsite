@@ -18,11 +18,11 @@ export async function encrypt(
     payload: SessionPayload,
     ttlMs: number = ACCESS_TTL_MS
 ): Promise<string> {
-    const expSeconds = Math.floor((Date.now() + ttlMs) / 1000); // seconds
+    const expSeconds = Math.floor((Date.now() + ttlMs) / 1000);
     return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime(expSeconds) // seconds
+        .setExpirationTime(expSeconds)
         .sign(secret);
 }
 
