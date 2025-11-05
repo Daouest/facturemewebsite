@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 export const COOKIE_NAME = "fm_session";
-export const ACCESS_TTL_MS = 100 * 60 * 100;
+export const ACCESS_TTL_MS = 100 * 60 * 1000;
 
 const secretKey = "secret"
 const key = new TextEncoder().encode(secretKey)
@@ -12,7 +12,7 @@ export type SessionPayload = JWTPayload & {
 }
 
 export async function encrypt(payload: SessionPayload, ttlMs = ACCESS_TTL_MS) {
-    const expSeconds = Math.floor((Date.now() + ttlMs) / 100)
+    const expSeconds = Math.floor((Date.now() + ttlMs) / 1000)
     return new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_NAME, ACCESS_TTL_MS, encrypt, decrypt, type SessionPayload, } from "./session-crypto";
 
+export { COOKIE_NAME, decrypt } from "./session-crypto"
 export function getTokenFromRequest(req: NextRequest): string | null {
     return req.cookies.get(COOKIE_NAME)?.value ?? null
 }

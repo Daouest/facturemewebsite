@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { COOKIE_NAME, decrypt, updateSessionEdge } from "@/app/lib/session/session-mw";
 
 const PUBLIC_PATHS = new Set<string>(["/", "/about", "/favicon.ico"]);
 const PUBLIC_PREFIXES = ["/auth", "/_next", "/api/auth", "/images", "/fonts"];
@@ -11,6 +10,7 @@ function isPublic(pathname: string) {
 }
 
 export async function middleware(req: NextRequest) {
+    const { COOKIE_NAME, decrypt, updateSession } = await import("@/app/lib/session/session-edge")
     try {
         const { pathname } = req.nextUrl;
 
@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
 
         // refresh token (guarded; if it fails, don't crash)
         try {
-            const refreshed = await updateSessionEdge(req);
+            const refreshed = await updateSession(req);
             if (refreshed) return refreshed;
         } catch {
             // swallow refresh errors in middleware
