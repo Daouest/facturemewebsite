@@ -164,19 +164,20 @@ export const DbAddress = getModel('Address', addressSchema);
 
 // export const TauxHoraireFacture = model('TauxHoraireFacture', tauxHoraireFactureSchema);
 
+//fix pour le lowercase avec les username/email
+//le index c'est pour le data racing
 const UserSchema = new mongoose.Schema({
     idUser: { type: Number, required: true, unique: true },
-    username: { type: String, required: true },
+    email: { type: String, required: true, unique: true, index: true, trim: true, lowercase: true },
+    username: { type: String, required: true, unique: true, index: true, trim: true, lowercase: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     idAddress: { type: String, default: null },
     idBusiness: { type: Number, default: null },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
     paidAcces: { type: Boolean, default: false }
-
 }, { collection: 'users' });
 
 //pour fix les erreurs de TS avec les cookies

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import { useUser as useUserContext } from "../context/UserContext";
@@ -8,9 +8,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type AuthMode = "login" | "signup";
+type AuthFormProps = { initialMode?: AuthMode };
 
-type AuthFormProps = {
-  initialMode?: AuthMode;
+type Availability = { email?: boolean; username?: boolean };
+
+const debounce = <F extends (...a: any[]) => any>(fn: F, ms = 400) => {
+  let t: any;
+  return (...a: Parameters<F>) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
 };
 
 export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
@@ -26,19 +33,59 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
   const { setUser } = useUserContext();
   const router = useRouter();
 
-  //doc Record type : https://www.typescriptlang.org/docs/handbook/utility-types.html
-  //facon fancy de set les messages d'erreurs par rapport aux champs de validation
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Live availability checking
+  const [availability, setAvailability] = useState<Availability>({});
+  const [checking, setChecking] = useState(false);
+
+  const checkAvailability = useMemo(
+    () =>
+      debounce(async (emailVal: string, usernameVal: string) => {
+        const emailQ = emailVal.trim();
+        const userQ = usernameVal.trim();
+        if (!emailQ && !userQ) {
+          setAvailability({});
+          return;
+        }
+        setChecking(true);
+        try {
+          const params = new URLSearchParams();
+          if (emailQ) params.set("email", emailQ);
+          if (userQ) params.set("username", userQ);
+          const res = await fetch(
+            `/api/auth/availability?${params.toString()}`,
+            {
+              cache: "no-store",
+            }
+          );
+          if (res.ok) {
+            const data = (await res.json()) as { taken: Availability };
+            setAvailability(data?.taken ?? {});
+          } else {
+            setAvailability({});
+          }
+        } catch {
+          setAvailability({});
+        } finally {
+          setChecking(false);
+        }
+      }, 400),
+    []
+  );
+
+  useEffect(() => {
+    if (mode === "signup") {
+      checkAvailability(email, username);
+    }
+  }, [email, username, mode, checkAvailability]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setErrors({});
-    //pour tests seulement
-    //effacer lorsque les tests sont complétés
-    if (mode == "login") {
-      console.log("Logging : ", { email, password });
+
+    if (mode === "login") {
       setIsSubmitting(true);
       try {
         const res = await fetch("/api/auth/login", {
@@ -53,8 +100,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           return;
         }
 
-        //connexion dans le context
-        //a checker
         setUser({
           id: data.user.idUser,
           username: data.user.username,
@@ -63,7 +108,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           lastName: data.user.lastName,
         });
 
-        //redirect vers le homepage apres la connexion
         router.replace("/homePage");
         router.refresh();
       } catch {
@@ -74,9 +118,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       return;
     }
 
-    //ici justement on fait les verification de chaque champ
-    //la constante "validationErrors" sera definie et redefinie a chaque fois
-    //qu'une validation n'est pas correcte
+    // SIGNUP validation
     const validationErrors: Record<string, string> = {};
     if (!firstName.trim())
       validationErrors.firstName = "First name is required";
@@ -86,9 +128,11 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     if (password !== confirmPassword)
       validationErrors.confirmPassword = "Passwords do not match";
 
-    //si la longeur de l'array est plus grande que 0
-    //alors, il y a une erreur quelque part dans le form.
-    //Donc, on le set dans "setErrors"
+    // If live availability says taken, reflect that before submit
+    if (availability.username)
+      validationErrors.username = "Username déjà utilisé";
+    if (availability.email) validationErrors.email = "Email déjà utilisé";
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -100,23 +144,24 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username,
-          firstName,
-          lastName,
-          email,
+          username: username.trim().toLowerCase(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim().toLowerCase(),
           password,
         }),
       });
       const data = await res.json();
 
       if (!res.ok) {
+        // Handles both 400 (validation) and 409 (duplicate E11000)
         setErrors(
           data?.errors ?? { form: data?.message ?? "Erreur signup au form" }
         );
         return;
       }
 
-      //redirect au login screen apres un bon signup
+      // success → go to check-email page
       router.replace("/auth/email/check-email");
     } catch {
       setErrors({ form: "Erreur du serveur au AuthForm" });
@@ -125,30 +170,36 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     }
   };
 
+  // Red borders if taken
+  const emailTaken = !!availability.email;
+  const usernameTaken = !!availability.username;
+
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
       <div className="w-full max-w-md">
         <form
           onSubmit={handleSubmit}
           aria-busy={isSubmitting}
-          className="flex flex-col w-full p-8 rounded-lg shadow-lg bg-white dark:bg-zinc-900 dark:border dark-zinc-700"
+          className="flex flex-col w-full p-8 rounded-lg shadow-lg bg-white dark:bg-zinc-900 dark:border dark:border-zinc-700"
         >
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
-            {mode == "login" ? "Connexion" : "Inscription"}
+            {mode === "login" ? "Connexion" : "Inscription"}
           </h2>
 
-          {/* Signup field */}
-          {mode == "signup" && (
+          {/* SIGNUP fields */}
+          {mode === "signup" && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 <div>
-                  {/* Names */}
                   <Input
                     label="Prenom"
                     type="text"
                     placeholder="Prenom"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => {
+                      setErrors((p) => ({ ...p, firstName: "" }));
+                      setFirstName(e.target.value);
+                    }}
                     required
                   />
                   {errors.firstName && (
@@ -163,7 +214,10 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                     type="text"
                     placeholder="Nom"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      setErrors((p) => ({ ...p, lastName: "" }));
+                      setLastName(e.target.value);
+                    }}
                     required
                   />
                   {errors.lastName && (
@@ -175,42 +229,93 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               </div>
 
               {/* Username */}
-              <Input
-                label="Nom d'utilisateur"
-                type="text"
-                placeholder="Nom d'utilisateur"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mb-5"
-                required
-              />
+              <div className="mb-5">
+                <Input
+                  label="Nom d'utilisateur"
+                  type="text"
+                  placeholder="Nom d'utilisateur"
+                  value={username}
+                  onChange={(e) => {
+                    setErrors((p) => ({ ...p, username: "" }));
+                    setUsername(e.target.value);
+                  }}
+                  className={`${usernameTaken ? "border-red-500" : ""}`}
+                  required
+                  aria-invalid={usernameTaken || !!errors.username}
+                  aria-describedby="username-help"
+                />
+                <div
+                  id="username-help"
+                  className="flex items-center gap-2 mt-1"
+                >
+                  {checking && (
+                    <span className="text-xs text-zinc-500">Vérification…</span>
+                  )}
+                  {usernameTaken && (
+                    <span className="text-xs text-red-600">
+                      Username déjà utilisé
+                    </span>
+                  )}
+                  {errors.username && (
+                    <span className="text-xs text-red-600">
+                      {errors.username}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-              {/* Email */}
+              {/* Email + confirmation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 <div>
                   <Input
                     label="Courriel"
-                    type="text"
+                    type="email"
                     placeholder="Courriel"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setErrors((p) => ({ ...p, email: "" }));
+                      setEmail(e.target.value);
+                    }}
+                    className={`${emailTaken ? "border-red-500" : ""}`}
                     required
+                    aria-invalid={emailTaken || !!errors.email}
+                    aria-describedby="email-help"
+                    autoComplete="email"
                   />
+                  <div id="email-help" className="flex items-center gap-2 mt-1">
+                    {checking && (
+                      <span className="text-xs text-zinc-500">
+                        Vérification…
+                      </span>
+                    )}
+                    {emailTaken && (
+                      <span className="text-xs text-red-600">
+                        Email déjà utilisé
+                      </span>
+                    )}
+                    {errors.email && (
+                      <span className="text-xs text-red-600">
+                        {errors.email}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Email confirmation */}
                 <div>
                   <Input
-                    label="Confirmation courriel"
-                    type="text"
+                    label="Confirmation"
+                    type="email"
                     placeholder="Confirmation courriel"
                     value={confirmEmail}
-                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    onChange={(e) => {
+                      setErrors((p) => ({ ...p, confirmEmail: "" }));
+                      setConfirmEmail(e.target.value);
+                    }}
                     autoComplete="email"
                     required
                   />
                   {errors.confirmEmail && (
-                    <p className="mt-1 text-cs text-red-600">
+                    <p className="mt-1 text-xs text-red-600">
                       {errors.confirmEmail}
                     </p>
                   )}
@@ -219,8 +324,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             </>
           )}
 
-          {/* Email au login */}
-          {mode == "login" && (
+          {/* LOGIN email */}
+          {mode === "login" && (
             <Input
               label="Courriel"
               type="email"
@@ -234,7 +339,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           )}
 
           {/* Passwords */}
-          {mode == "signup" ? (
+          {mode === "signup" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
               <div>
                 <Input
@@ -242,18 +347,24 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                   type="password"
                   placeholder="Mot de passe"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setErrors((p) => ({ ...p, password: "" }));
+                    setPassword(e.target.value);
+                  }}
                   autoComplete="new-password"
                   required
                 />
               </div>
               <div>
                 <Input
-                  label="Confirmer mot de passe"
+                  label="Confirmation"
                   type="password"
-                  placeholder="Confirmer mot de passe"
+                  placeholder="Confirmez mot de passe"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setErrors((p) => ({ ...p, confirmPassword: "" }));
+                    setConfirmPassword(e.target.value);
+                  }}
                   autoComplete="new-password"
                   required
                 />
@@ -275,39 +386,45 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               required
             />
           )}
+
+          {/* Submit */}
           <div className="flex justify-center mt-4">
             <Button
               type="submit"
               className="px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                (mode === "signup" &&
+                  (availability.email || availability.username || checking))
+              }
             >
               {isSubmitting
                 ? "En traitement"
-                : mode == "login"
+                : mode === "login"
                 ? "Connexion"
                 : "Inscription"}
             </Button>
           </div>
+
+          {/* Server-level form error */}
+          {errors.form && (
+            <p className="mt-4 text-center text-sm text-red-600">
+              {errors.form}
+            </p>
+          )}
         </form>
       </div>
 
-      <div className="mt-5 text-center">
-        {mode === "login" ? (
+      {mode === "login" && (
+        <div className="mt-5 text-center">
           <Link
             href="/auth/signup"
-            className="inline-block text-white dark:text-blue-400 font-semibold hover:underline text-base"
+            className="mt-4 text-sm text-zinc-600 dark:text-zinc-300 text-center underline underline-offset-4"
           >
             Page d'inscription
           </Link>
-        ) : (
-          <Link
-            href="/"
-            className="inline-block text-white dark:text-blue-400 font-semibold hover:underline text-base"
-          >
-            Page de connexion
-          </Link>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

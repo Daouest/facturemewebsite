@@ -1,35 +1,50 @@
-import mongoose from "mongoose";
-import type { Collection, UpdateFilter, WithId } from "mongodb";
-import { connectToDatabase } from "./mongodb";
 
-type CounterDoc = { _id: string; seq: number }
+import mongoose from "mongoose";
+import type { Collection, ModifyResult, Document } from "mongodb";
+import { connectToDatabase } from "./mongodb";
 
 //en gros c'est une facon d'auto-incrementer dans mongoDB
 //source : https://www.mongodb.com/resources/products/platform/mongodb-auto-increment
 
+type CounterDoc = { _id: string; seq: number };
+
+/**
+ * Auto-increment helper for MongoDB counters.
+ * Keeps using Mongoose connection + native collection (your original setup).
+ * Avoids "ConflictingUpdateOperators" by using an aggregation pipeline update.
+ */
 export async function getNextSeq(seqName: string, startAt = 1): Promise<number> {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const db = mongoose.connection.db
+    const db = mongoose.connection.db;
     if (!db) {
-        throw new Error("Erreur lors de la connexion dans avec la DB")
+        throw new Error("Erreur lors de la connexion avec la DB");
     }
 
-    const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters")
+    const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
 
-    const update: UpdateFilter<CounterDoc> = {
-        $inc: { seq: 1 },
-        $setOnInsert: { seq: startAt - 1 },
-    }
+    // Use a pipeline so we can set seq = (ifNull(seq, startAt-1)) + 1
+    const updatePipeline: Document[] = [
+        {
+            $set: {
+                seq: { $add: [{ $ifNull: ["$seq", startAt - 1] }, 1] },
+            },
+        },
+    ];
 
-    const doc: WithId<CounterDoc> | null = await counters.findOneAndUpdate(
+    const result: ModifyResult<CounterDoc> = await counters.findOneAndUpdate(
         { _id: seqName },
-        update,
+        updatePipeline as any, // pipeline updates are valid, TS casts to any for driver types
         {
             upsert: true,
             returnDocument: "after",
-            includeResultMetadata: false,
         }
-    )
-    return doc?.seq ?? startAt
+    );
+
+    const doc = result.value;
+    if (!doc || typeof doc.seq !== "number") {
+        // Fallback: if something odd happens, return startAt
+        return startAt;
+    }
+    return doc.seq;
 }
