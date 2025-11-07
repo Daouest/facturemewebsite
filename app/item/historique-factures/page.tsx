@@ -83,7 +83,7 @@ export default function HistoricInvoices() {
 
   return (
     <>
-      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100 pb-8">
         <Header />
 
         {/* Back arrow fixed under the header */}

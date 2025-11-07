@@ -27,6 +27,8 @@ const fr = {
   newInvoice: "➕ Nouvelle facture",
   catalogue: "🔷 Mes items",
   profile: "😎 Profil",
+  myClients: "👥 Mes clients",
+  newClient: "➕ Nouveau client",
 
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
@@ -83,6 +85,8 @@ const en = {
   newInvoice: "➕ New invoice",
   catalogue: "🔷 My items",
   profile: "😎 Profile",
+  myClients: "👥 My clients",
+  newClient: "➕ New client",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",

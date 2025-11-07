@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         purpose: "email-verify"
     })
 
-    const verifyUrl = new URL("/api/auth/confirm", APP_URL)
+    const verifyUrl = new URL("/api/auth/confirm", "https://factureme.io")
     verifyUrl.searchParams.set("token", token)
 
     await sendHtmlEmail({

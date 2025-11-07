@@ -33,7 +33,7 @@ export default function ItemCatalogue() {
     }));
 
     if (newCount) countRef.current = newCount;
-    if (res.status == 304) {
+    if (res.status === 304) {
       throw new Error("Items non Modifier");
     }
 
@@ -64,54 +64,56 @@ export default function ItemCatalogue() {
 
   return (
     <>
-      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
         <Header />
 
-        {/* Back arrow*/}
+        {/* Back arrow */}
         <Link
           href={"/homePage"}
-          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-2 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
           aria-label="Retour à l’accueil"
           title="Retour à l’accueil"
         >
-          <AiOutlineArrowLeft className="h-5 w-5 text-gray-800" />
+          <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
+          <span className="sr-only">Retour</span>
         </Link>
 
         <main className="flex-1 pt-[80px]">
           <div className="max-w-6xl mx-auto px-6 pb-10">
-            <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 sm:p-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+              {/* Title row */}
               <div className="grid grid-cols-3 items-center">
                 <div className="col-span-1" />
-                <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center">
-                  Catalogue
+                <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-100 text-center">
+                  Mes produits
                 </h1>
                 <div className="col-span-1 flex justify-end">
                   {/* Create Item button */}
                   <Link
                     href="/item/creation-item"
-                    className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white font-medium shadow hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center rounded-xl bg-sky-500 px-4 py-2 text-white font-medium shadow hover:bg-sky-400 transition-colors ring-1 ring-sky-400/40"
                     aria-label="Créer un item"
                   >
-                    Ajouter un nouvel item
+                    +
                   </Link>
                 </div>
               </div>
 
-              {/* Divider line separating title from body */}
-              <div className="my-4 border-t border-gray-300" />
+              {/* Divider */}
+              <div className="my-4 border-t border-white/10" />
 
-              {isLoading ? (
+              {status !== "error" && isLoading ? (
                 <div className="flex justify-center items-center py-10">
                   <Image
                     src="/Loading_Paperplane.gif"
                     alt="loading"
                     width={300}
                     height={300}
-                    className="object-contain max-w-full h-auto"
+                    className="object-contain max-w-full h-auto opacity-90"
                   />
                 </div>
               ) : (
-                <div className="overflow-y-auto">
+                <div className="overflow-y-auto rounded-xl border border-white/10 bg-white/0">
                   <Table rows={items ?? []} />
                 </div>
               )}

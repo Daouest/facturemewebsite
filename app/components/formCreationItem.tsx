@@ -1,14 +1,16 @@
 "use client";
-import react, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AiOutlineAlert } from "react-icons/ai";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "../context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function FormCreationItem() {
   const { formData, setFormData } = useFormData();
   const { user } = useUser();
+  const router = useRouter();
   const [price, setPrice] = useState<string>("");
 
   const [Errormessage, setErrorMessage] = useState({
@@ -22,16 +24,10 @@ export default function FormCreationItem() {
     if (file && formData !== null) {
       const fileUrl = URL.createObjectURL(file);
       const reader = new FileReader();
-
       reader.onload = () => {
         const imageBase64 = reader.result as string;
-        setFormData({
-          ...formData,
-          file: fileUrl,
-          image: imageBase64,
-        });
+        setFormData({ ...formData, file: fileUrl, image: imageBase64 });
       };
-
       reader.readAsDataURL(file);
     }
   };
@@ -76,98 +72,79 @@ export default function FormCreationItem() {
       }, 3000);
       return;
     }
-    setShowAlert(true);
 
     try {
       const numereicPrice = parseFloat(
         price.replace(/\s/g, "").replace(",", ".")
       );
-      const dataToSend = {
-        ...formData,
-        prix: numereicPrice,
-      };
+      const dataToSend = { ...formData, prix: numereicPrice };
 
       const reponse = await fetch("/api/item", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formData: dataToSend,
-          userData: user,
-        }),
+        body: JSON.stringify({ formData: dataToSend, userData: user }),
       });
 
       if (!reponse.ok) {
         throw new Error("Erreur serveur creation-item");
       }
 
-      const data = await reponse.json();
-      console.log("Réponse du serveur", data);
+      await reponse.json();
+
+      // On success, redirect to item-catalogue
+      router.push("/item/item-catalogue");
     } catch (err) {
       console.error("Erreur dans l'envoi des données [creation-item]", err);
-    } finally {
+      setErrorMessage({
+        error: true,
+        message: "Erreur lors de la création de l'article",
+      });
+      setShowAlert(true);
       setTimeout(() => {
         setShowAlert(false);
-        setFormData({
-          ...formData,
-          itemNom: "",
-          description: "",
-          prix: 0,
-          image: "",
-        });
-        window.location.reload();
-      }, 1500);
+        setErrorMessage({ error: false, message: "" });
+      }, 3000);
     }
   };
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-    if (
+    return (
       formData.itemNom.trim() !== "" &&
       formData.description.trim() !== "" &&
       p >= 0
-    ) {
-      return true;
-    }
-    return false;
+    );
   };
 
   return (
     <form
       onSubmit={sendFormulaire}
-      className="
-        w-full max-w-2xl mx-auto
-        bg-white border border-gray-100
-        rounded-2xl shadow-lg
-        px-6 sm:px-8 py-8 sm:py-10
-        mt-6
-        space-y-6
-      "
+      className={[
+        "w-full max-w-2xl mx-auto mt-6 space-y-6",
+        "rounded-2xl border border-white/10 bg-white/5 backdrop-blur",
+        "shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] px-6 sm:px-8 py-8 sm:py-10",
+      ].join(" ")}
     >
-      {showAlert && (
+      {showAlert && Errormessage.error && (
         <Alert
-          className={`w-full ${
-            Errormessage.error
-              ? "bg-red-50 border-red-200"
-              : "bg-green-50 border-green-200"
-          }`}
+          className={[
+            "w-full rounded-xl",
+            "border",
+            "bg-rose-500/10 border-rose-400/30",
+            "text-slate-100",
+          ].join(" ")}
         >
-          <AiOutlineAlert
-            className={`h-4 w-4 shrink-0 ${
-              Errormessage.error ? "text-red-600" : "text-green-600"
-            }`}
-          />
-          <AlertTitle className="text-sm font-semibold">
-            {Errormessage.error ? "Erreur" : "Succès"}
-          </AlertTitle>
-          {!Errormessage.error ? (
-            <AlertDescription className="text-green-700">
-              Formulaire envoyé avec succès.
-            </AlertDescription>
-          ) : (
-            <AlertDescription className="text-red-700">
-              {Errormessage.message}
-            </AlertDescription>
-          )}
+          <div className="flex items-start gap-3">
+            <AiOutlineAlert className="h-5 w-5 text-rose-300" />
+            <div>
+              <AlertTitle className="text-slate-100 text-sm font-semibold">
+                Erreur
+              </AlertTitle>
+              <AlertDescription className="text-rose-300">
+                {Errormessage.message}
+              </AlertDescription>
+            </div>
+          </div>
         </Alert>
       )}
 
@@ -175,12 +152,17 @@ export default function FormCreationItem() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <label
           htmlFor="itemNom"
-          className="text-gray-800 font-semibold sm:w-1/3"
+          className="text-slate-200 font-semibold sm:w-1/3"
         >
           Nom item :
         </label>
         <input
-          className="h-11 w-full sm:flex-1 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+          className={[
+            "h-11 w-full sm:flex-1 rounded-xl px-3 py-2",
+            "text-slate-100 placeholder:text-slate-400",
+            "bg-white/5 border border-white/10",
+            "focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40",
+          ].join(" ")}
           type="text"
           id="itemNom"
           name="itemNom"
@@ -195,12 +177,17 @@ export default function FormCreationItem() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <label
           htmlFor="description"
-          className="text-gray-800 font-semibold sm:w-1/3"
+          className="text-slate-200 font-semibold sm:w-1/3"
         >
           Description :
         </label>
         <input
-          className="h-11 w-full sm:flex-1 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+          className={[
+            "h-11 w-full sm:flex-1 rounded-xl px-3 py-2",
+            "text-slate-100 placeholder:text-slate-400",
+            "bg-white/5 border border-white/10",
+            "focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40",
+          ].join(" ")}
           type="text"
           id="description"
           name="description"
@@ -213,11 +200,16 @@ export default function FormCreationItem() {
 
       {/* Prix */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label htmlFor="prix" className="text-gray-800 font-semibold sm:w-1/3">
+        <label htmlFor="prix" className="text-slate-200 font-semibold sm:w-1/3">
           Prix item :
         </label>
         <input
-          className="h-11 w-full sm:flex-1 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+          className={[
+            "h-11 w-full sm:flex-1 rounded-xl px-3 py-2",
+            "text-slate-100 placeholder:text-slate-400",
+            "bg-white/5 border border-white/10",
+            "focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40",
+          ].join(" ")}
           type="text"
           id="prix"
           autoComplete="on"
@@ -233,12 +225,19 @@ export default function FormCreationItem() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <label
           htmlFor="imageUpload"
-          className="text-gray-800 font-semibold sm:w-1/3"
+          className="text-slate-200 font-semibold sm:w-1/3"
         >
           Ajouter une image :
         </label>
         <input
-          className="h-11 w-full sm:flex-1 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 file:mr-4 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className={[
+            "h-11 w-full sm:flex-1 rounded-xl px-3 py-2",
+            "text-slate-100 file:text-slate-100 placeholder:text-slate-400",
+            "bg-white/5 border border-white/10",
+            "focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40",
+            "file:mr-4 file:py-2 file:px-3 file:rounded-md file:border-0",
+            "file:bg-sky-500/10 file:text-sky-200 hover:file:bg-sky-500/20",
+          ].join(" ")}
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
@@ -250,7 +249,7 @@ export default function FormCreationItem() {
         <div className="sm:flex-1 flex justify-center">
           <Button
             type="submit"
-            className="w-full sm:w-2/3 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow"
+            className="w-full sm:w-2/3 h-12 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors border border-sky-400/40 shadow-sm"
           >
             Créer item
           </Button>

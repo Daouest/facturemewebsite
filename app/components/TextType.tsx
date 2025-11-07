@@ -11,7 +11,6 @@ import React, {
 } from "react";
 import { gsap } from "gsap";
 import "../css/TextType.css";
-import { clear } from "console";
 
 type VariableSpeed = { min: number; max: number } | number | false;
 type TextTypeProps = {
@@ -123,6 +122,7 @@ const TextType: React.FC<TextTypeProps> = ({
 
     const setT = (fn: () => void, ms: number) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(fn, ms);
     };
 
     const executeTypingAnimation = () => {

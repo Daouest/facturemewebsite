@@ -1,6 +1,6 @@
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import { DbObjet, DbBusiness, DbTauxHoraire, DbClient, DbFacture, DbObjetFacture, DbFactureHoraire, DbUsers, DbAddress } from "@/app/lib/models";
-import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, TauxHoraire } from "@/app/lib/definitions";
+import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, ItemFieldWithPrice, TauxHoraire } from "@/app/lib/definitions";
 import { ItemData, UserData, Address, Client, ClientAffichage } from "@/app/lib/definitions";
 import { calculateTotalByWorkedHours, calculateTaxes } from "@/app/lib/utils";
 import { getUserFromCookies } from "@/app/lib/session/session-node";
@@ -241,28 +241,30 @@ export async function getAddressInfo(idAddress: number) {
 export async function fetchObjectsAndRates() {
     try {
         const user = await getUserFromCookies();
-        if (!user) return [] as ItemField[];
+        if (!user) return [] as ItemFieldWithPrice[];
 
         const objects = await DbObjet.find(
             { idUser: user.idUser },
-            { idObjet: 1, productName: 1, _id: 0 }
+            { idObjet: 1, productName: 1, price: 1, _id: 0 }
         ).sort({ productName: 1 }).lean();
 
         const rates = await DbTauxHoraire.find(
             { idUser: user.idUser },
-            { idObjet: 1, workPosition: 1, _id: 0 }
+            { idObjet: 1, workPosition: 1, hourlyRate: 1, _id: 0 }
         ).sort({ workPosition: 1 }).lean();
 
-        const productObjects: ItemField[] = objects.map((object) => ({
+        const productObjects: ItemFieldWithPrice[] = objects.map((object) => ({
             id: object.idObjet,
             name: object.productName,
-            type: 'product',
+            type: 'product' as const,
+            price: object.price,
         }));
 
-        const hourlyObjects: ItemField[] = rates.map((rate) => ({
+        const hourlyObjects: ItemFieldWithPrice[] = rates.map((rate) => ({
             id: rate.idObjet,
             name: rate.workPosition,
-            type: 'hourly',
+            type: 'hourly' as const,
+            hourlyRate: rate.hourlyRate,
         }));
 
         return [...productObjects, ...hourlyObjects];

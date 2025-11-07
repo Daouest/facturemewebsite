@@ -64,32 +64,28 @@ export default function ItemCatalogue() {
     return tableRows ?? [];
   };
 
-    const {
-        data: factures,
-        isLoading,
-        status,
-
-    } = useQuery<Facture[]>({
-        queryKey: ["factures"],
-        queryFn: (async () => {
-            try {
-                return await fetchData();
-            } catch (err: any) { //erreur 304 
-                if (err.message === "Pas modifié") {
-
-                    return Promise.reject({ status: 304 });
-                }
-                throw err;
-            }
-        }),
-        refetchInterval: refreshSeconds.seconds,//10 sec
-        refetchOnWindowFocus: true,
-        refetchOnReconnect: true,
-        staleTime: refreshSeconds.staleTime //  les données son considérées comme bonne après 8 secondes
-
-    })
-
-   
+  const {
+    data: factures,
+    isLoading,
+    status,
+  } = useQuery<Facture[]>({
+    queryKey: ["factures"],
+    queryFn: async () => {
+      try {
+        return await fetchData();
+      } catch (err: any) {
+        //erreur 304
+        if (err.message === "Pas modifié") {
+          return Promise.reject({ status: 304 });
+        }
+        throw err;
+      }
+    },
+    refetchInterval: refreshSeconds.seconds, //10 sec
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: refreshSeconds.staleTime, //  les données son considérées comme bonne après 8 secondes
+  });
 
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
@@ -105,7 +101,7 @@ export default function ItemCatalogue() {
   }, [factures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
 
   return (
-    <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+    <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100 pb-8">
       <Header />
 
       {/* Back arrow*/}

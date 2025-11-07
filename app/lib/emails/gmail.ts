@@ -57,10 +57,19 @@ export async function sendHtmlEmail({
     }
 
     const gmail = getGmailClient();
-    const res = await gmail.users.messages.send({
-        userId: "me",
-        requestBody: { raw: encoded },
-    });
-
-    return res.data;
+    try {
+        const res = await gmail.users.messages.send({
+            userId: "me",
+            requestBody: { raw: encoded },
+        });
+        return res.data;
+    } catch (error: any) {
+        console.error("Gmail API Error:", {
+            message: error.message,
+            code: error.code,
+            status: error.status,
+            details: error.response?.data,
+        });
+        throw new Error(`Failed to send email: ${error.message}. You may need to regenerate your Gmail refresh token.`);
+    }
 }

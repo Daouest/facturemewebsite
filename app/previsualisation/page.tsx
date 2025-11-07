@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import Button from "../components/Button";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 //la previsualisation represente-t-elle la facture en cours (non approuvee | session) ou une facture archivee (approuvee | BD)?
 //todo.....
@@ -24,63 +26,94 @@ import Image from "next/image";
 //afficher le total de la facture (sous-total, taxes, total)
 //...................................................................................................
 
-let factureCherchee = false;
+let factureCherchee = false; // conservé (non utilisé)
+
+// Helpers (formatage monnaie & date)
+const fmtMoney = (n: number) =>
+  (n ?? 0).toLocaleString("fr-CA", { style: "currency", currency: "CAD" });
+
+const fmtDateTime = (iso: string) => {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString("fr-CA", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  } catch {
+    return iso;
+  }
+};
 
 //if logged in show previsualisation page
 export default function Previsualisation() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
   //states
-  const [factureId, setFactureId] = useState<number | null>(null);
+  const [factureId, setFactureId] = useState<number | null>(null); // conservé pour cohérence avec l'original
   const [facture, setFacture] = useState<any>(null);
   const [session, setSession] = useState<any>(null); //seulement besoin pour l'affichage //a retirer
+  const [error, setError] = useState<string | null>(null);
 
   //la totale useEffect
   useEffect(() => {
     const setAndFetchSession = async () => {
-      //utiliser ce code pour effectuer des tests de session........................
-      //0.    set les donnees (doit etre enleve)
-      // const res0 = await fetch('/api/set-facture', {
-      //     method: 'POST',
-      //     headers: {
-      //         'Content-Type': 'application/json',
-      //     },
-      //     credentials: 'include',
-      //     body: JSON.stringify({ factureId: 2 }),
-      // });
-      //
-      // if(res0.ok){
-      //............................................................................
+      // Check if factureId is in URL query params (from calendar)
+      const factureIdFromUrl = searchParams.get("factureId");
 
-      //1.    fetch les donnees
       try {
         setLoading(true);
+        setError(null);
+
+        // If factureId is in URL, set it in the session first
+        if (factureIdFromUrl) {
+          const setRes = await fetch("/api/set-facture", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ factureId: parseInt(factureIdFromUrl) }),
+          });
+
+          if (!setRes.ok) {
+            console.error("Failed to set facture in session");
+            setLoading(false);
+            setError("Impossible de définir la facture dans la session.");
+            return;
+          }
+          setFactureId(parseInt(factureIdFromUrl)); // conserve l’intention de l’état
+        }
+
+        //1.    fetch les donnees
         const res = await fetch("/api/previsualisation");
 
         if (res.ok) {
           //2.    chercher les details
           const data = await res.json();
           if (data) setFacture(data);
+        } else {
+          throw new Error("Échec du chargement des données de la facture.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Erreur", err);
         setSession(null);
+        setError(err?.message || "Une erreur est survenue.");
       } finally {
         setLoading(false);
       }
-      // } /* test de session */
     };
     setAndFetchSession();
-  }, []);
+  }, [searchParams]);
 
   if (loading) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-zinc-800">
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
         <Header />
         <div className="pt-10 flex flex-col items-center">
-          <h1 className="text-3xl font-bold">Prévisualisation</h1>
-          <p className="mt-4">
+          <h1 className="text-3xl font-bold text-slate-100">
+            Prévisualisation
+          </h1>
+          <p className="mt-4 text-slate-300/80">
             Prévisualiser vos informations avant de les imprimer.
           </p>
           <Image
@@ -88,7 +121,7 @@ export default function Previsualisation() {
             alt="Chargement..."
             width={200}
             height={200}
-            className="object-contain max-w-full h-auto"
+            className="object-contain max-w-full h-auto mt-4"
           />
         </div>
         <Footer />
@@ -98,28 +131,82 @@ export default function Previsualisation() {
 
   console.log("facture:", facture);
 
+  const valid =
+    facture &&
+    facture.user &&
+    facture.client &&
+    facture.facture &&
+    typeof facture === "object";
+
+  if (!valid) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+        <Header />
+        <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center text-slate-200 shadow mt-10">
+          <h2 className="text-2xl font-semibold">
+            {error ? "Erreur" : "Aucune donnée"}
+          </h2>
+          <p className="mt-2 text-slate-300/80">
+            {error
+              ? error
+              : "Impossible d’afficher la prévisualisation pour le moment."}
+          </p>
+          <div className="mt-6 flex gap-3 justify-center">
+            <Link href="/homePage">
+              <span className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-slate-100 hover:bg-white/10">
+                Retour à l’accueil
+              </span>
+            </Link>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sky-200 hover:bg-sky-500/20"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
   if (facture && facture.user && facture.client && facture.facture) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-between bg-gray-100 dark:bg-zinc-800">
+      <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
         <Header />
+
+        {/* Back arrow */}
+        <button
+          onClick={() => router.back()}
+          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors"
+          aria-label="Retour"
+          title="Retour"
+        >
+          <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
+          <span className="sr-only">Retour</span>
+        </button>
 
         <div
           id="bigContainer"
-          className="w-full max-w-5xl flex-grow bg-gray-50 rounded-xl mt-20 mb-8 shadow-sm"
+          className="w-full max-w-5xl flex-grow rounded-2xl mt-20 mb-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] border border-white/10 bg-white/5 backdrop-blur"
         >
-          <div className="pt-10 flex flex-col items-center">
-            <h1 className="text-3xl font-bold">Prévisualisation</h1>
-            <p className="mt-4">
+          <div className="pt-10 flex flex-col items-center px-6 sm:px-8">
+            <h1 className="text-3xl font-bold text-slate-100">
+              Prévisualisation
+            </h1>
+            <p className="mt-2 text-slate-300/80">
               Prévisualiser vos informations avant de les imprimer.
             </p>
+
             {userComponent(facture.user)}
             {clientComponent(facture.client)}
             {invoiceComponent(facture.facture)}
-            <div className="mb-8 flex justify-between">
+
+            <div className="mb-8 mt-4 w-full max-w-3xl flex flex-col sm:flex-row gap-3 sm:justify-between">
               <Button
                 type="button"
                 variant="secondary"
-                className="mt-3 block mx-auto text-center px-5 py-2"
+                className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-white/15 !bg-white/5 !text-slate-100 hover:!bg-white/10"
                 onClick={() => window.history.back()}
               >
                 Retour
@@ -127,7 +214,7 @@ export default function Previsualisation() {
               <Button
                 type="button"
                 variant="primary"
-                className="mt-3 block mx-auto text-center px-5 py-2"
+                className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-sky-400/40 !bg-sky-500/10 !text-sky-200 hover:!bg-sky-500/20"
                 onClick={() => router.push(`/invoices/-1/print`)}
               >
                 Imprimer la facture
@@ -141,7 +228,7 @@ export default function Previsualisation() {
     );
   } else {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-between bg-gray-100 dark:bg-zinc-800">
+      <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
         <Header />
         <div></div>
         <Footer />
@@ -164,15 +251,16 @@ function userComponent(infoArrayUser: any) {
 
   return (
     <div className="mt-8 w-full px-8 mb-8">
-      <h2 className="text-xl font-bold mb-4">Informations de l'émetteur</h2>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-4 text-slate-100">
+        Informations de l'émetteur
+      </h2>
+      <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-lg shadow-md text-slate-100">
         <p className="mb-2">
-          <span className="font-semibold">Nom:</span> {infoArrayUser["name"]}
+          <span className="text-slate-300/80 mr-2">Nom:</span>{" "}
+          {infoArrayUser["name"]}
         </p>
         <div className="flex flex-row gap-4 mb-2">
-          <p className="mb-2">
-            <span className="font-semibold">Addresse:</span>
-          </p>
+          <p className="mb-2 text-slate-300/80 font-medium">Addresse:</p>
           <div>
             <p>{infoArrayUser["address"]}</p>
             <p>{`${infoArrayUser["city"]}`}</p>
@@ -196,15 +284,16 @@ function clientComponent(infoArrayClient: any) {
 
   return (
     <div className="mt-8 w-full px-8 mb-8">
-      <h2 className="text-xl font-bold mb-4">Informations du client</h2>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-4 text-slate-100">
+        Informations du client
+      </h2>
+      <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-lg shadow-md text-slate-100">
         <p className="mb-2">
-          <span className="font-semibold">Nom:</span> {infoArrayClient["name"]}
+          <span className="text-slate-300/80 mr-2">Nom:</span>{" "}
+          {infoArrayClient["name"]}
         </p>
         <div className="flex flex-row gap-4 mb-2">
-          <p className="mb-2">
-            <span className="font-semibold">Addresse:</span>
-          </p>
+          <p className="mb-2 text-slate-300/80 font-medium">Addresse:</p>
           <div>
             <p>{infoArrayClient["address"]}</p>
             <p>{`${infoArrayClient["city"]}`}</p>
@@ -219,165 +308,200 @@ function clientComponent(infoArrayClient: any) {
 function invoiceComponent(infoArray: any) {
   return (
     <div className="mt-8 w-full px-8 mb-8">
-      <h2 className="text-xl font-bold mb-4">Informations de vente</h2>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-4 text-slate-100">
+        Informations de vente
+      </h2>
+      <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-lg shadow-md text-slate-100">
         <div className="mb-4">
           <div>
             <p className="mb-2">
-              <span className="font-semibold">Numero de facture:</span>{" "}
+              <span className="text-slate-300/80 mr-2">Numero de facture:</span>{" "}
               {infoArray["factureNumber"]}
             </p>
             <div className="flex flex-row gap-4 mb-2">
               <p className="mb-2">
-                <span className="font-semibold">Date:</span> {infoArray["date"]}
+                <span className="text-slate-300/80 mr-2">Date:</span>{" "}
+                {infoArray["date"]}
               </p>
               <p className="mb-2">
-                <span className="font-semibold">Heure:</span>{" "}
+                <span className="text-slate-300/80 mr-2">Heure:</span>{" "}
                 {infoArray["time"]}
               </p>
             </div>
           </div>
+
           <div>
             <p className="mb-2 font-semibold">Numéros de taxes:</p>
             {infoArray["taxesNumbers"] != undefined &&
             infoArray["taxesNumbers"].length > 0
               ? infoArray["taxesNumbers"].map((taxNum: any, index: number) => (
                   <p key={index} className="mb-2">
-                    <span className="font-semibold">
+                    <span className="text-slate-300/80 mr-2">
                       {taxNum.taxName} Number:
-                    </span>{" "}
-                    {taxNum.taxNumber}
+                    </span>
+                    <span className="font-medium">{taxNum.taxNumber}</span>
                   </p>
                 ))
               : null}
           </div>
         </div>
+
         {infoArray["colonnesHoraire"] != undefined &&
         infoArray["colonnesHoraire"].length > 0 ? (
-          <div className="mt-4">
-            <h3 className="text-lg font-bold mb-2">Détails des services</h3>
-            <table className="w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border border-gray-300 px-4 py-2">Poste</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Taux horaire
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Heure de début
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Heure de fin
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Pause</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Total d'heures
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {infoArray["colonnesHoraire"].map(
-                  (item: any, index: number) => (
-                    <tr
-                      key={index}
-                      className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-                    >
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.workPosition}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        ${item.hourlyRate.toFixed(2)}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {new Date(item.startTime).toLocaleString("en-CA")}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {new Date(item.endTime).toLocaleString("en-CA")}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.lunchTimeInMinutes} mins
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.totalHours} hrs
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        ${item.total.toFixed(2)}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
+          <div className="mt-4 rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/10 bg-white/5 font-semibold">
+              Détails des services
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto text-sm">
+                <thead>
+                  <tr className="bg-white/5 text-slate-300">
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Poste
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Taux horaire
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Heure de début
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Heure de fin
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Pause
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Total d'heures
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {infoArray["colonnesHoraire"].map(
+                    (item: any, index: number) => (
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0 ? "bg-white/0" : "bg-white/5"
+                        }
+                      >
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.workPosition}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtMoney(item.hourlyRate)}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtDateTime(item.startTime)}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtDateTime(item.endTime)}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.lunchTimeInMinutes} mins
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.totalHours} hrs
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtMoney(item.total)}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
+
         {infoArray["colonnesUnitaires"] != undefined &&
         infoArray["colonnesUnitaires"].length > 0 ? (
-          <div className="mt-4">
-            <h3 className="text-lg font-bold mb-2">Détails des produits</h3>
-            <table className="w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border border-gray-300 px-4 py-2">Produit</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Description
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Quantité</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Prix unitaire
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {infoArray["colonnesUnitaires"].map(
-                  (item: any, index: number) => (
-                    <tr
-                      key={index}
-                      className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-                    >
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.productName}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.description}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {item.quantity}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        ${item.pricePerUnit.toFixed(2)}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        ${item.total.toFixed(2)}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
+          <div className="mt-4 rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/10 bg-white/5 font-semibold">
+              Détails des produits
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto text-sm">
+                <thead>
+                  <tr className="bg-white/5 text-slate-300">
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Produit
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Description
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Quantité
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Prix unitaire
+                    </th>
+                    <th className="border border-white/10 px-4 py-2 text-left">
+                      Total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {infoArray["colonnesUnitaires"].map(
+                    (item: any, index: number) => (
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0 ? "bg-white/0" : "bg-white/5"
+                        }
+                      >
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.productName}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.description}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {item.quantity}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtMoney(item.pricePerUnit)}
+                        </td>
+                        <td className="border border-white/10 px-4 py-2">
+                          {fmtMoney(item.total)}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
-        <div className="mt-4">
+
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
           <h3 className="text-lg font-bold mb-2">Résumé</h3>
           <p className="mb-2">
-            <span className="font-semibold">Sous-total:</span> $
-            {infoArray["sousTotal"].toFixed(2)}
+            <span className="text-slate-300/80 mr-2">Sous-total:</span>
+            <span className="font-semibold">
+              {fmtMoney(infoArray["sousTotal"])}
+            </span>
           </p>
           {infoArray["taxes"] != undefined && infoArray["taxes"].length > 0
             ? infoArray["taxes"].map((tax: any, index: number) => (
                 <p key={index} className="mb-2">
-                  <span className="font-semibold">
+                  <span className="text-slate-300/80 mr-2">
                     {tax.name} ({tax.rate}%):
-                  </span>{" "}
-                  ${tax.amount.toFixed(2)}
+                  </span>
+                  <span className="font-semibold">{fmtMoney(tax.amount)}</span>
                 </p>
               ))
             : null}
-          <hr className="mb-2"></hr>
-          <p className="mb-2">
-            <span className="font-semibold">Total:</span> $
-            {infoArray["total"].toFixed(2)}
+          <hr className="my-2 border-white/10" />
+          <p className="mb-2 text-xl">
+            <span className="text-slate-300/80 mr-2">Total:</span>
+            <span className="font-bold text-sky-200">
+              {fmtMoney(infoArray["total"])}
+            </span>
           </p>
         </div>
       </div>

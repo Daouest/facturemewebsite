@@ -148,60 +148,60 @@ export default function EditProfileForm() {
     <div className="grid grid-cols-1 gap-8">
       {/* Section: Infos du profil */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
           Informations du profil
         </h2>
-        <div className="my-4 border-t border-gray-200" />
+        <div className="my-4 border-t border-white/10" />
 
         <form
           onSubmit={saveProfile}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Prénom
             </label>
             <Input
               value={form.firstName}
               onChange={onChange("firstName")}
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Nom
             </label>
             <Input
               value={form.lastName}
               onChange={onChange("lastName")}
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nom d’utilisateur
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              Nom d'utilisateur
             </label>
             <Input
               value={form.username}
               onChange={onChange("username")}
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Courriel
             </label>
             <Input
               value={form.email}
               onChange={onChange("email")}
               type="email"
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
@@ -209,16 +209,16 @@ export default function EditProfileForm() {
           <div className="sm:col-span-2 mt-2 flex items-center justify-end gap-3">
             <button
               disabled={saving}
-              className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 disabled:opacity-60 transition-colors shadow"
+              className="rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium px-4 py-2 hover:bg-sky-500/30 disabled:opacity-60 transition-colors"
               type="submit"
             >
               {saving ? "En traitement..." : "Sauvegarder"}
             </button>
             {saved === "ok" && (
-              <span className="text-green-700 text-sm">Sauvegardé!</span>
+              <span className="text-green-300 text-sm">Sauvegardé!</span>
             )}
             {saved === "err" && (
-              <span className="text-red-700 text-sm">
+              <span className="text-red-300 text-sm">
                 Erreur dans la sauvegarde!
               </span>
             )}
@@ -228,17 +228,17 @@ export default function EditProfileForm() {
 
       {/* Section: Mot de passe */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
           Mot de passe
         </h2>
-        <div className="my-4 border-t border-gray-200" />
+        <div className="my-4 border-t border-white/10" />
 
         <form
           onSubmit={changePassword}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4"
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Mot de passe actuel
             </label>
             <input
@@ -247,13 +247,13 @@ export default function EditProfileForm() {
                 setPassword((p) => ({ ...p, currentPassword: e.target.value }))
               }
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Nouveau mot de passe
             </label>
             <input
@@ -262,13 +262,13 @@ export default function EditProfileForm() {
                 setPassword((p) => ({ ...p, newPassword: e.target.value }))
               }
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Confirmer le nouveau
             </label>
             <input
@@ -280,7 +280,7 @@ export default function EditProfileForm() {
                 }))
               }
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
               required
             />
           </div>
@@ -288,18 +288,18 @@ export default function EditProfileForm() {
           <div className="sm:col-span-3 mt-2 flex items-center justify-end gap-3">
             <button
               disabled={savingPassword}
-              className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 disabled:opacity-60 transition-colors shadow"
+              className="rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium px-4 py-2 hover:bg-sky-500/30 disabled:opacity-60 transition-colors"
               type="submit"
             >
               {savingPassword ? "En traitement..." : "Changer le mot de passe"}
             </button>
             {savedPassword === "ok" && (
-              <span className="text-green-700 text-sm">
+              <span className="text-green-300 text-sm">
                 Mot de passe modifié
               </span>
             )}
             {savedPassword === "err" && (
-              <span className="text-red-700 text-sm">
+              <span className="text-red-300 text-sm">
                 Erreur dans la modification
               </span>
             )}

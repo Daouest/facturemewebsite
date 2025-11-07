@@ -25,137 +25,207 @@ export function Table<T extends TableItemType | Facture>({
   const [isClick, setIsClick] = useState(false);
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
-
   const router = useRouter();
+
   useEffect(() => {
+    if (id == null || !isClick) return;
+
+    let isCancelled = false;
+    const controller = new AbortController();
+
     const setMySession = async () => {
-      const res = await fetch("/api/set-facture", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          factureId: id !== null && id !== undefined ? id : null,
-        }),
-      });
+      try {
+        const res = await fetch("/api/set-facture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ factureId: id }),
+          signal: controller.signal,
+        });
 
-      const data = await res.json();
-
-      if (data && isClick) {
-        router.push("/previsualisation");
-      }
-      if (res.ok) {
-        console.log("Session set!");
-      } else {
-        console.error("Failed to set session");
+        // even if API returns a payload, we only need success here
+        if (!isCancelled && res.ok) {
+          router.push("/previsualisation");
+        } else if (!res.ok) {
+          console.error("Failed to set session");
+        }
+      } catch (e) {
+        if (!isCancelled) console.error("Session error:", e);
       }
     };
-    if (id !== null && id !== undefined && isClick) {
-      console.log("id dans le useEffect de table:", id);
-      setMySession();
-    }
-  }, [id]);
 
+    setMySession();
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
+  }, [id, isClick, router]);
+
+  // Empty state
   if (!rows || rows.length === 0) {
     return (
-      <div className=" h-[200px] w-full">
-        <p className="flex mt-20 text-red-600 text-2xl font-bold justify-center items-center">
-          {t("noData")}
+      <div
+        className={[
+          "rounded-2xl p-6 border border-dashed border-white/15 bg-white/5 backdrop-blur",
+          "text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
+        ].join(" ")}
+      >
+        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30">
+          <svg
+            className="h-6 w-6 text-sky-300"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+        </div>
+        <p className="text-slate-200 text-base font-semibold">{t("noData")}</p>
+        <p className="mt-1 text-sm text-slate-300/80">
+          {/** Optional guidance; keep or remove */}
+          {langage === "fr"
+            ? "Ajoutez des éléments pour les voir apparaître ici."
+            : "Add items to see them here."}
         </p>
       </div>
     );
   }
 
+  // ITEMS TABLE
   if (isTableItem(rows[0])) {
     const itemRows = rows as TableItemType[];
     return (
-      <table
-        className={`min-w-full border border-white shadow-2xl ${
-          className ?? ""
-        }`}
+      <div
+        className={["w-full overflow-x-auto rounded-xl", className ?? ""].join(
+          " "
+        )}
       >
-        <thead className="bg-gray-300">
-          <tr>
-            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
-              {t("productName")}
-            </th>
-            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
-              {t("description")}
-            </th>
-            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
-              {t("price")}
-            </th>
-            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
-              {t("image")}
-            </th>
-          </tr>
-        </thead>
-        <tbody className="border border-white">
-          {itemRows.map((row, index) => (
-            <tr
-              key={index}
-              onClick={() => router.push(`/item/detail/${row.idObjet}`)}
-              className="cursor-pointer bg-gray-50 hover:bg-gray-400 transition"
-            >
-              <td className="px-8 py-4 text-base text-black border">
-                {row.productName}
-              </td>
-              <td className="px-8 py-4 text-base text-black border">
-                {row.description}
-              </td>
-              <td className="px-8 py-4 text-base text-black border">
-                {formatIntoDecimal(row.price, "fr-CA", "CAD")}
-              </td>
-              <td className="px-8 py-4 text-base text-black border">
-                <ImageFromBd id={row.idObjet} name={row.productName} />
-              </td>
+        <table className="min-w-full border-separate border-spacing-0 text-sm">
+          <thead>
+            <tr className="bg-white/5 backdrop-blur">
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("productName")}
+              </th>
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("description")}
+              </th>
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("price")}
+              </th>
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("image")}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody className="divide-y divide-white/10">
+            {itemRows.map((row) => (
+              <tr
+                key={row.idObjet}
+                onClick={() => router.push(`/item/detail/${row.idObjet}`)}
+                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
+              >
+                <td className="px-4 py-3 text-slate-200 align-top">
+                  {row.productName}
+                </td>
+                <td className="px-4 py-3 text-slate-300/90 align-top">
+                  {row.description}
+                </td>
+                <td className="px-4 py-3 text-slate-100 align-top">
+                  {formatIntoDecimal(row.price, "fr-CA", "CAD")}
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <div className="ring-1 ring-white/10 rounded-md overflow-hidden inline-block">
+                    <ImageFromBd id={row.idObjet} name={row.productName} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
-  } else if (isTableFacture(rows[0])) {
+  }
+
+  // FACTURES LIST
+  if (isTableFacture(rows[0])) {
     const factureRows = rows as Facture[];
     return (
-      <div className={`grid gap-4 ${className ?? ""}`}>
-        {factureRows.map((row, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between p-4 rounded-xl shadow-lg bg-white  hover:bg-gray-300 transition cursor cursor-pointer"
+      <div className={["grid gap-3", className ?? ""].join(" ")}>
+        {factureRows.map((row) => (
+          <button
+            key={row.idFacture}
             onClick={() => {
               setIsClick(true);
               setId(row.idFacture);
             }}
+            className={[
+              "w-full text-left rounded-xl px-4 py-4",
+              "border border-white/10 bg-white/5 backdrop-blur",
+              "shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
+              "hover:bg-white/10 hover:border-white/20 transition-colors",
+              "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
+            ].join(" ")}
+            aria-label={`${t("invoice")} #${row.factureNumber} - ${
+              row.nomClient
+            }`}
           >
-            <div>
-              <h4 className="text-lg font-semibold text-gray-800 ">
-                {t("clientName")}: {row.nomClient}
-              </h4>
-              <p className="text-sm text-gray-500">
-                {t("invoice")} #{row.factureNumber}
-              </p>
-            </div>
-    <div className="flex flex-row gap-8 px-4 py-4 lg:gap-10 lg:px-16  ">
-              <div className="lg:ml-[60%]  text-right sm:flex flex-col">
-                <p className="text-sm font-medium text-blue-600">
-                  {row.typeFacture}
+            <div className="flex items-center justify-between gap-4">
+              {/* Left: client + invoice number */}
+              <div className="min-w-0">
+                <h4 className="text-base font-semibold text-slate-100 truncate">
+                  {t("clientName")}: {row.nomClient}
+                </h4>
+                <p className="text-xs text-slate-300/80">
+                  {t("invoice")} #{row.factureNumber}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-500">
+
+              {/* Right: meta */}
+              <div className="flex flex-row items-center gap-6">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-sky-300">
+                    {row.typeFacture}
+                  </p>
+                </div>
+                <div className="text-xs text-slate-300/80 whitespace-nowrap">
                   {dateToSting(row.dateFacture)}
-                </p>
-              </div>
-              <div
-                className={`text-sm ${
-                  row.isPaid
-                    ? "text-green-600"
-                    : "text-red-600 ml-[-30px] max-sm:text-xs"
-                }`}
-              >
-                <p>{row.isPaid ? "PAYÉE" : "NON PAYÉE"}</p>
+                </div>
+                <div
+                  className={[
+                    "text-sm font-semibold whitespace-nowrap",
+                    row.isPaid ? "text-emerald-300" : "text-rose-300",
+                  ].join(" ")}
+                >
+                  {row.isPaid
+                    ? langage === "fr"
+                      ? "PAYÉE"
+                      : "PAID"
+                    : langage === "fr"
+                    ? "NON PAYÉE"
+                    : "UNPAID"}
+                </div>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );

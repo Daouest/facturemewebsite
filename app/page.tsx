@@ -3,6 +3,7 @@
 import Image from "next/image";
 import AuthForm from "@/app/components/AuthForm";
 import Header from "./components/Header";
+import Footer from "./components/footer";
 
 export default function Home() {
   return (
@@ -43,6 +44,7 @@ export default function Home() {
           {/* Optional subtle background tint on the right for cohesion */}
           <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-transparent via-blue-950/20 to-blue-900/30" />
         </div>
+        <Footer />
       </main>
     </>
   );

@@ -52,7 +52,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       setFormData((prev) => ({
         ...prev,
         _id: data._id,
-        idObjet: idObjet,
+        idObjet,
         itemNom: data?.productName ?? "",
         prix: data?.price ?? 0,
         description: data?.description ?? "",
@@ -76,16 +76,10 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     if (file && formData !== null) {
       const fileUrl = URL.createObjectURL(file);
       const reader = new FileReader();
-
       reader.onload = () => {
         const imageBase64 = reader.result as string;
-        setFormData({
-          ...formData,
-          file: fileUrl,
-          image: imageBase64,
-        });
+        setFormData({ ...formData, file: fileUrl, image: imageBase64 });
       };
-
       reader.readAsDataURL(file);
     }
   };
@@ -121,20 +115,54 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     if (data === undefined || data === null) {
       router.push("/not-found");
     }
-  }, [data]);
+  }, [data, isLoading, router]);
+
   async function updateItemRequest(dataToSend: unknown) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        formData: dataToSend,
-        userData: user,
-      }),
+      body: JSON.stringify({ formData: dataToSend, userData: user }),
     });
     if (!res.ok) throw new Error("Erreur lors de la mise à jour");
     return true;
   }
-  const updateItem = async (e: React.FormEvent) => {
+
+  const deleteItemRequest = async (id: any) => {
+    const res = await fetch("/api/item", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formData: id ?? formData.idObjet,
+        userData: user,
+      }),
+    });
+    if (!res.ok) throw Error("Erreur lors de la suppréssion");
+    return true;
+  };
+
+  const mutation = useMutation({
+    mutationFn: updateItemRequest,
+    onSuccess: (ok) => {
+      queryClient.setQueryData(["items", idObjet], ok);
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+    },
+    onError: (error) => {
+      console.error("Erreur de la modification :", error);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteItemRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      router.push("/item/item-catalogue");
+    },
+    onError: (error) => {
+      console.error("Erreur de suppression :", error);
+    },
+  });
+
+  const updateItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formVerified()) {
       setErrorMessage({
@@ -144,32 +172,22 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       setShowAlert(true);
       setTimeout(() => {
         setShowAlert(false);
-        setErrorMessage({
-          error: false,
-          message: "",
-        });
+        setErrorMessage({ error: false, message: "" });
       }, 3000);
-
       return;
     }
 
     setShowAlert(true);
 
-    let numereicPrice;
+    let numericPrice: number | undefined;
     let dataToSend = formData;
+
     if (!fileChanged) {
-      numereicPrice = parseFloat(
-        price
-          .replace(/\s/g, "") // retire les espaces
-          .replace(",", ".")
-      );
-      dataToSend = {
-        ...formData,
-        prix: numereicPrice,
-      };
+      numericPrice = parseFloat(price.replace(/\s/g, "").replace(",", "."));
+      dataToSend = { ...formData, prix: numericPrice };
     }
+
     mutation.mutate(dataToSend, {
-      //on lance la mutation
       onSuccess: () => {
         setTimeout(() => {
           setShowAlert(false);
@@ -186,65 +204,10 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       },
     });
   };
-  const deleteItemRequest = async (idObjet: any) => {
-    const res = await fetch("/api/item", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        formData: idObjet ?? formData.idObjet,
-        userData: user,
-      }),
-    });
-    if (!res.ok) {
-      throw Error("Erreur lors de la suppréssion");
-    }
-    return true;
-  };
-  const mutation = useMutation({
-    mutationFn: updateItemRequest,
-    onSuccess: (updateItem) => {
-      queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
-      queryClient.invalidateQueries({ queryKey: ["items"] }); // invalide la liste d'items pour un refresh
-    },
-    onError: (error) => {
-      console.error("Erreur de la modification :", error);
-    },
-  });
-  const deleteMutation = useMutation({
-    mutationFn: deleteItemRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      router.push("/item/item-catalogue");
-    },
-    onError: (error) => {
-      console.error("Erreur de suppression :", error);
-    },
-  });
-
-  const deleteItemById = async () => {
-    try {
-      const res = await fetch("/api/item", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formData: formData.idObjet,
-          userData: user,
-        }),
-      });
-      if (res.ok) {
-        router.push("/item/item-catalogue");
-      } else {
-        console.log("Item non supprimé");
-      }
-    } catch (err) {
-      console.error("Erreur dans la fonction deleteItemsById", err);
-    }
-  };
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-    if (p !== lastPrice && p > 0 && fileChanged) return true;
-    if (p !== lastPrice && p > 0 && !fileChanged) return true;
+    if (p !== lastPrice && p > 0) return true;
     if (p === lastPrice && fileChanged) return true;
     return false;
   };
@@ -254,32 +217,32 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     fileInputRef.current?.click();
   };
 
-  // Loading state with consistent shell
+  // ---------- LOADING ----------
   if (isLoading) {
     return (
-      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
         <Header />
         <Link
           href="/item/item-catalogue"
-          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-2 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
           aria-label="Retour"
           title="Retour"
         >
-          <AiOutlineArrowLeft className="h-5 w-5 text-gray-800" />
+          <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
         </Link>
         <main className="flex-1 pt-[80px]">
           <div className="max-w-4xl mx-auto px-6 pb-10">
-            <div className="bg-white shadow-lg rounded-2xl p-8 flex flex-col items-center">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">
                 Détails
               </h1>
-              <div className="my-4 border-t border-gray-200 w-full" />
+              <div className="my-4 border-t border-white/10" />
               <Image
                 src="/Loading_Paperplane.gif"
                 alt="Chargement..."
                 width={200}
                 height={200}
-                className="object-contain max-w-full h-auto"
+                className="object-contain max-w-full h-auto opacity-90 mx-auto"
               />
             </div>
           </div>
@@ -289,28 +252,28 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     );
   }
 
-  // Error state with consistent shell
+  // ---------- ERROR ----------
   if (isError) {
     return (
-      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
         <Header />
         <Link
           href="/item/item-catalogue"
-          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-2 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
           aria-label="Retour"
           title="Retour"
         >
-          <AiOutlineArrowLeft className="h-5 w-5 text-gray-800" />
+          <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
         </Link>
         <main className="flex-1 pt-[80px]">
           <div className="max-w-4xl mx-auto px-6 pb-10">
-            <div className="bg-white shadow-lg rounded-2xl p-8 text-center">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">
                 Détails
               </h1>
-              <div className="my-4 border-t border-gray-200" />
-              <p className="text-lg text-gray-700">
-                Erreur dans le chargement de l'items
+              <div className="my-4 border-t border-white/10" />
+              <p className="text-lg text-slate-300">
+                Erreur dans le chargement de l&apos;item
               </p>
             </div>
           </div>
@@ -320,46 +283,51 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     );
   }
 
-  // Normal render
+  // ---------- NORMAL ----------
   return (
-    <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
+    <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
       <Header />
 
       {/* Back arrow */}
       <Link
         href="/item/item-catalogue"
-        className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-2 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
         aria-label="Retour"
         title="Retour"
       >
-        <AiOutlineArrowLeft className="h-5 w-5 text-gray-800" />
+        <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
       </Link>
 
       <main className="flex-1 pt-[80px]">
         <div className="max-w-5xl mx-auto px-6 pb-10">
-          <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8">
-            {/* Title + divider */}
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 sm:p-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 text-center">
               Détails
             </h1>
-            <div className="my-4 border-t border-gray-200" />
+            <div className="my-4 border-t border-white/10" />
 
             {/* Alert */}
             {showAlert && (
-              <Alert className="bg-gray-700 mt-2 w-full sm:w-[80%] md:w-[70%] mx-auto flex flex-col items-center text-white p-4 rounded-lg">
-                <AiOutlineAlert className="h-5 w-5 mb-1" />
-                <AlertTitle className="text-center text-white w-full">
-                  Message
-                </AlertTitle>
-                {!Errormessage.error ? (
-                  <AlertDescription className="text-center text-green-300">
-                    Formulaire envoyé avec succès.
-                  </AlertDescription>
-                ) : (
-                  <AlertDescription className="text-center text-red-400">
-                    {Errormessage.message}
-                  </AlertDescription>
-                )}
+              <Alert className="bg-white/5 border border-white/10 text-slate-100 mt-2 w-full sm:w-[80%] md:w-[70%] mx-auto rounded-xl">
+                <div className="flex items-start gap-3 p-4">
+                  <AiOutlineAlert
+                    className={`h-5 w-5 ${
+                      Errormessage.error ? "text-rose-300" : "text-emerald-300"
+                    }`}
+                  />
+                  <div className="flex-1">
+                    <AlertTitle className="text-slate-100">Message</AlertTitle>
+                    {!Errormessage.error ? (
+                      <AlertDescription className="text-emerald-300">
+                        Formulaire envoyé avec succès.
+                      </AlertDescription>
+                    ) : (
+                      <AlertDescription className="text-rose-300">
+                        {Errormessage.message}
+                      </AlertDescription>
+                    )}
+                  </div>
+                </div>
               </Alert>
             )}
 
@@ -371,13 +339,13 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
                 {/* Right column (texts/price) */}
-                <div className="flex flex-col gap-6 md:gap-8 justify-center items-center">
-                  <div className="flex flex-col items-center w-full gap-2">
+                <div className="flex flex-col gap-6 md:gap-8 justify-center">
+                  <div className="flex flex-col w-full gap-2">
                     <label
                       htmlFor="Nom"
-                      className="text-sm sm:text-base font-medium"
+                      className="text-xs font-medium text-slate-300"
                     >
-                      Nom de l'item
+                      Nom de l&apos;item
                     </label>
                     <input
                       type="text"
@@ -385,14 +353,14 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                       name="Nom"
                       value={formData?.itemNom}
                       readOnly
-                      className="text-center border border-gray-300 rounded-2xl py-2 w-[90%] sm:w-[70%]"
+                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
 
-                  <div className="flex flex-col items-center w-full gap-2">
+                  <div className="flex flex-col w-full gap-2">
                     <label
                       htmlFor="description"
-                      className="text-sm sm:text-base font-medium"
+                      className="text-xs font-medium text-slate-300"
                     >
                       {t("description")}
                     </label>
@@ -402,14 +370,14 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                       name="description"
                       value={formData?.description}
                       readOnly
-                      className="text-center border border-gray-300 rounded-2xl py-2 w-[90%] sm:w-[70%]"
+                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
 
-                  <div className="flex flex-col items-center w-full gap-2">
+                  <div className="flex flex-col w-full gap-2">
                     <label
                       htmlFor="prix"
-                      className="text-sm sm:text-base font-medium"
+                      className="text-xs font-medium text-slate-300"
                     >
                       {t("price")} $
                     </label>
@@ -425,61 +393,69 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                       )}
                       value={price}
                       onChange={handleChange}
-                      className="text-center border-2 hover:border-blue-600 border-gray-300 rounded-2xl py-2 w-[90%] sm:w-[70%]"
+                      className="text-slate-100 bg-white/5 border-2 border-white/10 hover:border-sky-400/40 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
                 </div>
 
                 {/* Left column (image) */}
-                <div className="flex flex-col items-center justify-center w-full relative">
-                  <p className="text-black font-semibold mb-2">
-                    Modifier l'image
+                <div className="flex flex-col items-center justify-center w-full">
+                  <p className="text-slate-200 font-semibold mb-3">
+                    Modifier l&apos;image
                   </p>
 
-                  {formData?.image ? (
-                    <div
-                      className="flex items-center justify-center w-full h-full p-4 cursor-pointer transform transition-transform duration-300 hover:scale-110"
+                  <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur ring-1 ring-white/10 shadow-[0_8px_24px_-20px_rgba(0,0,0,0.6)]">
+                    <button
+                      type="button"
                       onClick={handleClickImage}
+                      className="absolute right-3 top-3 z-10 rounded-lg bg-sky-500/90 px-3 py-1 text-xs font-medium text-white hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300/50"
+                      aria-label="Changer l'image"
                     >
-                      <Image
-                        src={formData.image}
-                        priority={true}
-                        alt="FactureMe"
-                        width={300}
-                        height={300}
-                        className="object-contain max-w-full h-auto rounded-lg"
-                      />
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  ) : formData.file ? (
-                    <div className="flex items-center justify-center w-full h-full p-4">
-                      <Image
-                        src={formData.file}
-                        priority={true}
-                        alt="FactureMe"
-                        width={300}
-                        height={300}
-                        className="object-contain max-w-full h-auto rounded-lg"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full p-4">
-                      <Image
-                        src="/default_image.jpg"
-                        priority={true}
-                        alt="FactureMe"
-                        width={300}
-                        height={300}
-                        className="object-contain max-w-full h-auto rounded-lg"
-                      />
-                    </div>
-                  )}
+                      Changer
+                    </button>
+
+                    {formData?.image ? (
+                      <div className="flex items-center justify-center w-full h-full p-4">
+                        <Image
+                          src={formData.image}
+                          priority
+                          alt="FactureMe"
+                          width={600}
+                          height={400}
+                          className="object-contain max-w-full h-auto"
+                        />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </div>
+                    ) : formData?.file ? (
+                      <div className="flex items-center justify-center w-full h-full p-4">
+                        <Image
+                          src={formData.file}
+                          priority
+                          alt="FactureMe"
+                          width={600}
+                          height={400}
+                          className="object-contain max-w-full h-auto"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full p-8">
+                        <Image
+                          src="/default_image.jpg"
+                          priority
+                          alt="FactureMe"
+                          width={600}
+                          height={400}
+                          className="object-contain max-w-full h-auto opacity-90"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -488,7 +464,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                 <Button
                   type="submit"
                   variant="outline"
-                  className="bg-black text-white text-sm sm:text-base px-6 py-2 rounded-lg w-[80%] sm:w-auto"
+                  className="rounded-xl bg-sky-500 text-white hover:bg-sky-400 border border-sky-400/40 shadow-sm"
                 >
                   Modifier
                 </Button>
@@ -496,21 +472,21 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="bg-black text-white text-sm sm:text-base px-6 py-2 rounded-lg w-[80%] sm:w-auto"
+                  className="rounded-xl bg-white/5 text-slate-100 hover:bg-white/10 border border-white/10"
                   onClick={() => router.push("/item/item-catalogue")}
                 >
                   Retour
                 </Button>
 
-                <div
+                <button
+                  type="button"
                   title="Supprimer l'item"
-                  className="flex flex-row justify-end items-end cursor-pointer"
-                  onClick={() => {
-                    deleteMutation.mutate(idObjet);
-                  }}
+                  onClick={() => deleteMutation.mutate(idObjet)}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 focus:outline-none focus:ring-2 focus:ring-rose-400/30"
                 >
-                  <AiOutlineDelete size={25} color="red" />
-                </div>
+                  <AiOutlineDelete className="h-5 w-5" />
+                  Supprimer
+                </button>
               </div>
             </form>
           </div>
