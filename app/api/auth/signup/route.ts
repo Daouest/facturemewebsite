@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod"
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import bcrypt from "bcryptjs";
 import { DbUsers } from "@/app/lib/models";
@@ -7,6 +6,8 @@ import { SignupSchema } from "@/app/lib/schemas/auth";
 import { APP_URL } from "@/app/lib/schemas/env";
 import { getNextSeq } from "@/app/lib/db/getNextSeq";
 import mongoose from "mongoose";
+import type { Db, Collection } from "mongodb";
+import type { CounterDoc } from "@/app/lib/db/getNextSeq";
 
 export const runtime = "nodejs";
 
@@ -60,7 +61,10 @@ export async function POST(req: Request) {
             )
         }
 
-        const idUser = await getNextSeq("users")
+        const db = mongoose.connection.db as unknown as Db;
+        const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
+
+        const idUser = await getNextSeq(counters, "users");
         const hash = await bcrypt.hash(password, 12);
 
         const user = await DbUsers.create({

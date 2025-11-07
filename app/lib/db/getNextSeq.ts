@@ -1,50 +1,34 @@
-
-import mongoose from "mongoose";
-import type { Collection, ModifyResult, Document } from "mongodb";
-import { connectToDatabase } from "./mongodb";
-
+import type { Collection, ModifyResult, Document, WithId } from "mongodb";
 //en gros c'est une facon d'auto-incrementer dans mongoDB
 //source : https://www.mongodb.com/resources/products/platform/mongodb-auto-increment
 
-type CounterDoc = { _id: string; seq: number };
+export type CounterDoc = { _id: string; seq: number };
 
 /**
  * Auto-increment helper for MongoDB counters.
  * Keeps using Mongoose connection + native collection (your original setup).
  * Avoids "ConflictingUpdateOperators" by using an aggregation pipeline update.
  */
-export async function getNextSeq(seqName: string, startAt = 1): Promise<number> {
-    await connectToDatabase();
 
-    const db = mongoose.connection.db;
-    if (!db) {
-        throw new Error("Erreur lors de la connexion avec la DB");
-    }
-
-    const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
-
-    // Use a pipeline so we can set seq = (ifNull(seq, startAt-1)) + 1
+export async function getNextSeq(
+    counters: Collection<CounterDoc>,
+    seqName: string,
+    startAt = 1
+): Promise<number> {
     const updatePipeline: Document[] = [
-        {
-            $set: {
-                seq: { $add: [{ $ifNull: ["$seq", startAt - 1] }, 1] },
-            },
-        },
+        { $set: { seq: { $add: [{ $ifNull: ["$seq", startAt - 1] }, 1] } } },
     ];
 
     const result: ModifyResult<CounterDoc> = await counters.findOneAndUpdate(
         { _id: seqName },
-        updatePipeline as any, // pipeline updates are valid, TS casts to any for driver types
+        updatePipeline as any,
         {
             upsert: true,
             returnDocument: "after",
+            includeResultMetadata: true as const, // 👈 forces ModifyResult<T>
         }
     );
 
     const doc = result.value;
-    if (!doc || typeof doc.seq !== "number") {
-        // Fallback: if something odd happens, return startAt
-        return startAt;
-    }
-    return doc.seq;
+    return doc?.seq ?? startAt;
 }
