@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/footer";
 import Link from "next/link";
-
+import { AiOutlineEdit } from 'react-icons/ai';
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
@@ -122,7 +122,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       router.push("/not-found");
     }
   }, [data]);
-  async function updateItemRequest(dataToSend: unknown) {
+  async function updateItemRequest(dataToSend: nay) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -221,25 +221,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     },
   });
 
-  const deleteItemById = async () => {
-    try {
-      const res = await fetch("/api/item", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formData: formData.idObjet,
-          userData: user,
-        }),
-      });
-      if (res.ok) {
-        router.push("/item/item-catalogue");
-      } else {
-        console.log("Item non supprimé");
-      }
-    } catch (err) {
-      console.error("Erreur dans la fonction deleteItemsById", err);
-    }
-  };
+
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
@@ -484,23 +466,16 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
               </div>
 
               {/* Buttons */}
-              <div className="mt-8 mb-2 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="bg-black text-white text-sm sm:text-base px-6 py-2 rounded-lg w-[80%] sm:w-auto"
+              <div className="mt-8 gap-10 mb-2 flex flex-col sm:flex-row cursor cursor-pointer justify-center items-center w-full">
+                <div
+                onClick={updateItem}
                 >
-                  Modifier
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="bg-black text-white text-sm sm:text-base px-6 py-2 rounded-lg w-[80%] sm:w-auto"
-                  onClick={() => router.push("/item/item-catalogue")}
-                >
-                  Retour
-                </Button>
+                  <AiOutlineEdit
+                    
+                    color="black"
+                    size={27}
+                  />
+                </div>
 
                 <div
                   title="Supprimer l'item"

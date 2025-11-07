@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import { useUser as useUserContext } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+import useLocalStorage from "../lib/hooks/useLocalStorage";
 type AuthMode = "login" | "signup";
 
 type AuthFormProps = {
@@ -22,14 +22,99 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
   const { setUser } = useUserContext();
   const router = useRouter();
 
+
   //doc Record type : https://www.typescriptlang.org/docs/handbook/utility-types.html
   //facon fancy de set les messages d'erreurs par rapport aux champs de validation
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({ form: "" })
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBlocked, setIsBlocked] = useState<boolean | null>(false);
+  const [stopTimeout, setStopTimeout] = useState<boolean>(false);
+  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>("errorCount", 4);
+  const [isUserIsFind,setIsUserIsFind] = useState(true);
+  useEffect(() => {
+    console.log("storedErrorCount", storedErrorCount);
+
+    if (storedErrorCount !== 0) return;
+    fetchBlock();
+  }, [storedErrorCount]);
+ useEffect(() => {
+    setStoredErrorCount(4);
+    setIsUserIsFind(true);
+  }, []);
+
+  useEffect(() => {
+    setStopTimeout(false);
+
+    if (storedErrorCount !== 0) return;
+
+
+    const interval = setInterval(() => {
+      expiredBlockUser(); // appel initial
+      console.log("stopTimeout", stopTimeout)
+      if (stopTimeout) {
+        clearInterval(interval);
+        return;
+      }
+      expiredBlockUser();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [storedErrorCount, stopTimeout]);
+
+  const fetchBlock = async () => {
+    // On envoie une requête au serveur pour créer le cookie
+    try {
+      const res = await fetch("/api/auth/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockUser: true }),
+      })
+      if (!res.ok) {
+        console.error("Erreur lors de la création du cookie");
+        return;
+      }
+      console.log("Cookie de blocage défini avec succès !");
+
+    } catch (err) {
+      console.error("Erreur dans le blockage de cookie", err)
+    }
+  }
+
+  const expiredBlockUser = async () => {
+    let falseCount = 0;
+    try {
+      const res = await fetch("/api/auth/status");
+      const data = await res.json();
+      console.log("data.blockUser", data.blockUser);
+
+      if (data.blockUser === false) {
+        falseCount++;
+        if (falseCount >= 1) {
+          console.log("dans if flaseCount", falseCount)
+          setIsBlocked(false);
+          // setErrorCount(5);
+          setStoredErrorCount(5);
+          setStopTimeout(false);
+          return;
+        }
+
+      } else {
+        falseCount = 0;
+        setIsBlocked(true);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la vérification du cookie", err);
+    }
+
+
+  };
+  useEffect(()=>{
+   console.log("isUserIsFind ",isUserIsFind  )
+
+  },[isUserIsFind])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +125,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     if (mode == "login") {
       console.log("Logging : ", { email, password });
       setIsSubmitting(true);
+      setIsUserIsFind(true)
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
@@ -47,20 +133,25 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
-
         if (!res.ok) {
-          setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
+
+          setErrors({ form: data.message ?? "Erreur in longin" });
+          setStoredErrorCount(prev => (prev > 1 ? prev - 1 : 0));
+          setIsUserIsFind(false);
+
           return;
         }
 
         //connexion dans le context
         //a checker
+        setIsUserIsFind(true);
         setUser({
           id: data.user.idUser,
           username: data.user.username,
           email: data.user.email,
           firstName: data.user.firstName,
           lastName: data.user.lastName,
+          isAdmin: data.user.isAdmin,
         });
 
         //redirect vers le homepage apres la connexion
@@ -108,14 +199,14 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
         }),
       });
       const data = await res.json();
-
       if (!res.ok) {
+
         setErrors(
           data?.errors ?? { form: data?.message ?? "Erreur signup au form" }
         );
         return;
       }
-
+      //isaacbvital@gmail.com
       //redirect au login screen apres un bon signup
       router.replace("/auth/email/check-email");
     } catch {
@@ -136,6 +227,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
             {mode == "login" ? "Connexion" : "Inscription"}
           </h2>
+
+          <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
+            {errors.form !== ""  && !isUserIsFind ? `Il vous reste ${storedErrorCount } ${storedErrorCount <= 1 ? "tentavive" : "tentavives"} ` : ""}
+          </p>
+          <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
+            {storedErrorCount === 0 ? `Vous avez étét bloqué revenez dans 1 minute` : ""}
+          </p>
 
           {/* Signup field */}
           {mode == "signup" && (
@@ -227,8 +325,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Courriel"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mb-5"
+              className={`mb-5 ${!isUserIsFind   ? " border-2 border-red-600" : ""}`}
               autoComplete="email"
+              disabled={isBlocked ? true : false}
               required
             />
           )}
@@ -271,21 +370,22 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mb-7"
+              className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
+              disabled={isBlocked ? true : false}
               required
             />
           )}
           <div className="flex justify-center mt-4">
             <Button
               type="submit"
-              className="px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors"
-              disabled={isSubmitting}
+              className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors ${isBlocked || isSubmitting ? "" : "cursor cursor-pointer"}`}
+              disabled={isSubmitting || isBlocked ? true : false}
             >
               {isSubmitting
                 ? "En traitement"
                 : mode == "login"
-                ? "Connexion"
-                : "Inscription"}
+                  ? "Connexion"
+                  : "Inscription"}
             </Button>
           </div>
         </form>

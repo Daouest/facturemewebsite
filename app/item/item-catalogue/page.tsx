@@ -56,10 +56,10 @@ export default function ItemCatalogue() {
         throw err;
       }
     },
-    refetchInterval: refreshSeconds.seconds,
-    refetchOnWindowFocus: true,
+    refetchInterval:refreshSeconds.seconds,
+    refetchOnWindowFocus: "always",
     refetchOnReconnect: true,
-    staleTime: 8000,
+    staleTime: refreshSeconds.staleTime,
   });
 
   return (
@@ -100,7 +100,7 @@ export default function ItemCatalogue() {
               {/* Divider line separating title from body */}
               <div className="my-4 border-t border-gray-300" />
 
-              {isLoading ? (
+              {isLoading && status !== "error" ? (
                 <div className="flex justify-center items-center py-10">
                   <Image
                     src="/Loading_Paperplane.gif"

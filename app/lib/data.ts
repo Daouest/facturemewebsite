@@ -667,3 +667,29 @@ export async function getAllTaxesNumbers(businessId: number) {
         throw new Error('Failed to fetch business.');
     }
 }
+
+export async function getClients(){
+      const clients = await DbClient.find();
+        if (!clients) {
+
+            console.error("Les clients n'ont pas été  trouvé");
+            return null
+
+        }
+        //console.log("Client trouvé", clients);
+
+        return clients;
+}
+
+export async function getClientById(idClient:number){
+      const existingClient = await DbClient.findOne({ idClient: idClient });
+        if (!existingClient) {
+
+            console.error("Client non trouvé ou vous n'avez pas la permission de le modifier");
+            return {success:false};
+
+        }
+        console.log("Client trouvé", existingClient.nomClient);
+
+        return existingClient.nomClient;
+}

@@ -11,7 +11,6 @@ import { useLangageContext } from "../context/langageContext";
 import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
 import { refreshSeconds } from "@/app/lib/constante";
-import TextType from "@/app/components/TextType";
 export default function HomePage() {
   const { langage, setLangage } = useLangageContext();
   const { user } = useUser();
@@ -20,7 +19,7 @@ export default function HomePage() {
 
   const options = [
     { value: "fr", label: "Français" },
-    { value: "en", label: "Anglais" },
+    { value: "en", label: "English" },
   ];
 
   const t = createTranslator(langage);
@@ -57,8 +56,6 @@ export default function HomePage() {
     if (res.status == 304) {
       throw new Error("Pas modifié");
     }
-    console.log("listeItems", listeItems);
-
     return listeItems ?? [];
   };
 
@@ -87,7 +84,7 @@ export default function HomePage() {
     staleTime: refreshSeconds.staleTime //  les données son considérées comme bonne après 8 secondes
 
   })
-  
+
   return (
     <>
       <Header />
@@ -105,20 +102,11 @@ export default function HomePage() {
             />
             <h2 className="text-lg font-semibold text-gray-800">
               {t("hello") + " "}
-              <TextType
-                text={[
-                  `${user?.firstName
+              {     `${user?.firstName
                     ?.charAt(0)
-                    .toUpperCase()}${user?.firstName?.substring(1, 5)} ${
-                    user?.lastName?.charAt(0).toUpperCase() ?? ""
-                  }${user?.lastName?.substring(1, 5) ?? ""}`,
-                ]}
-                className="font-semibold"
-                typingSpeed={75}
-                pauseDuration={1500}
-                showCursor={false}
-                cursorCharacter="|"
-              />
+                    .toUpperCase()}${user?.firstName?.substring(1, 5) ?? ""} ${user?.lastName?.charAt(0).toUpperCase() ?? ""
+                  }${user?.lastName?.substring(1, 5) ?? ""}`}
+            
             </h2>
             <p className="text-sm text-gray-500 mb-6">{t("dashboard")}</p>
 
@@ -159,6 +147,16 @@ export default function HomePage() {
               >
                 {t("profile")}
               </Link>
+              {
+                user?.isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                   👤 {t("admin_section")}
+                  </Link>
+                )
+              }
             </nav>
           </div>
 

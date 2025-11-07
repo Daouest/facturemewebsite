@@ -2,7 +2,6 @@
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/footer";
 import FormCreationItem from "@/app/components/formCreationItem";
-import { useFormData } from "@/app/context/FormContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { createTranslator } from "@/app/lib/utils";
@@ -10,7 +9,6 @@ import { useLangageContext } from "../../context/langageContext";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
 export default function CreationPage() {
-  const { formData } = useFormData();
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
 
