@@ -78,7 +78,7 @@ export default function TickePage() {
                         <div className="my-4 border-t border-gray-200" />
                         {status !== "error" && isLoading ? (
                             <div className="flex justify-center items-center py-10">
-                                <p className="text-[18px] font-semibold"> Loading...</p>
+                                <p className="text-[18px] font-semibold animate-pulse"> Loading...</p>
                             </div>
                         ) : (
                             <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar">

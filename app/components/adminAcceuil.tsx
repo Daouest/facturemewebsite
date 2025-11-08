@@ -90,7 +90,7 @@ export default function AdminAcceuil() {
 
     const renderedList = useMemo(() => {
         if (dataOutput.length === 0) {
-            return <p className="self-center text-gray-400">Aucune donnée trouvée</p>;
+            return <p className="self-center text-gray-700">Aucune donnée trouvée</p>;
         }
 
         if (showData.users) {

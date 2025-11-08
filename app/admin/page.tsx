@@ -115,13 +115,13 @@ export default function AdminPage() {
 
                         <div className="flex flex-col  w-full h-full">
                             {showPage.tickePage && (
-                                <Suspense fallback={<div className="self-center"> Loading...</div>}>
+                                <Suspense fallback={<div className="self-center animate-pulse"> Loading...</div>}>
                                     <TickePage />
                                 </Suspense>
                             )}
 
                             {showPage.stats && (
-                                <Suspense fallback={<div className="self-center"> Loading...</div>}>
+                                <Suspense fallback={<div className="self-center animate-pulse"> Loading...</div>}>
                                     <StatsFactureMe />
                                 </Suspense>
                             )}
