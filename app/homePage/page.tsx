@@ -11,8 +11,6 @@ import { useLangageContext } from "../context/langageContext";
 import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
 import { refreshSeconds } from "@/app/lib/constante";
-import TextType from "@/app/components/TextType";
-
 export default function HomePage() {
   const { langage, setLangage } = useLangageContext();
   const { user } = useUser();
@@ -21,7 +19,7 @@ export default function HomePage() {
 
   const options = [
     { value: "fr", label: "Français" },
-    { value: "en", label: "Anglais" },
+    { value: "en", label: "English" },
   ];
 
   const t = createTranslator(langage);
@@ -59,7 +57,6 @@ export default function HomePage() {
     if (res.status === 304) {
       throw new Error("Pas modifié");
     }
-
     return listeItems ?? [];
   };
 
@@ -85,17 +82,82 @@ export default function HomePage() {
     staleTime: refreshSeconds.staleTime,
   });
 
+  })
+
   return (
     <>
       <Header />
 
-      {/* Background */}
-      <div className="relative flex justify-center items-start pt-[80px] pb-8 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6 overflow-hidden">
-        {/* soft glows */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
-          <div className="absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
-        </div>
+      <div className="relative flex justify-center items-start pt-[80px] min-h-screen bg-gradient-to-r from-blue-50 via-white to-blue-100 px-6 overflow-hidden">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 w-full max-w-7xl">
+          {/* Sidebar */}
+          <div className="col-span-12 lg:col-span-3 bg-white shadow-lg rounded-xl p-6 flex flex-col items-center border border-gray-100">
+            <Image
+              src="/default_user.png"
+              alt="profile"
+              width={96}
+              height={96}
+              className="rounded-full w-24 h-24 mb-4"
+            />
+            <h2 className="text-lg font-semibold text-gray-800">
+              {t("hello") + " "}
+              {     `${user?.firstName
+                    ?.charAt(0)
+                    .toUpperCase()}${user?.firstName?.substring(1, 5) ?? ""} ${user?.lastName?.charAt(0).toUpperCase() ?? ""
+                  }${user?.lastName?.substring(1, 5) ?? ""}`}
+            
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">{t("dashboard")}</p>
+
+            <nav className="w-full flex flex-col gap-2">
+              <Link
+                href="/item/items-archives"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                {t("invoices")}
+              </Link>
+              <Link
+                href="/invoices/create"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                {t("newInvoice")}
+              </Link>
+              <Link
+                href="/item/item-catalogue"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                {t("catalogue")}
+              </Link>
+              <Link
+                href="/item/creation-item"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                {t("createItem")}
+              </Link>
+              <Link
+                href="/pub"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                ⭐ {t("info")}
+              </Link>
+              <Link
+                href="/profile"
+                className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                {t("profile")}
+              </Link>
+              {
+                user?.isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                   👤 {t("admin_section")}
+                  </Link>
+                )
+              }
+            </nav>
+          </div>
 
         <div className="relative z-10 w-full max-w-7xl flex flex-col gap-6">
           {/* Lang / Date */}

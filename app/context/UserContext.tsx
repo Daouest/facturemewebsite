@@ -7,6 +7,8 @@ export type AppUser = {
   email?: string;
   firstName?: string;
   lastName?: string;
+  isAdmin?: boolean;
+  isOnline?: boolean;
 } | null;
 type UserContextType = {
   user: AppUser;

@@ -1,6 +1,6 @@
 import { connectToDatabase } from "@/app/lib/db/mongodb";
-import { DbObjet, DbBusiness, DbTauxHoraire, DbClient, DbFacture, DbObjetFacture, DbFactureHoraire, DbUsers, DbAddress } from "@/app/lib/models";
-import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, ItemFieldWithPrice, TauxHoraire } from "@/app/lib/definitions";
+import {DbTicket, DbObjet, DbBusiness, DbTauxHoraire, DbClient, DbFacture, DbObjetFacture, DbFactureHoraire, DbUsers, DbAddress } from "@/app/lib/models";
+import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, TauxHoraire } from "@/app/lib/definitions";
 import { ItemData, UserData, Address, Client, ClientAffichage } from "@/app/lib/definitions";
 import { calculateTotalByWorkedHours, calculateTaxes } from "@/app/lib/utils";
 import { getUserFromCookies } from "@/app/lib/session/session-node";
@@ -224,6 +224,17 @@ export async function getUserInfoByEmail(_email: string) {
     } catch (err) {
         console.error("Erreur dans la fonctions getUserInfo", err);
         return { success: false, message: "Erreur dans la récupération de l'utilisateur" };
+    }
+}
+export async function getAllUsers() {
+    try {
+        const userData = await DbUsers.find();
+
+        if (!userData) return null
+        return userData;
+    } catch (err) {
+        console.error("Erreur dans la fonctions getUserInfo", err);
+        return null;
     }
 }
 
@@ -668,4 +679,125 @@ export async function getAllTaxesNumbers(businessId: number) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch business.');
     }
+}
+
+export async function getClients(){
+      const clients = await DbClient.find();
+        if (!clients) {
+
+            console.error("Les clients n'ont pas été  trouvé");
+            return null
+
+        }
+        //console.log("Client trouvé", clients);
+
+        return clients;
+}
+
+export async function getClientById(idClient:number){
+      const existingClient = await DbClient.findOne({ idClient: idClient });
+        if (!existingClient) {
+
+            console.error("Client non trouvé ou vous n'avez pas la permission de le modifier");
+            return {success:false};
+
+        }
+        console.log("Client trouvé", existingClient.nomClient);
+
+        return existingClient.nomClient;
+}
+
+export async function getAllTickets() {
+    try {
+        // const tickets = await DbTicket.aggregate([
+        //     {
+        //         $lookup: {
+        //             from: "clients",  
+        //             localField: "idClient",   
+        //             foreignField: "idClient", // champ correspondant dans Client
+        //             as: "clientInfo"
+        //         }
+        //     },
+        //     {
+        //         $unwind: "$clientInfo" // "déplie" le tableau userInfo → chaque item a son client unique
+        //     },
+        //     {
+        //         $project: { // choisir les champs à garder
+        //             _id:1,
+        //             idTicket:1,
+        //             idClient: 1,
+        //             message: 1,
+        //             isCompleted: 1,
+        //             date:1,
+        //             "clientInfo.nomClient": 1,
+        //         }
+        //     }
+        // ]);
+         const tickets = await DbTicket.find();
+
+        return { success: true, message: "Succès dans la récupération des tickets", ticket: tickets }
+
+    } catch (err) {
+        console.error("Erreur dans la fonctions getAllTicket", err)
+        return { success: false, message: "Erreur dans la récupération des tickets" }
+    }
+
+}
+
+
+export async function deleteTicket(id: number) {
+    try {
+        await DbObjet.deleteOne({ _id: id});
+        const item = await DbObjet.findOne({ _id: id });
+        if (!item) return { success: true }
+
+        return { success: false }
+
+    } catch (err) {
+        console.error("Erreur dans la supprimé deleteItemsById", err)
+        return { success: false, message: "Erreur item  n'a pas été supprimé" }
+
+    }
+
+}
+
+
+export async function updateTicket(idClient: number, idTicket: number, status: boolean) {
+  try {
+    console.log("status", status);
+
+    await connectToDatabase();
+    const Today: Date = new Date();
+
+    const existingTicket = await DbTicket.findOne({ idClient, idTicket });
+    if (!existingTicket) {
+      console.error("Ticket non trouvé ou vous n'avez pas la permission de le modifier");
+      return { success: false };
+    }
+
+    const client = await getClientById(idClient);
+    if (!client) {
+      console.error("Client non trouvé");
+      return { success: false };
+    }
+
+    const updateData = await DbTicket.findOneAndUpdate(
+      { idTicket },
+      {
+        $set: {
+          isCompleted: status,
+          date: Today,
+          nomClient: client, 
+        },
+      },
+      { new: true } // renvoie le ticket mis à jour
+    );
+
+    console.log("objet modifié", updateData);
+    return { success: true, ticket: updateData };
+
+  } catch (err) {
+    console.error("Erreur dans le controller updateTicket:", err);
+    return { success: false };
+  }
 }

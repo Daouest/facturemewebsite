@@ -1,5 +1,9 @@
-
 const fr = {
+  acceuil: "Acceuil",
+  ticket: "Tickets",
+  message: "Message",
+  admin_section: "Séction admin",
+  edit: "Modifier",
   hello: "Bonjour",
   info: "FAQs",
   historicInvoices: " Historique des factures",
@@ -21,6 +25,7 @@ const fr = {
   noFacture: "Vous n'avez aucune facture pour l'instant",
   welcome: "Bienvenue",
   dashboard: "Vite fait, bien fait!",
+
   // Sidebar
   invoices: "📄 Mes factures",
   createItem: "➕ Créer un item",
@@ -38,9 +43,11 @@ const fr = {
   languageEnglish: "Anglais",
 
   invoice: "Facture",
+
   // Factures
   recentInvoices: "📊 Vos factures récentes",
   loading: "Chargement...",
+
   // Nouveautés
   news: "🔔 Nouveautés",
   exportPDF: "📥 Exporter en PDF",
@@ -50,12 +57,16 @@ const fr = {
 
   today: "Aujourd'hui",
 
-  //LANGAGE
-  chooseLanguage: "choisir une langue"
+  // Langue
+  chooseLanguage: "choisir une langue",
 } as const;
 
-
 const en = {
+  acceuil: "Acceuil",
+  ticket: "Tickets",
+  message: "Message",
+  admin_section: "Admin section",
+  edit: "Edit",
   hello: "Hi",
   info: "FAQs",
   historicInvoices: "Invoice histories",
@@ -75,7 +86,6 @@ const en = {
   image: "Image",
   productName: "Product Name",
   noFacture: "Nothing to see here yet!",
-
   welcome: "Welcome",
   dashboard: "Nice and easy!",
 
@@ -109,21 +119,21 @@ const en = {
   today: "Today",
 
   invoice: "Invoice",
-  //langage
-  chooseLanguage: "Choose a language"
-}
+  // Language
+  chooseLanguage: "Choose a language",
+} as const;
 
 type TranslationKey = keyof typeof fr;
+
 export const translations: Record<"fr" | "en", Record<TranslationKey, string>> = {
   fr,
   en,
-}
-
+};
 
 export const refreshSeconds = {
-  seconds: 3600000,
-  staleTime: 3600000
-}
+  seconds: 60 * 1000,
+  staleTime: 60 * 1000,
+};
 
 export const CommentsData = [
   {
@@ -134,32 +144,33 @@ export const CommentsData = [
   },
   {
     name: "Xavier Bouchard",
-    comment: "L’interface est intuitive et m’a fait gagner un temps fou dans le suivi de mes paiements.",
+    comment:
+      "L’interface est intuitive et m’a fait gagner un temps fou dans le suivi de mes paiements.",
     profil: "/comment_avatar2.jpg",
     stars: 5,
   },
   {
     name: "Jean-François Tremblay",
-    comment: "Grâce à FactureMe, je peux enfin centraliser mes factures sans m’y perdre. Un vrai plus pour mon entreprise.",
+    comment:
+      "Grâce à FactureMe, je peux enfin centraliser mes factures sans m’y perdre. Un vrai plus pour mon entreprise.",
     profil: "/comment_avatar3.jpg",
     stars: 4,
   },
   {
     name: "Amina El-Mansouri",
-    comment: "J’apprécie les rappels automatiques et la clarté du tableau de bord. Très utile au quotidien.",
+    comment:
+      "J’apprécie les rappels automatiques et la clarté du tableau de bord. Très utile au quotidien.",
     profil: "/comment_avatar4.jpg",
-
     stars: 5,
   },
   {
     name: "Marc-André Gagnon",
-    comment: "Un outil simple mais puissant. La gestion des factures n’a jamais été aussi fluide.",
+    comment:
+      "Un outil simple mais puissant. La gestion des factures n’a jamais été aussi fluide.",
     profil: "/default_user.png",
-
     stars: 5,
-  }
-
-]
+  },
+];
 
 export const data = [
   {

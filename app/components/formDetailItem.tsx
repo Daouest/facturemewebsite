@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/footer";
 import Link from "next/link";
-
+import { AiOutlineEdit } from 'react-icons/ai';
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
@@ -115,9 +115,8 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     if (data === undefined || data === null) {
       router.push("/not-found");
     }
-  }, [data, isLoading, router]);
-
-  async function updateItemRequest(dataToSend: unknown) {
+  }, [data]);
+  async function updateItemRequest(dataToSend: nay) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -204,6 +203,42 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       },
     });
   };
+  const deleteItemRequest = async (idObjet: any) => {
+    const res = await fetch("/api/item", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formData: idObjet ?? formData.idObjet,
+        userData: user,
+      }),
+    });
+    if (!res.ok) {
+      throw Error("Erreur lors de la suppréssion");
+    }
+    return true;
+  };
+  const mutation = useMutation({
+    mutationFn: updateItemRequest,
+    onSuccess: (updateItem) => {
+       queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
+      queryClient.invalidateQueries({ queryKey: ["items"] }); // invalide la liste d'items pour un refresh
+    },
+    onError: (error) => {
+      console.error("Erreur de la modification :", error);
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteItemRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      window.location.href = "/item/item-catalogue";
+    },
+    onError: (error) => {
+      console.error("Erreur de suppression :", error);
+    },
+  });
+
+
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
@@ -460,23 +495,16 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
               </div>
 
               {/* Buttons */}
-              <div className="mt-8 mb-2 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="rounded-xl bg-sky-500 text-white hover:bg-sky-400 border border-sky-400/40 shadow-sm"
+              <div className="mt-8 gap-10 mb-2 flex flex-col sm:flex-row cursor cursor-pointer justify-center items-center w-full">
+                <div
+                onClick={updateItem}
                 >
-                  Modifier
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-xl bg-white/5 text-slate-100 hover:bg-white/10 border border-white/10"
-                  onClick={() => router.push("/item/item-catalogue")}
-                >
-                  Retour
-                </Button>
+                  <AiOutlineEdit
+                    
+                    color="black"
+                    size={27}
+                  />
+                </div>
 
                 <button
                   type="button"

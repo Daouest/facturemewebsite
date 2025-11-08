@@ -15,10 +15,9 @@ import {
   getFacturesUsersPaidInvoice,
 } from "@/app/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { refreshSeconds } from "@/app/lib/constante";
 import { useLangageContext } from "../../context/langageContext";
 
-export default function ItemCatalogue() {
+export default function ItemArchived() {
   const [sorterByFactureNumber, setSorterByFactureNumber] = useState(false);
   const [sorterByDate, setSorterByDate] = useState(false);
   const [sortByPaidInvoice, setSortByPaidInvoice] = useState(false);
@@ -64,41 +63,42 @@ export default function ItemCatalogue() {
     return tableRows ?? [];
   };
 
-  const {
-    data: factures,
-    isLoading,
-    status,
-  } = useQuery<Facture[]>({
-    queryKey: ["factures"],
-    queryFn: async () => {
-      try {
-        return await fetchData();
-      } catch (err: any) {
-        //erreur 304
-        if (err.message === "Pas modifié") {
-          return Promise.reject({ status: 304 });
-        }
-        throw err;
-      }
-    },
-    refetchInterval: refreshSeconds.seconds, //10 sec
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    staleTime: refreshSeconds.staleTime, //  les données son considérées comme bonne après 8 secondes
-  });
+    const {
+        data: archivedFactures,
+        isLoading,
+        status,
+
+    } = useQuery<Facture[]>({
+        queryKey: ["archivedFactures"],
+        queryFn: (async () => {
+            try {
+                return await fetchData();
+            } catch (err: any) { //erreur 304 
+                if (err.message === "Pas modifié") {
+
+                    return Promise.reject({ status: 304 });
+                }
+                throw err;
+            }
+        }),
+        refetchOnWindowFocus: "always",
+        refetchOnReconnect: true,
+    })
+
+   
 
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
-    if (!factures) return [];
+    if (!archivedFactures) return [];
     if (sorterByFactureNumber) {
-      return getFacturesUsersByFactureNumber(factures ?? []);
+      return getFacturesUsersByFactureNumber(archivedFactures ?? []);
     } else if (sortByPaidInvoice) {
-      return getFacturesUsersPaidInvoice(factures ?? []);
+      return getFacturesUsersPaidInvoice(archivedFactures ?? []);
     } else if (sorterByDate) {
-      return getFacturesUsersByDate(factures ?? []);
+      return getFacturesUsersByDate(archivedFactures ?? []);
     }
-    return factures;
-  }, [factures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
+    return archivedFactures;
+  }, [archivedFactures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
 
   return (
     <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100 pb-8">
@@ -144,7 +144,7 @@ export default function ItemCatalogue() {
 
                 <div
                   className={`${
-                    factures && factures?.length > 0 ? "flex" : "hidden"
+                    archivedFactures && archivedFactures?.length > 0 ? "flex" : "hidden"
                   } items-center gap-6`}
                 >
                   <div className="text-center">

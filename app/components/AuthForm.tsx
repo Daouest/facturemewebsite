@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import { useUser as useUserContext } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useLocalStorage from "../lib/hooks/useLocalStorage";
 
 type AuthMode = "login" | "signup";
 type AuthFormProps = { initialMode?: AuthMode };
-
 type Availability = { email?: boolean; username?: boolean };
 
 const debounce = <F extends (...a: any[]) => any>(fn: F, ms = 400) => {
@@ -29,51 +29,122 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
   const { setUser } = useUserContext();
   const router = useRouter();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // doc Record type : https://www.typescriptlang.org/docs/handbook/utility-types.html
+  // façon fancy de set les messages d'erreurs par rapport aux champs de validation
+  const [errors, setErrors] = useState<Record<string, string>>({ form: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBlocked, setIsBlocked] = useState<boolean | null>(false);
+  const [stopTimeout, setStopTimeout] = useState<boolean>(false);
+  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>("errorCount", 4);
+  const [isUserIsFind, setIsUserIsFind] = useState(true);
 
-  // Live availability checking
+  useEffect(() => {
+    console.log("storedErrorCount", storedErrorCount);
+    if (storedErrorCount !== 0) return;
+    fetchBlock();
+  }, [storedErrorCount]);
+
+  useEffect(() => {
+    setStoredErrorCount(4);
+    setIsUserIsFind(true);
+  }, []);
+
+  useEffect(() => {
+    setStopTimeout(false);
+    if (storedErrorCount !== 0) return;
+
+    const interval = setInterval(() => {
+      expiredBlockUser(); // appel initial
+      console.log("stopTimeout", stopTimeout);
+      if (stopTimeout) {
+        clearInterval(interval);
+        return;
+      }
+      expiredBlockUser();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [storedErrorCount, stopTimeout]);
+
+  const fetchBlock = async () => {
+    try {
+      const res = await fetch("/api/auth/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockUser: true }),
+      });
+      if (!res.ok) {
+        console.error("Erreur lors de la création du cookie");
+        return;
+      }
+      console.log("Cookie de blocage défini avec succès !");
+    } catch (err) {
+      console.error("Erreur dans le blockage de cookie", err);
+    }
+  };
+
+  const expiredBlockUser = async () => {
+    let falseCount = 0;
+    try {
+      const res = await fetch("/api/auth/status");
+      const data = await res.json();
+      console.log("data.blockUser", data.blockUser);
+
+      if (data.blockUser === false) {
+        falseCount++;
+        if (falseCount >= 1) {
+          console.log("dans if flaseCount", falseCount);
+          setIsBlocked(false);
+          setStoredErrorCount(5);
+          setStopTimeout(false);
+          return;
+        }
+      } else {
+        falseCount = 0;
+        setIsBlocked(true);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la vérification du cookie", err);
+    }
+  };
+
+  useEffect(() => {
+    console.log("isUserIsFind ", isUserIsFind);
+  }, [isUserIsFind]);
+
   const [availability, setAvailability] = useState<Availability>({});
   const [checking, setChecking] = useState(false);
 
-  const checkAvailability = useMemo(
-    () =>
-      debounce(async (emailVal: string, usernameVal: string) => {
-        const emailQ = emailVal.trim();
-        const userQ = usernameVal.trim();
-        if (!emailQ && !userQ) {
-          setAvailability({});
-          return;
-        }
-        setChecking(true);
-        try {
-          const params = new URLSearchParams();
-          if (emailQ) params.set("email", emailQ);
-          if (userQ) params.set("username", userQ);
-          const res = await fetch(
-            `/api/auth/availability?${params.toString()}`,
-            {
-              cache: "no-store",
-            }
-          );
-          if (res.ok) {
-            const data = (await res.json()) as { taken: Availability };
-            setAvailability(data?.taken ?? {});
-          } else {
-            setAvailability({});
-          }
-        } catch {
-          setAvailability({});
-        } finally {
-          setChecking(false);
-        }
-      }, 400),
-    []
-  );
+  const checkAvailability = debounce(async (emailVal: string, usernameVal: string) => {
+    const emailQ = emailVal.trim();
+    const userQ = usernameVal.trim();
+    if (!emailQ && !userQ) {
+      setAvailability({});
+      return;
+    }
+    setChecking(true);
+    try {
+      const params = new URLSearchParams();
+      if (emailQ) params.set("email", emailQ);
+      if (userQ) params.set("username", userQ);
+      const res = await fetch(`/api/auth/availability?${params.toString()}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { taken: Availability };
+        setAvailability(data?.taken ?? {});
+      } else {
+        setAvailability({});
+      }
+    } catch {
+      setAvailability({});
+    } finally {
+      setChecking(false);
+    }
+  }, 400);
 
   useEffect(() => {
     if (mode === "signup") {
@@ -87,6 +158,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
     if (mode === "login") {
       setIsSubmitting(true);
+      setIsUserIsFind(true);
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
@@ -94,18 +166,23 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
-
         if (!res.ok) {
-          setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
+          setErrors({ form: data.message ?? "Erreur in login" });
+          setStoredErrorCount((prev) => (prev > 1 ? prev - 1 : 0));
+          setIsUserIsFind(false);
           return;
         }
 
+        // connexion dans le context
+        setIsUserIsFind(true);
         setUser({
           id: data.user.idUser,
           username: data.user.username,
           email: data.user.email,
           firstName: data.user.firstName,
           lastName: data.user.lastName,
+          isAdmin: data.user.isAdmin,
+          isOnline: data.user.isOnline,
         });
 
         router.replace("/homePage");
@@ -118,19 +195,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       return;
     }
 
-    // SIGNUP validation
+    // SIGNUP
     const validationErrors: Record<string, string> = {};
-    if (!firstName.trim())
-      validationErrors.firstName = "First name is required";
+    if (!firstName.trim()) validationErrors.firstName = "First name is required";
     if (!lastName.trim()) validationErrors.lastName = "Last name is required";
-    if (email !== confirmEmail)
-      validationErrors.confirmEmail = "Emails do not match";
-    if (password !== confirmPassword)
-      validationErrors.confirmPassword = "Passwords do not match";
-
-    // If live availability says taken, reflect that before submit
-    if (availability.username)
-      validationErrors.username = "Username déjà utilisé";
+    if (email !== confirmEmail) validationErrors.confirmEmail = "Emails do not match";
+    if (password !== confirmPassword) validationErrors.confirmPassword = "Passwords do not match";
+    if (availability.username) validationErrors.username = "Username déjà utilisé";
     if (availability.email) validationErrors.email = "Email déjà utilisé";
 
     if (Object.keys(validationErrors).length > 0) {
@@ -152,16 +223,12 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
         }),
       });
       const data = await res.json();
-
       if (!res.ok) {
-        // Handles both 400 (validation) and 409 (duplicate E11000)
-        setErrors(
-          data?.errors ?? { form: data?.message ?? "Erreur signup au form" }
-        );
+        setErrors(data?.errors ?? { form: data?.message ?? "Erreur signup au form" });
         return;
       }
 
-      // success → go to check-email page
+      // redirect au login screen après un bon signup
       router.replace("/auth/email/check-email");
     } catch {
       setErrors({ form: "Erreur du serveur au AuthForm" });
@@ -170,7 +237,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     }
   };
 
-  // Red borders if taken
   const emailTaken = !!availability.email;
   const usernameTaken = !!availability.username;
 
@@ -186,145 +252,24 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             {mode === "login" ? "Connexion" : "Inscription"}
           </h2>
 
-          {/* SIGNUP fields */}
+          <p className="text-[12px] font-bold mb-6 text-red-600 text-center">
+            {errors.form !== "" && !isUserIsFind
+              ? `Il vous reste ${storedErrorCount} ${
+                  storedErrorCount <= 1 ? "tentative" : "tentatives"
+                }`
+              : ""}
+          </p>
+          <p className="text-[12px] font-bold mb-6 text-red-600 text-center">
+            {storedErrorCount === 0 ? `Vous avez été bloqué, revenez dans 1 minute` : ""}
+          </p>
+
           {mode === "signup" && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                <div>
-                  <Input
-                    label="Prenom"
-                    type="text"
-                    placeholder="Prenom"
-                    value={firstName}
-                    onChange={(e) => {
-                      setErrors((p) => ({ ...p, firstName: "" }));
-                      setFirstName(e.target.value);
-                    }}
-                    required
-                  />
-                  {errors.firstName && (
-                    <p className="mt-1 text-xs text-red-600">
-                      {errors.firstName}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    label="Nom"
-                    type="text"
-                    placeholder="Nom"
-                    value={lastName}
-                    onChange={(e) => {
-                      setErrors((p) => ({ ...p, lastName: "" }));
-                      setLastName(e.target.value);
-                    }}
-                    required
-                  />
-                  {errors.lastName && (
-                    <p className="mt-1 text-xs text-red-600">
-                      {errors.lastName}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Username */}
-              <div className="mb-5">
-                <Input
-                  label="Nom d'utilisateur"
-                  type="text"
-                  placeholder="Nom d'utilisateur"
-                  value={username}
-                  onChange={(e) => {
-                    setErrors((p) => ({ ...p, username: "" }));
-                    setUsername(e.target.value);
-                  }}
-                  className={`${usernameTaken ? "border-red-500" : ""}`}
-                  required
-                  aria-invalid={usernameTaken || !!errors.username}
-                  aria-describedby="username-help"
-                />
-                <div
-                  id="username-help"
-                  className="flex items-center gap-2 mt-1"
-                >
-                  {checking && (
-                    <span className="text-xs text-zinc-500">Vérification…</span>
-                  )}
-                  {usernameTaken && (
-                    <span className="text-xs text-red-600">
-                      Username déjà utilisé
-                    </span>
-                  )}
-                  {errors.username && (
-                    <span className="text-xs text-red-600">
-                      {errors.username}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Email + confirmation */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                <div>
-                  <Input
-                    label="Courriel"
-                    type="email"
-                    placeholder="Courriel"
-                    value={email}
-                    onChange={(e) => {
-                      setErrors((p) => ({ ...p, email: "" }));
-                      setEmail(e.target.value);
-                    }}
-                    className={`${emailTaken ? "border-red-500" : ""}`}
-                    required
-                    aria-invalid={emailTaken || !!errors.email}
-                    aria-describedby="email-help"
-                    autoComplete="email"
-                  />
-                  <div id="email-help" className="flex items-center gap-2 mt-1">
-                    {checking && (
-                      <span className="text-xs text-zinc-500">
-                        Vérification…
-                      </span>
-                    )}
-                    {emailTaken && (
-                      <span className="text-xs text-red-600">
-                        Email déjà utilisé
-                      </span>
-                    )}
-                    {errors.email && (
-                      <span className="text-xs text-red-600">
-                        {errors.email}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <Input
-                    label="Confirmation"
-                    type="email"
-                    placeholder="Confirmation courriel"
-                    value={confirmEmail}
-                    onChange={(e) => {
-                      setErrors((p) => ({ ...p, confirmEmail: "" }));
-                      setConfirmEmail(e.target.value);
-                    }}
-                    autoComplete="email"
-                    required
-                  />
-                  {errors.confirmEmail && (
-                    <p className="mt-1 text-xs text-red-600">
-                      {errors.confirmEmail}
-                    </p>
-                  )}
-                </div>
-              </div>
+              {/* champs signup */}
+              ...
             </>
           )}
 
-          {/* LOGIN email */}
           {mode === "login" && (
             <Input
               label="Courriel"
@@ -332,71 +277,20 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Courriel"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mb-5"
+              className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               autoComplete="email"
+              disabled={isBlocked ? true : false}
               required
             />
           )}
 
-          {/* Passwords */}
-          {mode === "signup" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-              <div>
-                <Input
-                  label="Mot de passe"
-                  type="password"
-                  placeholder="Mot de passe"
-                  value={password}
-                  onChange={(e) => {
-                    setErrors((p) => ({ ...p, password: "" }));
-                    setPassword(e.target.value);
-                  }}
-                  autoComplete="new-password"
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  label="Confirmation"
-                  type="password"
-                  placeholder="Confirmez mot de passe"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setErrors((p) => ({ ...p, confirmPassword: "" }));
-                    setConfirmPassword(e.target.value);
-                  }}
-                  autoComplete="new-password"
-                  required
-                />
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.confirmPassword}
-                  </p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <Input
-              label="Mot de passe"
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mb-7"
-              required
-            />
-          )}
-
-          {/* Submit */}
           <div className="flex justify-center mt-4">
             <Button
               type="submit"
-              className="px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors"
-              disabled={
-                isSubmitting ||
-                (mode === "signup" &&
-                  (availability.email || availability.username || checking))
-              }
+              className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors ${
+                isBlocked || isSubmitting ? "" : "cursor cursor-pointer"
+              }`}
+              disabled={isSubmitting || isBlocked ? true : false}
             >
               {isSubmitting
                 ? "En traitement"
@@ -406,11 +300,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             </Button>
           </div>
 
-          {/* Server-level form error */}
           {errors.form && (
-            <p className="mt-4 text-center text-sm text-red-600">
-              {errors.form}
-            </p>
+            <p className="mt-4 text-center text-sm text-red-600">{errors.form}</p>
           )}
         </form>
       </div>
