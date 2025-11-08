@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod"
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import bcrypt from "bcryptjs";
 import { DbUsers } from "@/app/lib/models";
@@ -7,6 +6,8 @@ import { SignupSchema } from "@/app/lib/schemas/auth";
 import { APP_URL } from "@/app/lib/schemas/env";
 import { getNextSeq } from "@/app/lib/db/getNextSeq";
 import mongoose from "mongoose";
+import type { Db, Collection } from "mongodb";
+import type { CounterDoc } from "@/app/lib/db/getNextSeq";
 
 export const runtime = "nodejs";
 
@@ -60,7 +61,10 @@ export async function POST(req: Request) {
             )
         }
 
-        const idUser = await getNextSeq("users")
+        const db = mongoose.connection.db as unknown as Db;
+        const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
+
+        const idUser = await getNextSeq(counters, "users");
         const hash = await bcrypt.hash(password, 12);
 
         const user = await DbUsers.create({
@@ -112,8 +116,21 @@ export async function POST(req: Request) {
         console.log("[SIGNUP] Signup completed successfully");
         return NextResponse.json(responseData, { status: 201 });
     }
-    catch (e) {
+    catch (e: any) {
+        // Handle duplicate key (E11000) from Mongo/Mongoose
+        // l'erreur E11000 c'est en gros à cause des duplicates keys
+        // source : https://www.mongodb.com/docs/manual/core/index-unique/#unique-index-and-missing-field
+        if (e?.code === 11000 && e?.keyPattern) {
+            const errors: Record<string, string> = {};
+            if (e.keyPattern.email) errors.email = "Email déjà utilisé";
+            if (e.keyPattern.username) errors.username = "Username déjà utilisé";
+            return NextResponse.json(
+                { message: "Conflit: identifiant déjà pris", errors },
+                { status: 409 }
+            );
+        }
         console.error("[SIGNUP] Fatal error:", e);
         return NextResponse.json({ message: "Erreur signup serveur" }, { status: 500 });
     }
+
 }

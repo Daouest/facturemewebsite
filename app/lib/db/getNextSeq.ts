@@ -1,35 +1,34 @@
-import mongoose from "mongoose";
-import type { Collection, UpdateFilter, WithId } from "mongodb";
-import { connectToDatabase } from "./mongodb";
-
-type CounterDoc = { _id: string; seq: number }
-
+import type { Collection, ModifyResult, Document, WithId } from "mongodb";
 //en gros c'est une facon d'auto-incrementer dans mongoDB
 //source : https://www.mongodb.com/resources/products/platform/mongodb-auto-increment
 
-export async function getNextSeq(seqName: string, startAt = 1): Promise<number> {
-    await connectToDatabase()
+export type CounterDoc = { _id: string; seq: number };
 
-    const db = mongoose.connection.db
-    if (!db) {
-        throw new Error("Erreur lors de la connexion dans avec la DB")
-    }
+/**
+ * Auto-increment helper for MongoDB counters.
+ * Keeps using Mongoose connection + native collection (your original setup).
+ * Avoids "ConflictingUpdateOperators" by using an aggregation pipeline update.
+ */
 
-    const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters")
+export async function getNextSeq(
+    counters: Collection<CounterDoc>,
+    seqName: string,
+    startAt = 1
+): Promise<number> {
+    const updatePipeline: Document[] = [
+        { $set: { seq: { $add: [{ $ifNull: ["$seq", startAt - 1] }, 1] } } },
+    ];
 
-    const update: UpdateFilter<CounterDoc> = {
-        $inc: { seq: 1 },
-        $setOnInsert: { seq: startAt - 1 },
-    }
-
-    const doc: WithId<CounterDoc> | null = await counters.findOneAndUpdate(
+    const result: ModifyResult<CounterDoc> = await counters.findOneAndUpdate(
         { _id: seqName },
-        update,
+        updatePipeline as any,
         {
             upsert: true,
             returnDocument: "after",
-            includeResultMetadata: false,
+            includeResultMetadata: true as const, // 👈 forces ModifyResult<T>
         }
-    )
-    return doc?.seq ?? startAt
+    );
+
+    const doc = result.value;
+    return doc?.seq ?? startAt;
 }

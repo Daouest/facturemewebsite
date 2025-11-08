@@ -186,9 +186,34 @@ export function Table<T extends TableItemType | Facture | Ticket>({
                 <ImageFromBd id={row.idObjet} name={row.productName} />
               </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody className="divide-y divide-white/10">
+            {itemRows.map((row) => (
+              <tr
+                key={row.idObjet}
+                onClick={() => router.push(`/item/detail/${row.idObjet}`)}
+                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
+              >
+                <td className="px-4 py-3 text-slate-200 align-top">
+                  {row.productName}
+                </td>
+                <td className="px-4 py-3 text-slate-300/90 align-top">
+                  {row.description}
+                </td>
+                <td className="px-4 py-3 text-slate-100 align-top">
+                  {formatIntoDecimal(row.price, "fr-CA", "CAD")}
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <div className="ring-1 ring-white/10 rounded-md overflow-hidden inline-block">
+                    <ImageFromBd id={row.idObjet} name={row.productName} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -205,6 +230,16 @@ export function Table<T extends TableItemType | Facture | Ticket>({
               setIsClick({ ...isClick, facture: true });
               setId(row.idFacture);
             }}
+            className={[
+              "w-full text-left rounded-xl px-4 py-4",
+              "border border-white/10 bg-white/5 backdrop-blur",
+              "shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
+              "hover:bg-white/10 hover:border-white/20 transition-colors",
+              "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
+            ].join(" ")}
+            aria-label={`${t("invoice")} #${row.factureNumber} - ${
+              row.nomClient
+            }`}
           >
             <div>
               <h4 className="text-lg font-semibold text-gray-800">
@@ -232,7 +267,7 @@ export function Table<T extends TableItemType | Facture | Ticket>({
             >
               <p>{row.isPaid ? "PAYÉE" : "NON PAYÉE"}</p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );

@@ -1,29 +1,50 @@
 "use client";
-import AuthForm from "@/app/components/AuthForm";
+
 import Image from "next/image";
+import AuthForm from "@/app/components/AuthForm";
 import Header from "./components/Header";
+import Footer from "./components/footer";
+
 export default function Home() {
   return (
     <>
       <Header />
-      <main className="grid min-h-dvh grid-cols-1 lg:grid-cols-2">
-        <div className="relative min-h-[50dvh] lg:min-h-dvh">
+      <main className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        {/* Left: full-bleed image with dark overlay */}
+        <div className="relative min-h-[50vh] lg:min-h-screen">
           <Image
             src="/construction_design.jpg"
-            alt="image"
+            alt="Conception et construction"
             fill
             priority
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/70 via-blue-950/70 to-blue-950/80" />
         </div>
 
-        <div className="flex items-center justify-center px-6 py-10">
-          <div className="flex w-full max-w-md flex-col items-center gap-8">
-            <h1 className="text-3xl lg:text-5xl text-amber-50">FactureMe</h1>
-            <AuthForm initialMode="login" />
+        {/* Right: centered content */}
+        <div className="relative flex items-center justify-center px-6 py-12 lg:py-20">
+          <div className="w-full max-w-md">
+            <div className="mb-8 text-center">
+              <h1 className="text-4xl lg:text-5xl font-bold text-white">
+                FactureMe
+              </h1>
+              <p className="mt-3 text-blue-100">
+                Connectez-vous pour gérer vos factures facilement.
+              </p>
+            </div>
+
+            {/* Glass card for the form */}
+            <div className="rounded-2xl border border-white/10 bg-white/90 shadow-xl backdrop-blur-md p-6 sm:p-8 text-zinc-900 dark:text-zinc-100">
+              <AuthForm initialMode="login" />
+            </div>
           </div>
+
+          {/* Optional subtle background tint on the right for cohesion */}
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-transparent via-blue-950/20 to-blue-900/30" />
         </div>
+        <Footer />
       </main>
     </>
   );

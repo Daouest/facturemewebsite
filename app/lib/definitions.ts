@@ -126,6 +126,18 @@ export type ItemField = {
     type: 'product' | 'hourly';
 };
 
+// Extended type with pricing information for invoice calculations
+export type ItemFieldWithPrice = ItemField & (
+    | {
+        type: 'product';
+        price: number;
+    }
+    | {
+        type: 'hourly';
+        hourlyRate: number;
+    }
+);
+
 export type BusinessField = {
   id: number;
   name: string;

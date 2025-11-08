@@ -31,15 +31,17 @@ export default function ImageFromBd({ name, id }: ImageFromBdProps) {
     <Image
       src={imageUrl ? imageUrl : "/default_image.jpg"}
       alt={`Image ${id}`}
-      width={60}
-      height={50}
+      width={80}
+      height={80}
+      className="object-cover w-20 h-20"
     />
   ) : (
     <Image
       src={loading ? "/image_loading.gif" : "/default_image.jpg"}
       alt={`image_loading ${id}`}
-      width={60}
-      height={50}
+      width={80}
+      height={80}
+      className="object-cover w-20 h-20"
     />
   );
 }

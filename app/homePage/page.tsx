@@ -41,6 +41,7 @@ export default function HomePage() {
 
     if (newEtag) etagRef.current = newEtag;
     if (newCount) countRef.current = newCount;
+
     const data = await res.json();
     const listeItems: TableFactureType[] = data.map((facture: any) => ({
       idFacture: facture.idFacture,
@@ -53,35 +54,33 @@ export default function HomePage() {
       nomClient: facture.clientInfo?.nomClient,
     }));
 
-    if (res.status == 304) {
+    if (res.status === 304) {
       throw new Error("Pas modifié");
     }
     return listeItems ?? [];
   };
 
-
   const {
     data: LastThreeFactures,
     isLoading,
     status,
-
   } = useQuery<TableFactureType[]>({
     queryKey: ["LastThreeFactures"],
-    queryFn: (async () => {
+    queryFn: async () => {
       try {
         return await fetchData();
-      } catch (err: any) { //erreur 304 
+      } catch (err: any) {
         if (err.message === "Pas modifié") {
-
           return Promise.reject({ status: 304 });
         }
         throw err;
       }
-    }),
+    },
     refetchInterval: refreshSeconds.seconds,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    staleTime: refreshSeconds.staleTime //  les données son considérées comme bonne après 8 secondes
+    staleTime: refreshSeconds.staleTime,
+  });
 
   })
 
@@ -160,76 +159,198 @@ export default function HomePage() {
             </nav>
           </div>
 
-          {/* Main Content */}
-          <div className="col-span-12 lg:col-span-9 flex flex-col gap-6">
-            {/* Lang / Date */}
-            <div className="flex justify-end items-center text-sm font-semibold text-gray-700 gap-4">
-              <div>
-                <label htmlFor="dropdown" className="mr-2 text-gray-600">
-                  {t("chooseLanguage")}
-                </label>
+        <div className="relative z-10 w-full max-w-7xl flex flex-col gap-6">
+          {/* Lang / Date */}
+          <div className="flex justify-end items-center text-sm font-semibold text-slate-200 gap-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="dropdown" className="mr-1 text-slate-300/80">
+                {t("chooseLanguage")}
+              </label>
+              <div className="relative">
                 <select
                   id="dropdown"
                   value={langage}
                   onChange={changeLang}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="border border-white/10 bg-white/5 text-slate-100 rounded-md px-2 py-1 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none pr-8"
                 >
                   {options.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      className="bg-slate-900"
+                    >
                       {option.label}
                     </option>
                   ))}
                 </select>
-              </div>
-              <p>{getDateNow()}</p>
-            </div>
-
-            {/* Recent invoices */}
-            <div className="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <span className="text-blue-600">📄</span> {t("recentInvoices")}
-              </h3>
-              {status !== "error" && isLoading ? (
-                <div className="flex justify-center items-center">
-                  <Image
-                    src="/image_loading.gif"
-                    alt="loading"
-                    width={50}
-                    height={100}
-                    className="object-contain max-w-full h-auto"
+                <svg
+                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
                   />
-                </div>
-              ) : (
-                <LastFactures rows={LastThreeFactures ?? []} />
-              )}
-            </div>
-
-            {/* News */}
-            <div className="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <span className="text-blue-600">🆕</span> {t("news")}
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center font-medium text-gray-700 shadow-sm transition-transform hover:-translate-y-1 hover:bg-blue-100">
-                  {t("exportPDF")}
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center font-medium text-gray-700 shadow-sm transition-transform hover:-translate-y-1 hover:bg-blue-100">
-                  {t("onlinePayment")}
-                </div>
-                <Link
-                  href="/clients-catalogue"
-                  className="bg-blue-50 rounded-lg p-4 text-center font-medium text-gray-700 shadow-sm transition-transform hover:-translate-y-1 hover:bg-blue-100"
-                >
-                  {t("clientManagement")}
-                </Link>
-                <Link
-                  href="/calendar"
-                  className="bg-blue-50 rounded-lg p-4 text-center font-medium text-gray-700 shadow-sm transition-transform hover:-translate-y-1 hover:bg-blue-100"
-                >
-                  {t("calendar")}
-                </Link>
+                </svg>
               </div>
             </div>
+            <p className="text-slate-300/80">{getDateNow()}</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Sidebar */}
+            <aside className="col-span-12 lg:col-span-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+              <div className="flex flex-col items-center">
+                <Image
+                  src="/default_user.png"
+                  alt="profile"
+                  width={96}
+                  height={96}
+                  className="rounded-full w-24 h-24 mb-4 ring-2 ring-white/10"
+                />
+                <h2 className="text-lg font-semibold text-slate-100 text-center">
+                  {t("hello") + " "}
+                  <TextType
+                    text={[
+                      `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${
+                        user?.firstName?.substring(1, 5) ?? ""
+                      } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${
+                        user?.lastName?.substring(1, 5) ?? ""
+                      }`,
+                    ]}
+                    className="font-semibold text-slate-100"
+                    typingSpeed={75}
+                    pauseDuration={1500}
+                    showCursor={false}
+                    cursorCharacter="|"
+                  />
+                </h2>
+                <p className="text-sm text-slate-300/80 mb-6">
+                  {t("dashboard")}
+                </p>
+              </div>
+
+              <nav className="w-full flex flex-col gap-2">
+                {/* Factures row */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/item/items-archives"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("invoices")}
+                  </Link>
+                  <Link
+                    href="/invoices/create"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("newInvoice")}
+                  </Link>
+                </div>
+
+                {/* Items row */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/item/item-catalogue"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("catalogue")}
+                  </Link>
+                  <Link
+                    href="/item/creation-item"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("createItem")}
+                  </Link>
+                </div>
+
+                {/* Clients row */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/clients-catalogue"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("myClients")}
+                  </Link>
+                  <Link
+                    href="/clients-catalogue/create"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("newClient")}
+                  </Link>
+                </div>
+
+                {/* Profile & FAQ row */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/profile"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    {t("profile")}
+                  </Link>
+                  <Link
+                    href="/pub"
+                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  >
+                    ⭐ {t("info")}
+                  </Link>
+                </div>
+              </nav>
+            </aside>
+
+            {/* Main Content */}
+            <section className="col-span-12 lg:col-span-9 flex flex-col gap-6">
+              {/* Recent invoices */}
+              <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+                <h3 className="text-xl font-semibold text-slate-100 mb-4 flex items-center gap-2">
+                  <span className="text-sky-300">📄</span> {t("recentInvoices")}
+                </h3>
+                {status !== "error" && isLoading ? (
+                  <div className="flex justify-center items-center py-6">
+                    <Image
+                      src="/image_loading.gif"
+                      alt="loading"
+                      width={50}
+                      height={100}
+                      className="object-contain max-w-full h-auto opacity-80"
+                    />
+                  </div>
+                ) : (
+                  <LastFactures rows={LastThreeFactures ?? []} />
+                )}
+              </div>
+
+              {/* News */}
+              <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+                <h3 className="text-xl font-semibold text-slate-100 mb-4 flex items-center gap-2">
+                  <span className="text-sky-300">🆕</span> {t("news")}
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
+                    {t("exportPDF")}
+                  </div>
+                  <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
+                    {t("onlinePayment")}
+                  </div>
+                  <Link
+                    href="/clients-catalogue"
+                    className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
+                  >
+                    {t("clientManagement")}
+                  </Link>
+                  <Link
+                    href="/calendar"
+                    className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
+                  >
+                    {t("calendar")}
+                  </Link>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -238,18 +359,3 @@ export default function HomePage() {
     </>
   );
 }
-
-/*
-On peut le voir comme une base de données locale de tes requêtes HTTP.
-Quand tu appelles useQuery, React Query va :
-
-demander à ton QueryClient s’il a déjà la donnée en cache ;
-
-sinon, exécuter le queryFn (fetch) ;
-
-stocker le résultat dans le cache ;
-
-fournir data, isLoading, isFetching, etc., à ton composant.
-
-Sans QueryClient, React Query ne peut pas stocker ou partager les données
-*/
