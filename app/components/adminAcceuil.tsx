@@ -3,6 +3,8 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Client, UserData } from "@/app/lib/definitions";
+import { useUser } from "@/app/context/UserContext";
+
 import "@/app/css/adminAcceuil.css";
 
 export default function AdminAcceuil() {
@@ -13,8 +15,10 @@ export default function AdminAcceuil() {
     const [showData, setShowData] = useState({ clients: true, users: false });
 
     const [dataOutput, setDataOutput] = useState<Client[] | UserData[]>([]);
-
-
+    const { user } = useUser();
+    useEffect(() => {
+        if(!user?.isAdmin ) router.push("/homePage");
+    }, []);
     const handleClients = async () => {
         let resquestString = "";
         if (showData.clients) {
