@@ -48,13 +48,15 @@ export type ItemData = {
 
 export type UserData = {
   id: number;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
+  username: string;
+  firstName: string;
+  lastName: string;
   email?: string;
   password?: string;
   idAddress?: number;
   idBusiness?: number;
+  isAdmin?: boolean;
+  isOnline?: boolean;
 };
 
 export type Objet = {
@@ -96,7 +98,6 @@ export type Client = {
     idUser: number,
     nomClient: string,
     idAddress: number,
-    isOnline?:boolean,
 }
 
 export type ClientAffichage = {

@@ -6,6 +6,7 @@ import {
   getFacturesUsersPaidInvoice
 } from "@/app/lib/data";
 import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
+import { fa } from "zod/v4/locales";
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,39 +21,39 @@ export async function GET(req: NextRequest) {
 
     // console.log("Paramètres reçus:", {
     //   sorted: sortBy,
-    //   isPaid: filterByPaid
+    //   isPaid: filterByPaid  
     // });
 
     // Récupération initiale des factures
-    let historiqueFactures = await getAllFacturesUsers(userId, true);
+  let historiqueFactures = await getAllFacturesUsers(userId,false);
 
     // Support filtering by date range to avoid returning a huge pool of invoices.
     // Expected query params: start=YYYY-MM-DD and end=YYYY-MM-DD
-    const startParam = searchParams.get("start");
-    const endParam = searchParams.get("end");
-    if (startParam && endParam) {
-      try {
-        const start = new Date(startParam + "T00:00:00");
-        const end = new Date(endParam + "T23:59:59.999");
-        historiqueFactures = (historiqueFactures || []).filter((f: any) => {
-          const d = new Date(f.dateFacture);
-          return d >= start && d <= end;
-        });
-      } catch (err) {
-        console.warn("Invalid start/end params provided to histories-invoices API", err);
-      }
-    }
+    // const startParam = searchParams.get("start");
+    // const endParam = searchParams.get("end");
+    // if (startParam && endParam) {
+    //   try {
+    //     const start = new Date(startParam + "T00:00:00");
+    //     const end = new Date(endParam + "T23:59:59.999");
+    //     historiqueFactures = (historiqueFactures || []).filter((f: any) => {
+    //       const d = new Date(f.dateFacture);
+    //       return d >= start && d <= end;
+    //     });
+    //   } catch (err) {
+    //     console.warn("Invalid start/end params provided to histories-invoices API", err);
+    //   }
+    // }
 
     // Calcul des métadonnées pour le cache
 
     //Application des filtres ou tris selon les paramètres
     if (sortBy === "factureNumber") {
-      historiqueFactures = await getFacturesUsersByFactureNumber(userId, true);
+      historiqueFactures = await getFacturesUsersByFactureNumber(userId,false);
     } else if (sortBy === "date") {
-      historiqueFactures = await getFacturesUsersByDate(userId, true);
+      historiqueFactures = await getFacturesUsersByDate(userId,false);
     } else if (filterByPaid === "false") {
-      historiqueFactures = await getFacturesUsersPaidInvoice(userId, true);
-    }
+      historiqueFactures = await getFacturesUsersPaidInvoice(userId,false);
+    } 
 
     // Réponse avec les données et les headers de cache
     const response = NextResponse.json(historiqueFactures);

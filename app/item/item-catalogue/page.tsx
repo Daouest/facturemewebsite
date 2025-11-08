@@ -56,10 +56,10 @@ export default function ItemCatalogue() {
         throw err;
       }
     },
-    refetchInterval:refreshSeconds.seconds,
+    refetchInterval:8000,
     refetchOnWindowFocus: "always",
     refetchOnReconnect: true,
-    staleTime: refreshSeconds.staleTime,
+    staleTime: 8000,
   });
 
   return (

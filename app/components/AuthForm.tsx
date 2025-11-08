@@ -152,6 +152,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           firstName: data.user.firstName,
           lastName: data.user.lastName,
           isAdmin: data.user.isAdmin,
+          isOnline: data.user.isOnline,
         });
 
         //redirect vers le homepage apres la connexion

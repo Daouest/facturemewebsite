@@ -121,8 +121,8 @@ export const translations = {
 };
 
 export const refreshSeconds = {
-  seconds: 3600000,
-  staleTime: 3600000
+  seconds: 60*1000,
+  staleTime: 60*1000
 }
 
 export const CommentsData = [

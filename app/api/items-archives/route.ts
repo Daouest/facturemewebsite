@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import {
   getAllFacturesUsers,
   getLastFacture
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     // });
 
     // Récupération initiale des factures
-    let factures = await getAllFacturesUsers(userId);
+    let factures = await getAllFacturesUsers(userId,true);
 
     // Calcul des métadonnées pour le cache
     const totalFactures = factures?.length ?? 0;
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     const factureCount = totalFactures.toString();
 
     //Application des filtres ou tris selon les paramètres
-    if (isLastFacturesRequested) {
+  if (isLastFacturesRequested) {
       factures = await getLastFacture(userId);
     }
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       (!sortBy || sortBy === "false");
 
     if (isCacheValid) {
-      return new NextResponse(null, { status: 304 });
+      return new NextResponse(null, { status: 304 }); 
     }
 
     // Réponse avec les données et les headers de cache

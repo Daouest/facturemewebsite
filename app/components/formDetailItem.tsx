@@ -203,7 +203,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const mutation = useMutation({
     mutationFn: updateItemRequest,
     onSuccess: (updateItem) => {
-      queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
+       queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
       queryClient.invalidateQueries({ queryKey: ["items"] }); // invalide la liste d'items pour un refresh
     },
     onError: (error) => {
@@ -214,7 +214,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     mutationFn: deleteItemRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      router.push("/item/item-catalogue");
+      window.location.href = "/item/item-catalogue";
     },
     onError: (error) => {
       console.error("Erreur de suppression :", error);

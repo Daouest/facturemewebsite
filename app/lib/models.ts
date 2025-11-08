@@ -56,6 +56,17 @@ const objetSchema = new Schema({
 
 export const DbObjet = getModel('Objet', objetSchema);
 
+
+const ticketSchema = new Schema({
+    _id: { type: String},
+    idClient: { type: Number },
+    message: { type: String },
+    isCompleted: { type: Boolean},
+    date: { type: Date },
+    nomClient:{type:String}
+}, { collection: 'tickets_client' });
+export const DbTicket = getModel('Ticket', ticketSchema);
+
 const tauxHoraireSchema = new Schema({
     idObjet: { type: Number },
     idUser: { type: Number },
@@ -175,8 +186,8 @@ const UserSchema = new mongoose.Schema({
     idBusiness: { type: Number, default: null },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
+    isOnline: { type: Boolean, default: false },
     paidAcces: { type: Boolean, default: false }
-
 }, { collection: 'users' });
 
 //pour fix les erreurs de TS avec les cookies
