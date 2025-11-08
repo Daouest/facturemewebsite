@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Client, UserData } from "@/app/lib/definitions";
@@ -15,7 +15,7 @@ export default function AdminAcceuil() {
     const [dataOutput, setDataOutput] = useState<Client[] | UserData[]>([]);
 
 
-   const handleClients = async () => {
+    const handleClients = async () => {
         let resquestString = "";
         if (showData.clients) {
             resquestString = "/api/client/clients";
@@ -35,9 +35,7 @@ export default function AdminAcceuil() {
         }
         return data;
     }
-    // useEffect(()=>{
-    //     handleClients();
-    // },[showData.clients, showData.users])
+
 
     const {
         data,
@@ -76,7 +74,8 @@ export default function AdminAcceuil() {
             filter = (data as UserData[]).filter(i =>
                 i?.lastName.toLowerCase().includes(searche.toLowerCase())
             );
-        } else {
+        }
+        if (showData.clients) {
             filter = (data as Client[])?.filter(i =>
                 i.nomClient.toLowerCase().includes(searche.toLowerCase())
             );
@@ -88,6 +87,36 @@ export default function AdminAcceuil() {
         console.log("clients", data);
         setDataOutput(data ?? []);
     }, [data]);
+
+    const renderedList = useMemo(() => {
+        if (dataOutput.length === 0) {
+            return <p className="self-center text-gray-400">Aucune donnée trouvée</p>;
+        }
+
+        if (showData.users) {
+            return (dataOutput as UserData[]).map((u, index) => (
+                <div key={index} className="user-card" onClick={() => router.push("/clients-catalogue")}>
+                    <div className="user-avatar">{u?.firstName?.charAt(0) ?? ""}</div>
+                    <div className="user-info">
+                        <h3 className="user-name">{u.lastName}</h3>
+                        <div className={`user-status ${u.isOnline ? "online" : "offline"}`}>
+                            {u.isOnline ? "online" : "offline"}
+                        </div>
+                    </div>
+                </div>
+            ));
+        }
+
+        return (dataOutput as Client[]).map((u, index) => (
+            <div key={index} className="user-card" onClick={() => router.push("/clients-catalogue")}>
+                <div className="user-avatar">{u?.nomClient?.charAt(0) ?? ""}</div>
+                <div className="user-info">
+                    <h3 className="user-name">{u.nomClient}</h3>
+                </div>
+            </div>
+        ));
+    }, [dataOutput, showData]);
+
     return (
         <div className="admin-acceuil">
 
@@ -112,66 +141,32 @@ export default function AdminAcceuil() {
 
                 {/* Navigation Tabs */}
                 <div className="content-tabs">
-                    <button className="tab active" onClick={() => { setShowData({ ...showData, clients: true, users: false }) ; }}>Clients</button>
-                    <button className="tab" onClick={() => { setShowData({ ...showData, clients: false, users: true })}}>Users</button>
+                    <button className="tab active" onClick={() => { setShowData({ ...showData, clients: true, users: false }); }}>Clients</button>
+                    <button className="tab" onClick={() => { setShowData({ ...showData, clients: false, users: true }) }}>Users</button>
                 </div>
 
                 {/* Users Section */}
                 <div className="users-section">
-                    <h2 className="users-title">{showData.clients? "Clients": "Users"}</h2>
-                    {isLoading ? (
-                        <div className="users-grid">
-                            <p className="self-center"> Loading...</p>
-                        </div>
-                    ) : (
-                        <div className="users-grid">
+                    <h2 className="users-title">{showData.clients ? "Clients" : "Users"}</h2>
 
-                            {
-                                dataOutput.length === 0 ? (
-                                    <p className="self-center"> No data found</p>
-                                )
-                                    :
-                                    (
+                    {
+                        (isLoading) ? (
+                            <div className="users-grid flex justify-center items-center py-10">
+                                <p className="text-gray-700 text-lg animate-pulse">Loading...</p>
+                            </div>
+                        )
+                            : (
+                                < div className="users-grid">
+                                    {renderedList}
+                                </div>
+                            )
+                    }
 
-                                        showData.users ? (dataOutput as UserData[]).map((u, index) => (
-                                            <div key={index} className="user-card"
-                                                onClick={() => router.push("/clients-catalogue")}>
-                                                <div className="user-avatar">
-                                                    {u?.firstName ? u.firstName.charAt(0) : ""}
-                                                </div>
-                                                <div className="user-info">
-                                                    <h3 className="user-name">{u.lastName}</h3>
 
-                                                    (
-                                                    <div className={`user-status ${u.isOnline ? 'online' : 'offline'}`}>
-                                                        {u.isOnline ? 'online' : 'offline'}
-                                                    </div>
-                                                    )
-                                                </div>
-                                            </div>
-                                        )) : (
-
-                                            showData.clients && (dataOutput as Client[]).map((u,index) => (
-                                                <div key={index} className="user-card"
-                                                    onClick={() => router.push("/clients-catalogue")}>
-                                                    <div className="user-avatar">
-                                                        {u?.nomClient ? u.nomClient.charAt(0): ""}
-                                                    </div>
-                                                    <div className="user-info">
-                                                        <h3 className="user-name">{u.nomClient}</h3>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )
-
-                                    )
-                            }
-
-                        </div>
-                    )}
                 </div>
+
             </div>
-        </div>
+        </div >
     );
 };
 
