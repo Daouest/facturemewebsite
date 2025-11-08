@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     try {
 
         const result = await getAllTickets();
-        console.log("result", result);
+        // console.log("result", result);
 
         if (!result.success) {
             return NextResponse.json(result, { status: 500 });
