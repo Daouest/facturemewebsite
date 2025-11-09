@@ -154,7 +154,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     mutationFn: deleteItemRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      router.push("/item/item-catalogue");
+      window.location.href = "/item/item-catalogue";
     },
     onError: (error) => {
       console.error("Erreur de suppression :", error);
@@ -198,46 +198,11 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
             file: "",
           });
           setLastPrice(0);
-          router.push("/item/item-catalogue");
+          window.location.href = "/item/item-catalogue";
         }, 1500);
       },
     });
   };
-  const deleteItemRequest = async (idObjet: any) => {
-    const res = await fetch("/api/item", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        formData: idObjet ?? formData.idObjet,
-        userData: user,
-      }),
-    });
-    if (!res.ok) {
-      throw Error("Erreur lors de la suppréssion");
-    }
-    return true;
-  };
-  const mutation = useMutation({
-    mutationFn: updateItemRequest,
-    onSuccess: (updateItem) => {
-       queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
-      queryClient.invalidateQueries({ queryKey: ["items"] }); // invalide la liste d'items pour un refresh
-    },
-    onError: (error) => {
-      console.error("Erreur de la modification :", error);
-    },
-  });
-  const deleteMutation = useMutation({
-    mutationFn: deleteItemRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      window.location.href = "/item/item-catalogue";
-    },
-    onError: (error) => {
-      console.error("Erreur de suppression :", error);
-    },
-  });
-
 
 
   const formVerified = (): boolean => {
@@ -510,7 +475,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                   type="button"
                   title="Supprimer l'item"
                   onClick={() => deleteMutation.mutate(idObjet)}
-                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 focus:outline-none focus:ring-2 focus:ring-rose-400/30"
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2  hover:cursor-pointer border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 focus:outline-none focus:ring-2 focus:ring-rose-400/30"
                 >
                   <AiOutlineDelete className="h-5 w-5" />
                   Supprimer

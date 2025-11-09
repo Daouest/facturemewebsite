@@ -91,8 +91,8 @@ export default function FormCreationItem() {
 
       await reponse.json();
 
-      // On success, redirect to item-catalogue
-      router.push("/item/item-catalogue");
+      // // On success, redirect to item-catalogue
+      // router.push("/item/item-catalogue");
     } catch (err) {
       console.error("Erreur dans l'envoi des données [creation-item]", err);
       setErrorMessage({
@@ -249,7 +249,7 @@ export default function FormCreationItem() {
         <div className="sm:flex-1 flex justify-center">
           <Button
             type="submit"
-            className="w-full sm:w-2/3 h-12 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors border border-sky-400/40 shadow-sm"
+            className="w-full sm:w-2/3 h-12 rounded-xl bg-sky-500 text-white hover:cursor-pointer hover:bg-sky-400 transition-colors border border-sky-400/40 shadow-sm"
           >
             Créer item
           </Button>

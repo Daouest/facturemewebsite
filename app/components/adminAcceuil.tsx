@@ -81,7 +81,7 @@ export default function AdminAcceuil() {
         }
         if (showData.clients) {
             filter = (data as Client[])?.filter(i =>
-                i.nomClient.toLowerCase().includes(searche.toLowerCase())
+                i?.nomClient.toLowerCase().includes(searche.toLowerCase())
             );
         }
         setDataOutput(filter ?? []);

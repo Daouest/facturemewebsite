@@ -1,12 +1,11 @@
 "use client";
-import React, {useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { TableItemType, Facture, Ticket } from "@/app/lib/definitions";
-import Modal from 'react-modal';
+import Modal from "react-modal";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
 import {
   isTableFacture,
   isTableItem,
@@ -29,8 +28,15 @@ export function Table<T extends TableItemType | Facture | Ticket>({
   className,
 }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
-  const [isClick, setIsClick] = useState({ facture: false, ticketMessage: false, ticketStatus: false });
-  const [messageTicket, setMessageTicket] = useState({ client: "", message: "" });
+  const [isClick, setIsClick] = useState({
+    facture: false,
+    ticketMessage: false,
+    ticketStatus: false,
+  });
+  const [messageTicket, setMessageTicket] = useState({
+    client: "",
+    message: "",
+  });
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
   const router = useRouter();
@@ -38,18 +44,17 @@ export function Table<T extends TableItemType | Facture | Ticket>({
   const queryClient = useQueryClient();
   const etagRef = useRef<string | null>(null);
 
-  useEffect(() => {// setAppElement doit être exécuté après le montage sinon le DOM n'existe pas encore
-
+  useEffect(() => {
+    // setAppElement doit être exécuté après le montage sinon le DOM n'existe pas encore
     if (typeof window === "undefined") return;
-    const rootEl = document.getElementById("__next") ?? document.body; //_next est un ID automatiquement ajouté par Next.js à la racine de ton application côté client.
+    const rootEl = document.getElementById("__next") ?? document.body;
     Modal.setAppElement(rootEl);
   }, []);
 
-
-
   const closeModal = () => {
     setIsOpen(false);
-  }
+  };
+
   useEffect(() => {
     const setMySession = async () => {
       const res = await fetch("/api/set-facture", {
@@ -69,17 +74,13 @@ export function Table<T extends TableItemType | Facture | Ticket>({
       }
     };
 
-    if (id !== null && isClick) {
+    if (id !== null && isClick.facture) {
       console.log("id dans le useEffect de table:", id);
       setMySession();
     }
   }, [id, isClick, router]);
 
-
-
-  const {
-    data: tickets,
-  } = useQuery<Ticket[]>({
+  const { data: tickets } = useQuery<Ticket[]>({
     queryKey: ["tickets"],
     queryFn: async () => {
       const res = await fetch("/api/ticket", {
@@ -89,8 +90,7 @@ export function Table<T extends TableItemType | Facture | Ticket>({
         },
       });
       const newEtag = res.headers.get("Etag");
-
-      if (newEtag) etagRef.current = newEtag; console.log(" etagRef.current", etagRef.current)
+      if (newEtag) etagRef.current = newEtag;
 
       if (!res.ok) throw new Error("Erreur lors de la récupération");
       return res.json();
@@ -98,47 +98,50 @@ export function Table<T extends TableItemType | Facture | Ticket>({
     refetchInterval: 5000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    staleTime: 8000 //  les données son considérées comme bonne après 8 secondes
+    staleTime: 8000,
+  });
 
-  })
-
-  const handleChangeStatus = async ({ idClient, idTicket, status }: { idClient: number, idTicket: number, status: boolean }) => {
+  const handleChangeStatus = async ({
+    idClient,
+    idTicket,
+    status,
+  }: {
+    idClient: number;
+    idTicket: number;
+    status: boolean;
+  }) => {
     const res = await fetch("/api/ticket", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        idClient: idClient,
-        idTicket: idTicket,
-        status: status
+        idClient,
+        idTicket,
+        status,
       }),
     });
-    // const data = await res.json()
     if (!res.ok) throw new Error("Erreur lors de la mise à jour");
     return res.json();
-  }
-
+  };
 
   const mutation = useMutation({
     mutationFn: handleChangeStatus,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tickets"] }); // fait un relaod coté serveur
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
     },
     onError: (error) => {
       console.error("Erreur de la modification :", error);
     },
   });
 
-
   const update = (idClient: number, idTicket: number, status: boolean) => {
-
     mutation.mutate({ idClient, idTicket, status }, {
       onSuccess: () => {
         console.log("Modification complétée");
-      }
+      },
     });
-  }
+  };
 
-  // Sécurité : si rows est vide, on ne rend rien
+  // Sécurité : si rows est vide
   if (!rows || rows.length === 0) return null;
 
   // TABLE DES ITEMS
@@ -165,9 +168,9 @@ export function Table<T extends TableItemType | Facture | Ticket>({
           </tr>
         </thead>
         <tbody className="border border-white">
-          {itemRows.map((row, index) => (
+          {itemRows.map((row) => (
             <tr
-              key={index}
+              key={row.idObjet}
               onClick={() =>
                 router.push(`/item/detail/${btoa(String(row.idObjet))}`)
               }
@@ -186,34 +189,9 @@ export function Table<T extends TableItemType | Facture | Ticket>({
                 <ImageFromBd id={row.idObjet} name={row.productName} />
               </td>
             </tr>
-          </thead>
-
-          <tbody className="divide-y divide-white/10">
-            {itemRows.map((row) => (
-              <tr
-                key={row.idObjet}
-                onClick={() => router.push(`/item/detail/${row.idObjet}`)}
-                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-3 text-slate-200 align-top">
-                  {row.productName}
-                </td>
-                <td className="px-4 py-3 text-slate-300/90 align-top">
-                  {row.description}
-                </td>
-                <td className="px-4 py-3 text-slate-100 align-top">
-                  {formatIntoDecimal(row.price, "fr-CA", "CAD")}
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <div className="ring-1 ring-white/10 rounded-md overflow-hidden inline-block">
-                    <ImageFromBd id={row.idObjet} name={row.productName} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     );
   }
 
@@ -221,11 +199,10 @@ export function Table<T extends TableItemType | Facture | Ticket>({
   if (isTableFacture(rows[0])) {
     const factureRows = rows as Facture[];
     return (
-      <div className={`grid gap-4 ${className ?? ""} `}>
+      <div className={`grid gap-4 ${className ?? ""}`}>
         {factureRows.map((row, index) => (
-          <div
+          <button
             key={index}
-            className="flex items-center justify-between p-4 rounded-xl shadow-lg bg-white hover:bg-gray-300 transition cursor-pointer"
             onClick={() => {
               setIsClick({ ...isClick, facture: true });
               setId(row.idFacture);
@@ -237,9 +214,7 @@ export function Table<T extends TableItemType | Facture | Ticket>({
               "hover:bg-white/10 hover:border-white/20 transition-colors",
               "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
             ].join(" ")}
-            aria-label={`${t("invoice")} #${row.factureNumber} - ${
-              row.nomClient
-            }`}
+            aria-label={`${t("invoice")} #${row.factureNumber} - ${row.nomClient}`}
           >
             <div>
               <h4 className="text-lg font-semibold text-gray-800">
@@ -260,10 +235,9 @@ export function Table<T extends TableItemType | Facture | Ticket>({
             </div>
 
             <div
-              className={`text-sm ${row.isPaid
-                ? "text-green-600"
-                : "text-red-600 ml-[-30px] max-sm:text-xs"
-                }`}
+              className={`text-sm ${
+                row.isPaid ? "text-green-600" : "text-red-600 ml-[-30px] max-sm:text-xs"
+              }`}
             >
               <p>{row.isPaid ? "PAYÉE" : "NON PAYÉE"}</p>
             </div>
@@ -272,9 +246,10 @@ export function Table<T extends TableItemType | Facture | Ticket>({
       </div>
     );
   }
+
+  // TABLE DES TICKETS
   if (isTableTicket(rows[0])) {
     const ticketRows = rows as Ticket[];
-    console.log("ticketRows",ticketRows);
     return (
       <>
         <table className="min-w-full border border-gray-300 shadow-lg rounded-xl bg-white">
@@ -294,27 +269,25 @@ export function Table<T extends TableItemType | Facture | Ticket>({
               </th>
             </tr>
           </thead>
-
           <tbody>
             {ticketRows.map((row, index) => (
               <tr
                 key={index}
                 className="border-b border-gray-200 hover:bg-gray-100 transition duration-200 text-center"
               >
-                {/* Nom du client */}
                 <td className="px-4 py-2 text-sm font-semibold text-gray-800">
                   {row.nomClient}
-                  {/* Marc */}
                 </td>
 
-                {/* Message */}
                 <td
                   className="px-4 py-2 text-sm text-black border-2 border-gray-100 hover:cursor-pointer"
                   onClick={() => {
-                    setIsClick({ ...isClick, ticketMessage: !isClick.ticketMessage });
+                    setIsClick({
+                      ...isClick,
+                      ticketMessage: !isClick.ticketMessage,
+                    });
                     setIsOpen(true);
                     setMessageTicket({
-                      ...messageTicket,
                       client: row.nomClient,
                       message: row.message,
                     });
@@ -323,20 +296,21 @@ export function Table<T extends TableItemType | Facture | Ticket>({
                   {showLongText(row.message)}
                 </td>
 
-                {/* Date */}
                 <td className="px-4 py-2 text-xs text-gray-500">
                   {dateToSting(row.date)}
                 </td>
 
-                {/* Statut */}
                 <td
                   className="px-4 py-2 text-sm hover:cursor-pointer"
                   onClick={() => {
-                    setIsClick({ ...isClick, ticketStatus: !isClick.ticketStatus });
+                    setIsClick({
+                      ...isClick,
+                      ticketStatus: !isClick.ticketStatus,
+                    });
                     update(row.idClient, row.idTicket, !isClick.ticketStatus);
                   }}
                 >
-                  {row.isCompleted  ? (
+                  {row.isCompleted ? (
                     <Badge className="bg-blue-500">Complété</Badge>
                   ) : (
                     <Badge variant="destructive">Non complété</Badge>
@@ -347,30 +321,29 @@ export function Table<T extends TableItemType | Facture | Ticket>({
           </tbody>
         </table>
 
-
-
-        {
-          isClick.ticketMessage && (
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={closeModal}
-              className="bg-white p-6 flex flex-col rounded-xl shadow-xl max-w-md mx-auto outline-none relative z-50 top-30  left-60 transform -translate-y-1/2 -translate-x-1/2"
-              overlayClassName="fixed inset-0 bg-black/40 flex justify-center items-center z-40"
-              contentLabel=" Modal"
+        {isClick.ticketMessage && (
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            className="bg-white p-6 flex flex-col rounded-xl shadow-xl max-w-md mx-auto outline-none relative z-50"
+            overlayClassName="fixed inset-0 bg-black/40 flex justify-center items-center z-40"
+            contentLabel="Modal"
+          >
+            <div className="text-start font-semibold">
+              {messageTicket.client} :
+            </div>
+            <div className="text-center">{messageTicket.message}</div>
+            <Button
+              className="flex self-center mt-5 hover:cursor-pointer"
+              onClick={closeModal}
             >
-              <div className="text-start font-semibold">{messageTicket.client}:</div>
-              <div className="text-center">{messageTicket.message}</div>
-              <Button className="flex self-center mt-5 hover:cursor hover:cursor-pointer " onClick={closeModal}>Fermer</Button>
-
-            </Modal>
-
-          )
-        }
+              Fermer
+            </Button>
+          </Modal>
+        )}
       </>
     );
   }
 
-
-  // Aucun type reconnu
   return null;
 }

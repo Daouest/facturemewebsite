@@ -263,12 +263,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             {storedErrorCount === 0 ? `Vous avez été bloqué, revenez dans 1 minute` : ""}
           </p>
 
-          {mode === "signup" && (
-            <>
-              {/* champs signup */}
-              ...
-            </>
-          )}
+          
 
           {mode === "login" && (
             <Input
@@ -280,6 +275,55 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               autoComplete="email"
               disabled={isBlocked ? true : false}
+              required
+            />
+          )}
+          {mode === "signup" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <Input
+                  label="Mot de passe"
+                  type="password"
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChange={(e) => {
+                    setErrors((p) => ({ ...p, password: "" }));
+                    setPassword(e.target.value);
+                  }}
+                  autoComplete="new-password"
+                  required
+                />
+              </div>
+              <div>
+                <Input
+                  label="Confirmation"
+                  type="password"
+                  placeholder="Confirmez mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setErrors((p) => ({ ...p, confirmPassword: "" }));
+                    setConfirmPassword(e.target.value);
+                  }}
+                  autoComplete="new-password"
+                  required
+                />
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <Input
+              label="Mot de passe"
+              type="password"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
+              disabled={isBlocked ? true : false}
+
               required
             />
           )}

@@ -19,9 +19,9 @@ export default function AdminPage() {
     const t = createTranslator(langage);
     const TickePage = React.lazy(() => import("../components/Ticket"));
     const router = useRouter()
-    // useEffect(() => {
-    //     if (!user?.isAdmin) router.push("/homePage");
-    // }, [])
+    useEffect(() => {
+        if (!user?.isAdmin) router.push("/homePage");
+    }, [])
     return (
         <>
             <Header />
