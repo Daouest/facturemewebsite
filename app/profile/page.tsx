@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import EditProfileForm from "./EditProfileForm";
+import EditBusinessForm from "./EditBusinessForm";
 import { Menu, X } from "lucide-react";
 
 export default function ProfilePage() {
@@ -66,6 +67,7 @@ export default function ProfilePage() {
                 <div className="my-4 border-t border-white/10" />
 
                 <EditProfileForm />
+                <EditBusinessForm />
               </div>
             </div>
           </div>

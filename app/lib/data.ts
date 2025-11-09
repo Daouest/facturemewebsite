@@ -149,6 +149,11 @@ export async function fetchNextClientId() {
     return lastClient ? lastClient.idClient + 1 : 1;
 }
 
+export async function fetchNextBusinessId() {
+    const lastBizz = await DbBusiness.findOne().sort({ idBusiness: -1 }).lean<Business | null>();
+    return lastBizz ? lastBizz.idBusiness + 1 : 1;
+}
+
 export async function fetchNextObjetId() {
     const lastObjet = await DbObjet.findOne().sort({ idObjet: -1 }).lean<Objet | null>();
     return lastObjet ? lastObjet.idObjet + 1 : 1;
