@@ -155,10 +155,10 @@ export default function EditBusinessForm() {
         <div className="grid grid-cols-1 gap-8">
             {/* Section: Infos de la compagnie */}
             <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
                     Informations de votre compagnie
                 </h2>
-                <div className="my-4 border-t border-gray-200" />
+                <div className="my-4 border-t border-white/10" />
 
                 <form
                     onSubmit={saveProfile}
@@ -166,54 +166,54 @@ export default function EditBusinessForm() {
                     {/* Nom et Numéro */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
                                 Nom de la compagnie
                             </label>
                             <Input
                                 value={form.name}
                                 onChange={onChange("name")}
-                                className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-300 mb-1">
                                 Numéro de compagnie
                             </label>
                             <Input
                                 value={form.businessNumber}
                                 onChange={onChange("businessNumber")}
-                                className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 required
                             />
                         </div>
                     </div>
 
                     {/*Addresse*/}
-                    <div id="businessAddressContainer" className="flex flex-col gap-1 bg-blue-50 rounded-xl p-4 mb-4">
-                        <p className="mb-3 block font-semibold text-gray-800 flex items-center gap-2">Addresse</p>
+                    <div id="businessAddressContainer" className="flex flex-col gap-1 rounded-xl p-4 mb-4 bg-white/5 backdrop-blur border border-white/10">
+                        <p className="mb-3 block font-semibold text-slate-100 flex items-center gap-2">Addresse</p>
 
                         {/*Premier ligne: addresse, ville*/}
                         <div className="flex flex-row w-full gap-4">
                             <div className="flex flex-row items-center w-full">
-                                <label className="text-sm font-semibold text-gray-800 items-center mr-3">Addresse</label>
+                                <label className="text-sm font-semibold text-slate-300 items-center mr-3">Addresse</label>
                                 <input
                                     required
                                     placeholder="ex.: 123, rue des Alphabets"
                                     value={form.address}
                                     onChange={onChange("address")}
-                                    className="w-full bg-white rounded-xl border border-gray-200 py-3 pl-5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                                 />
                             </div>
                             <div className="flex flex-row items-center w-full">
-                                <label className="text-sm font-semibold text-gray-800 items-center mr-3">Ville</label>
+                                <label className="text-sm font-semibold text-slate-300 items-center mr-3">Ville</label>
                                 <input
                                     required
                                     pattern="^[^\d]+$"
                                     placeholder="ex.: Montréal"
                                     value={form.city}
                                     onChange={onChange("city")}
-                                    className="w-full bg-white rounded-xl border border-gray-200 py-3 pl-5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                                 />
                             </div>
                         </div>
@@ -221,7 +221,7 @@ export default function EditBusinessForm() {
                         {/*Seconde ligne: code postal, province, pays*/}
                         <div className="flex flex-row w-full gap-4">
                             <div className="flex flex-row items-center w-full">
-                                <label className="text-sm font-semibold text-gray-800 items-center mr-3">Code postal</label>
+                                <label className="text-sm font-semibold text-slate-300 items-center mr-3">Code postal</label>
                                 <input
                                     required
                                     placeholder="ex.: A1B 2C3"
@@ -230,23 +230,23 @@ export default function EditBusinessForm() {
                                     minLength={6}
                                     maxLength={6}
                                     pattern="^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$"
-                                    className="w-full bg-white rounded-xl border border-gray-200 py-3 pl-5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                                 />
                             </div>
                             <div className="flex flex-row items-center w-1/2">
-                                <label className="text-sm font-semibold text-gray-800 items-center mr-3">Province</label>
+                                <label className="text-sm font-semibold text-slate-300 items-center mr-3">Province</label>
                                 <Provinces
                                     value={form.province}
                                     onChange={(province) => setForm((form) => ({ ...form, province }))}
                                 />
                             </div>
                             <div className="flex flex-row items-center w-1/2">
-                                <label className="text-sm font-semibold text-gray-800 items-center mr-3">Pays</label>
+                                <label className="text-sm font-semibold text-slate-300 items-center mr-3">Pays</label>
                                 <input
                                     required
                                     value="CA"
                                     disabled
-                                    className="w-full bg-white rounded-xl border border-gray-200 py-3 pl-5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                                 />
                             </div>
                         </div>
@@ -257,7 +257,7 @@ export default function EditBusinessForm() {
                         {/* taxes */}
                         <div className="flex-1">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Numéro de TVQ
                                 </label>
                                 <Input
@@ -265,11 +265,11 @@ export default function EditBusinessForm() {
                                     onChange={onChange("TVQ")}
                                     minLength={9}
                                     maxLength={9}
-                                    className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                    className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Numéro de TVS
                                 </label>
                                 <Input
@@ -277,11 +277,11 @@ export default function EditBusinessForm() {
                                     onChange={onChange("TVS")}
                                     minLength={9}
                                     maxLength={9}
-                                    className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                    className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Numéro de TVP
                                 </label>
                                 <Input
@@ -289,11 +289,11 @@ export default function EditBusinessForm() {
                                     onChange={onChange("TVP")}
                                     minLength={9}
                                     maxLength={9}
-                                    className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                    className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Numéro de TVH
                                 </label>
                                 <Input
@@ -301,7 +301,7 @@ export default function EditBusinessForm() {
                                     onChange={onChange("TVH")}
                                     minLength={9}
                                     maxLength={9}
-                                    className="w-full h-11 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                                    className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                                 />
                             </div>
                         </div>
@@ -311,13 +311,13 @@ export default function EditBusinessForm() {
                             <div>
                                 <label
                                     htmlFor="imageUpload"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                    className="block text-sm font-medium text-slate-300 mb-1"
                                 >
                                     Logo
                                 </label>
                                 <input
-                                    className="h-11 w-full sm:flex-1 rounded-xl border border-gray-200 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 
-                                       file:mr-2 file:px-3  file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    className="h-11 w-full sm:flex-1 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 
+                                       file:mr-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-blue-100 hover:file:bg-blue-800"
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageUpload}
@@ -338,13 +338,13 @@ export default function EditBusinessForm() {
                     <div className="sm:col-span-2 mt-2 flex items-center justify-end gap-3">
                         <button
                             disabled={saving}
-                            className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 disabled:opacity-60 transition-colors shadow"
+                            className="rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium px-4 py-2 hover:bg-sky-500/30 disabled:opacity-60 transition-colors"
                             type="submit"
                         >
                             {saving ? "En traitement..." : "Modifier la compagnie"}
                         </button>
                         {saved === "ok" && (
-                            <span className="text-green-700 text-sm">Sauvegardé!</span>
+                            <span className="text-green-300 text-sm">Sauvegardé!</span>
                         )}
                         {saved === "err" && (
                             <span className="text-red-700 text-sm">
@@ -368,14 +368,14 @@ export function Provinces({ value, onChange }: ProvincesProps) {
             value={value}
             onChange={(e) => onChange(e.target.value)}
             required
-            className="w-full bg-white rounded-xl border border-gray-200 py-3 pl-5 text-sm outline-none appearance-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
         >
             {provinces.map((province) => (
-                <option key={province} value={province}>
+                <option key={province} value={province} className="bg-slate-800">
                     {province}
                 </option>
             ))}
-            <option value="" disabled>
+            <option value="" disabled className="bg-slate-800">
                 Sélectionner
             </option>
         </select>
