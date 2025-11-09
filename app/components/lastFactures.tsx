@@ -1,39 +1,80 @@
-"use client"
+"use client";
 import { dateToSting, createTranslator } from "@/app/lib/utils";
-import { TableFactureType } from "@/app/lib/definitions"
+import { TableFactureType } from "@/app/lib/definitions";
 import { useLangageContext } from "../context/langageContext";
+import Link from "next/link";
+import { FileText, User, Calendar, ChevronRight } from "lucide-react";
 
 type ListFacturesProps<T extends TableFactureType> = {
-    rows: T[];
-}
-export function LastFactures<T extends TableFactureType>({ rows }: ListFacturesProps<T>) {
-    const { langage } = useLangageContext();
+  rows: T[];
+};
+export function LastFactures<T extends TableFactureType>({
+  rows,
+}: ListFacturesProps<T>) {
+  const { langage } = useLangageContext();
 
-    const t = createTranslator(langage);
+  const t = createTranslator(langage);
 
-    if (rows.length == 0) {
-        return (
-            <div className="flex flex-row text-red-600 font-bold justify-center items-center-safe">
-                <p> {t("noFacture")}</p>
-            </div>
-        )
-    }
-
+  if (rows.length == 0) {
     return (
-        <div className={ `${rows.length === 1 ? "grid grid-cols gap-4 justify-center items-center":"grid grid-cols-3 gap-4"}`}>
-            {
-                rows.map((item, index) => (
-
-                    <div key={index} className="bg-blue-600 text-white rounded-xl p-4 shadow hover:scale-105 transition">
-                        <h4 className="font-semibold">{t("invoice")} {item.factureNumber}</h4>
-                        <p className="text-sm">Client: {item.nomClient}.</p>
-                        <p className="text-sm">Date: {dateToSting(item.dateFacture)}</p>
-                    </div>
-
-                ))
-            }
-
+      <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="rounded-full bg-red-500/10 p-4 mb-4">
+          <FileText className="w-12 h-12 text-red-400" />
         </div>
-    )
+        <p className="text-slate-300 font-medium text-center">
+          {t("noFacture")}
+        </p>
+      </div>
+    );
+  }
 
+  return (
+    <div
+      className={`${
+        rows.length === 1
+          ? "grid grid-cols-1 gap-4 justify-center"
+          : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      }`}
+    >
+      {rows.map((item, index) => (
+        <Link
+          href={`/previsualisation?factureId=${item.idFacture}`}
+          key={index}
+          className="group relative rounded-xl border border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur p-5 shadow-lg hover:shadow-xl hover:border-sky-400/30 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+        >
+          {/* Subtle gradient overlay on hover */}
+          <div className="absolute inset-0 bg-gradient-to-br from-sky-400/0 to-indigo-400/0 group-hover:from-sky-400/5 group-hover:to-indigo-400/5 transition-all duration-300" />
+
+          <div className="relative z-10">
+            {/* Customer name with icon */}
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+                <User className="w-4 h-4 text-sky-300" />
+              </div>
+              <h4 className="font-semibold text-slate-100 text-lg truncate">
+                {item.nomClient}
+              </h4>
+            </div>
+
+            {/* Facture number - hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2 mb-2 text-slate-300">
+              <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <p className="text-sm truncate">#{item.factureNumber}</p>
+            </div>
+
+            {/* Date - hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2 text-slate-400">
+              <Calendar className="w-4 h-4 flex-shrink-0" />
+              <p className="text-xs">{dateToSting(item.dateFacture)}</p>
+            </div>
+
+            {/* Arrow indicator on hover */}
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <ChevronRight className="w-5 h-5 text-sky-400" />
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
 }

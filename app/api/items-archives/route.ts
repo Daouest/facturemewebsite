@@ -7,7 +7,6 @@ import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
 
 export async function GET(req: NextRequest) {
   try {
-    // 🔍 Extraction des paramètres de requête
     const { searchParams } = new URL(req.url);
     const token = req.cookies.get(COOKIE_NAME)?.value;
     const session = token ? await decrypt(token) : null;

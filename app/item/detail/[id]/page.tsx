@@ -1,6 +1,6 @@
 import FormDetailItem from "@/app/components/formDetailItem";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 export default async function DetailItem({
   params,
 }: {

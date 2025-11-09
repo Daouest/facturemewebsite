@@ -10,6 +10,7 @@ import {
   StyleSheet,
   pdf,
 } from "@react-pdf/renderer";
+import { Lightbulb } from "lucide-react";
 
 const styles = StyleSheet.create({
   page: {
@@ -428,9 +429,19 @@ export default function PDFInvoice({ invoiceId }: PDFInvoiceProps) {
                 >
                   ×
                 </button>
-                <div style={{ marginBottom: 12 }}>
+                <div
+                  style={{
+                    marginBottom: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Lightbulb
+                    style={{ width: 20, height: 20, color: "#2c5aa0" }}
+                  />
                   <strong style={{ color: "#2c5aa0" }}>
-                    💡 Choisir l'emplacement de sauvegarde
+                    Choisir l'emplacement de sauvegarde
                   </strong>
                 </div>
                 <div style={{ marginBottom: 8, color: "#555" }}>

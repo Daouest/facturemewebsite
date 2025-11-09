@@ -15,7 +15,7 @@ import { useUser } from "@/app/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import Link from "next/link";
 
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {

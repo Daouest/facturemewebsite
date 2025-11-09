@@ -1,37 +1,47 @@
 "use client";
 import Link from "next/link";
+import { HelpCircle, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer
-      className="
-        w-full bg-blue-600 dark:bg-zinc-900 text-white
-        border-t border-blue-700/40 dark:border-zinc-800
-        /* sticky only on md+ */
-        md:fixed md:bottom-0 md:left-0 md:right-0 md:z-50
-      "
+      className="w-full bg-slate-800/90 backdrop-blur border-t border-white/10 md:fixed md:bottom-0 md:left-0 md:right-0 md:z-50"
       aria-label="Footer"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-20 md:h-24 flex items-center">
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <h2 className="text-xl font-bold">FactureMe</h2>
-            <p className="text-sm text-white/80">Vite fait bien fait!</p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Brand */}
+          <div className="flex flex-col">
+            <h2 className="text-xl font-bold text-slate-100">FactureMe</h2>
+            <p className="text-sm text-slate-400">Vite fait bien fait!</p>
           </div>
 
-          <nav aria-label="Footer navigation" className="hidden md:block">
+          {/* Navigation */}
+          <nav
+            aria-label="Footer navigation"
+            className="flex gap-6 items-center"
+          >
             <Link
               href="/about"
-              className="underline underline-offset-4 hover:opacity-90"
+              className="text-sm text-slate-300 hover:text-sky-400 transition-colors"
             >
               About us
             </Link>
+            <Link
+              href="/pub"
+              className="flex items-center gap-2 text-sm text-slate-300 hover:text-sky-400 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span>FAQ</span>
+            </Link>
           </nav>
 
-          <div className="text-sm md:text-right">
+          {/* Contact */}
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-slate-400" />
             <a
               href="mailto:FactureMe25@gmail.com"
-              className="underline underline-offset-4 hover:opacity-90"
+              className="text-sm text-slate-300 hover:text-sky-400 transition-colors"
             >
               FactureMe25@gmail.com
             </a>

@@ -91,6 +91,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
@@ -143,6 +144,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           username: username.trim().toLowerCase(),
           firstName: firstName.trim(),

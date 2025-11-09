@@ -2,6 +2,7 @@
 //component qu'on va reutiliser dans chaque page
 // *** Faire la traduction ***
 import Image from "next/image";
+import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -48,9 +49,14 @@ export default function Header() {
 
         <nav className="flex items-center gap-6 text-sm font-medium">
           {/* Username (when logged in) */}
-          <div className="flex text-blue-400 dark:text-gray-100 text-sm sm:text-base font-medium truncate max-w-xs text-center">
-            {user?.username?.toUpperCase() ?? ""}
-          </div>
+          {isLoggedIn && (
+            <Link
+              href="/profile"
+              className="text-blue-400 dark:text-gray-100 text-sm sm:text-base font-medium truncate max-w-xs text-center hover:text-sky-400 transition-colors cursor-pointer"
+            >
+              {user?.username?.toUpperCase() ?? ""}
+            </Link>
+          )}
 
           {/* When NOT logged in:
               - if on About page, show "Connexion"

@@ -26,7 +26,49 @@ export function UserProvider({
   const [user, setUser] = useState<AppUser>(initialUser);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => setReady(true), []);
+  useEffect(() => {
+    setReady(true);
+
+    // Only validate if we have an initial user (from server-side cookie)
+    // This prevents interfering with client-side login flow
+    if (!initialUser) {
+      return;
+    }
+
+    // Validate session periodically, not on initial mount
+    // This checks if the session expired while user is browsing
+    const validateSession = async () => {
+      try {
+        const res = await fetch("/api/session", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        // Only clear user if we get a definitive 401 (unauthorized)
+        if (res.status === 401) {
+          setUser(null);
+        }
+      } catch (error) {
+        // Don't clear user on network errors - could be temporary
+        console.error("Session validation failed:", error);
+      }
+    };
+
+    // Check session after 5 seconds, then every 5 minutes
+    const initialTimer = setTimeout(() => {
+      validateSession();
+    }, 5000);
+
+    const interval = setInterval(() => {
+      validateSession();
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   return (
     <UserContext.Provider value={{ user, setUser, ready }}>

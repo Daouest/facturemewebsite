@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import AuthForm from "@/app/components/AuthForm";

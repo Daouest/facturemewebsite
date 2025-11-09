@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { Table } from "@/components/ui/table";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Link from "next/link";

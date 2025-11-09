@@ -22,13 +22,13 @@ const fr = {
   welcome: "Bienvenue",
   dashboard: "Vite fait, bien fait!",
   // Sidebar
-  invoices: "📄 Mes factures",
-  createItem: "➕ Créer un item",
-  newInvoice: "➕ Nouvelle facture",
-  catalogue: "🔷 Mes items",
-  profile: "😎 Profil",
-  myClients: "👥 Mes clients",
-  newClient: "➕ Nouveau client",
+  invoices: "Mes factures",
+  createItem: "Créer un item",
+  newInvoice: "Nouvelle facture",
+  catalogue: "Mes items",
+  profile: "Profil",
+  myClients: "Mes clients",
+  newClient: "Nouveau client",
 
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
@@ -39,14 +39,14 @@ const fr = {
 
   invoice: "Facture",
   // Factures
-  recentInvoices: "📊 Vos factures récentes",
+  recentInvoices: "Vos factures récentes",
   loading: "Chargement...",
   // Nouveautés
-  news: "🔔 Nouveautés",
-  exportPDF: "📥 Exporter en PDF",
-  onlinePayment: "💳 Paiement en ligne",
-  clientManagement: "👥 Mes clients",
-  calendar: "📅 Calendrier",
+  news: "Nouveautés",
+  exportPDF: "Exporter en PDF",
+  onlinePayment: "Paiement en ligne",
+  clientManagement: "Mes clients",
+  calendar: "Calendrier",
 
   today: "Aujourd'hui",
 
@@ -80,13 +80,13 @@ const en = {
   dashboard: "Nice and easy!",
 
   // Sidebar
-  invoices: "📄 My invoices",
-  createItem: "➕ Create an item",
-  newInvoice: "➕ New invoice",
-  catalogue: "🔷 My items",
-  profile: "😎 Profile",
-  myClients: "👥 My clients",
-  newClient: "➕ New client",
+  invoices: "My invoices",
+  createItem: "Create an item",
+  newInvoice: "New invoice",
+  catalogue: "My items",
+  profile: "Profile",
+  myClients: "My clients",
+  newClient: "New client",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",
@@ -96,15 +96,15 @@ const en = {
   languageEnglish: "English",
 
   // Invoices
-  recentInvoices: "📊 Your recent invoices",
+  recentInvoices: "Your recent invoices",
   loading: "Loading...",
 
   // News
-  news: "🔔 News",
-  exportPDF: "📥 Export to PDF",
-  onlinePayment: "💳 Online payment",
-  clientManagement: "👥 My clients",
-  calendar: "📅 Calendar",
+  news: "News",
+  exportPDF: "Export to PDF",
+  onlinePayment: "Online payment",
+  clientManagement: "My clients",
+  calendar: "Calendar",
 
   today: "Today",
 

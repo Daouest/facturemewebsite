@@ -1,5 +1,5 @@
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 
 export default function VerifiedPage() {
   return (

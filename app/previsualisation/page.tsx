@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import Footer from "../components/footer";
+import Footer from "../components/Footer";
 import Button from "../components/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -107,25 +107,30 @@ export default function Previsualisation() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-        <Header />
-        <div className="pt-10 flex flex-col items-center">
-          <h1 className="text-3xl font-bold text-slate-100">
-            Prévisualisation
-          </h1>
-          <p className="mt-4 text-slate-300/80">
-            Prévisualiser vos informations avant de les imprimer.
-          </p>
-          <Image
-            src="/Loading_Paperplane.gif"
-            alt="Chargement..."
-            width={200}
-            height={200}
-            className="object-contain max-w-full h-auto mt-4"
-          />
+      <>
+        <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
+          <Header />
+          <main className="flex-1 flex items-center justify-center pt-[80px]">
+            <div className="flex flex-col items-center px-6">
+              <h1 className="text-3xl font-bold text-slate-100">
+                Prévisualisation
+              </h1>
+              <p className="mt-4 text-slate-300/80">
+                Prévisualiser vos informations avant de les imprimer.
+              </p>
+              <Image
+                src="/Loading_Paperplane.gif"
+                alt="Chargement..."
+                width={200}
+                height={200}
+                className="object-contain max-w-full h-auto mt-4"
+              />
+            </div>
+          </main>
         </div>
+
         <Footer />
-      </main>
+      </>
     );
   }
 
@@ -140,99 +145,113 @@ export default function Previsualisation() {
 
   if (!valid) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-        <Header />
-        <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center text-slate-200 shadow mt-10">
-          <h2 className="text-2xl font-semibold">
-            {error ? "Erreur" : "Aucune donnée"}
-          </h2>
-          <p className="mt-2 text-slate-300/80">
-            {error
-              ? error
-              : "Impossible d’afficher la prévisualisation pour le moment."}
-          </p>
-          <div className="mt-6 flex gap-3 justify-center">
-            <Link href="/homePage">
-              <span className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-slate-100 hover:bg-white/10">
-                Retour à l’accueil
-              </span>
-            </Link>
-            <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sky-200 hover:bg-sky-500/20"
-            >
-              Réessayer
-            </button>
-          </div>
+      <>
+        <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
+          <Header />
+          <main className="flex-1 flex items-center justify-center pt-[80px]">
+            <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center text-slate-200 shadow mx-6">
+              <h2 className="text-2xl font-semibold">
+                {error ? "Erreur" : "Aucune donnée"}
+              </h2>
+              <p className="mt-2 text-slate-300/80">
+                {error
+                  ? error
+                  : "Impossible d'afficher la prévisualisation pour le moment."}
+              </p>
+              <div className="mt-6 flex gap-3 justify-center flex-wrap">
+                <Link href="/homePage">
+                  <span className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-slate-100 hover:bg-white/10">
+                    Retour à l'accueil
+                  </span>
+                </Link>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sky-200 hover:bg-sky-500/20"
+                >
+                  Réessayer
+                </button>
+              </div>
+            </div>
+          </main>
         </div>
+
         <Footer />
-      </main>
+      </>
     );
   }
 
   if (facture && facture.user && facture.client && facture.facture) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-        <Header />
+      <>
+        <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
+          <Header />
 
-        {/* Back arrow */}
-        <button
-          onClick={() => router.back()}
-          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors"
-          aria-label="Retour"
-          title="Retour"
-        >
-          <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
-          <span className="sr-only">Retour</span>
-        </button>
+          {/* Back arrow */}
+          <button
+            onClick={() => router.back()}
+            className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors"
+            aria-label="Retour"
+            title="Retour"
+          >
+            <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
+            <span className="sr-only">Retour</span>
+          </button>
 
-        <div
-          id="bigContainer"
-          className="w-full max-w-5xl flex-grow rounded-2xl mt-20 mb-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] border border-white/10 bg-white/5 backdrop-blur"
-        >
-          <div className="pt-10 flex flex-col items-center px-6 sm:px-8">
-            <h1 className="text-3xl font-bold text-slate-100">
-              Prévisualisation
-            </h1>
-            <p className="mt-2 text-slate-300/80">
-              Prévisualiser vos informations avant de les imprimer.
-            </p>
+          <main className="flex-1 pt-[80px] flex items-center justify-center">
+            <div
+              id="bigContainer"
+              className="w-full max-w-5xl rounded-2xl my-8 mx-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] border border-white/10 bg-white/5 backdrop-blur"
+            >
+              <div className="pt-10 flex flex-col items-center px-6 sm:px-8">
+                <h1 className="text-3xl font-bold text-slate-100">
+                  Prévisualisation
+                </h1>
+                <p className="mt-2 text-slate-300/80">
+                  Prévisualiser vos informations avant de les imprimer.
+                </p>
 
-            {userComponent(facture.user)}
-            {clientComponent(facture.client)}
-            {invoiceComponent(facture.facture)}
+                {userComponent(facture.user)}
+                {clientComponent(facture.client)}
+                {invoiceComponent(facture.facture)}
 
-            <div className="mb-8 mt-4 w-full max-w-3xl flex flex-col sm:flex-row gap-3 sm:justify-between">
-              <Button
-                type="button"
-                variant="secondary"
-                className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-white/15 !bg-white/5 !text-slate-100 hover:!bg-white/10"
-                onClick={() => window.history.back()}
-              >
-                Retour
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-sky-400/40 !bg-sky-500/10 !text-sky-200 hover:!bg-sky-500/20"
-                onClick={() => router.push(`/invoices/-1/print`)}
-              >
-                Imprimer la facture
-              </Button>
+                <div className="mb-8 mt-4 w-full max-w-3xl flex flex-col sm:flex-row gap-3 sm:justify-between">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-white/15 !bg-white/5 !text-slate-100 hover:!bg-white/10"
+                    onClick={() => window.history.back()}
+                  >
+                    Retour
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    className="mt-3 text-center px-5 py-2 !rounded-xl !border !border-sky-400/40 !bg-sky-500/10 !text-sky-200 hover:!bg-sky-500/20"
+                    onClick={() => router.push(`/invoices/-1/print`)}
+                  >
+                    Imprimer la facture
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          </main>
         </div>
 
         <Footer />
-      </main>
+      </>
     );
   } else {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-        <Header />
-        <div></div>
+      <>
+        <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
+          <Header />
+          <main className="flex-1 flex items-center justify-center">
+            <div></div>
+          </main>
+        </div>
+
         <Footer />
-      </main>
+      </>
     );
   }
 }

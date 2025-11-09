@@ -2,20 +2,26 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
+import Sidebar from "@/app/components/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { getDateNow, createTranslator } from "@/app/lib/utils";
 import { LastFactures } from "@/app/components/lastFactures";
 import { TableFactureType } from "@/app/lib/definitions";
 import { useLangageContext } from "../context/langageContext";
-import { useUser } from "@/app/context/UserContext";
-import Link from "next/link";
 import { refreshSeconds } from "@/app/lib/constante";
-import TextType from "@/app/components/TextType";
+import Link from "next/link";
+import {
+  FileText,
+  Sparkles,
+  FileDown,
+  CreditCard,
+  Users,
+  Calendar,
+} from "lucide-react";
 
 export default function HomePage() {
   const { langage, setLangage } = useLangageContext();
-  const { user } = useUser();
   const etagRef = useRef<string | null>(null);
   const countRef = useRef<string | null>(null);
 
@@ -99,9 +105,12 @@ export default function HomePage() {
 
         <div className="relative z-10 w-full max-w-7xl flex flex-col gap-6">
           {/* Lang / Date */}
-          <div className="flex justify-end items-center text-sm font-semibold text-slate-200 gap-4">
+          <div className="flex flex-wrap justify-end items-center text-sm font-semibold text-slate-200 gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
-              <label htmlFor="dropdown" className="mr-1 text-slate-300/80">
+              <label
+                htmlFor="dropdown"
+                className="mr-1 text-slate-300/80 text-xs sm:text-sm"
+              >
                 {t("chooseLanguage")}
               </label>
               <div className="relative">
@@ -109,7 +118,7 @@ export default function HomePage() {
                   id="dropdown"
                   value={langage}
                   onChange={changeLang}
-                  className="border border-white/10 bg-white/5 text-slate-100 rounded-md px-2 py-1 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none pr-8"
+                  className="border border-white/10 bg-white/5 text-slate-100 rounded-md px-2 py-1 text-xs sm:text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none pr-7"
                 >
                   {options.map((option) => (
                     <option
@@ -122,7 +131,7 @@ export default function HomePage() {
                   ))}
                 </select>
                 <svg
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-slate-400"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -137,115 +146,22 @@ export default function HomePage() {
                 </svg>
               </div>
             </div>
-            <p className="text-slate-300/80">{getDateNow()}</p>
+            <p className="text-slate-300/80 text-xs sm:text-sm">
+              {getDateNow()}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Sidebar */}
-            <aside className="col-span-12 lg:col-span-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
-              <div className="flex flex-col items-center">
-                <Image
-                  src="/default_user.png"
-                  alt="profile"
-                  width={96}
-                  height={96}
-                  className="rounded-full w-24 h-24 mb-4 ring-2 ring-white/10"
-                />
-                <h2 className="text-lg font-semibold text-slate-100 text-center">
-                  {t("hello") + " "}
-                  <TextType
-                    text={[
-                      `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${
-                        user?.firstName?.substring(1, 5) ?? ""
-                      } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${
-                        user?.lastName?.substring(1, 5) ?? ""
-                      }`,
-                    ]}
-                    className="font-semibold text-slate-100"
-                    typingSpeed={75}
-                    pauseDuration={1500}
-                    showCursor={false}
-                    cursorCharacter="|"
-                  />
-                </h2>
-                <p className="text-sm text-slate-300/80 mb-6">
-                  {t("dashboard")}
-                </p>
-              </div>
-
-              <nav className="w-full flex flex-col gap-2">
-                {/* Factures row */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/item/items-archives"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("invoices")}
-                  </Link>
-                  <Link
-                    href="/invoices/create"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("newInvoice")}
-                  </Link>
-                </div>
-
-                {/* Items row */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/item/item-catalogue"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("catalogue")}
-                  </Link>
-                  <Link
-                    href="/item/creation-item"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("createItem")}
-                  </Link>
-                </div>
-
-                {/* Clients row */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/clients-catalogue"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("myClients")}
-                  </Link>
-                  <Link
-                    href="/clients-catalogue/create"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("newClient")}
-                  </Link>
-                </div>
-
-                {/* Profile & FAQ row */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/profile"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    {t("profile")}
-                  </Link>
-                  <Link
-                    href="/pub"
-                    className="text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  >
-                    ⭐ {t("info")}
-                  </Link>
-                </div>
-              </nav>
-            </aside>
+            <Sidebar />
 
             {/* Main Content */}
-            <section className="col-span-12 lg:col-span-9 flex flex-col gap-6">
+            <section className="flex-1 flex flex-col gap-6">
               {/* Recent invoices */}
               <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
                 <h3 className="text-xl font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                  <span className="text-sky-300">📄</span> {t("recentInvoices")}
+                  <FileText className="w-5 h-5 text-sky-300" />{" "}
+                  {t("recentInvoices")}
                 </h3>
                 {status !== "error" && isLoading ? (
                   <div className="flex justify-center items-center py-6">
@@ -265,25 +181,29 @@ export default function HomePage() {
               {/* News */}
               <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
                 <h3 className="text-xl font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                  <span className="text-sky-300">🆕</span> {t("news")}
+                  <Sparkles className="w-5 h-5 text-sky-300" /> {t("news")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
+                    <FileDown className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("exportPDF")}
                   </div>
                   <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
+                    <CreditCard className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("onlinePayment")}
                   </div>
                   <Link
                     href="/clients-catalogue"
                     className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
                   >
+                    <Users className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("clientManagement")}
                   </Link>
                   <Link
                     href="/calendar"
                     className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
                   >
+                    <Calendar className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("calendar")}
                   </Link>
                 </div>
