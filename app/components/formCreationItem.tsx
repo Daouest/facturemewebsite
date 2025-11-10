@@ -6,11 +6,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function FormCreationItem() {
   const { formData, setFormData } = useFormData();
   const { user } = useUser();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [price, setPrice] = useState<string>("");
 
   const [Errormessage, setErrorMessage] = useState({
@@ -90,6 +92,19 @@ export default function FormCreationItem() {
       }
 
       await reponse.json();
+
+      // Reset form data to initial state
+      setFormData({
+        itemNom: "",
+        description: "",
+        prix: 0,
+        image: "",
+        file: "",
+      });
+      setPrice("");
+
+      // Invalidate the items cache to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ["items"] });
 
       // On success, redirect to item-catalogue
       router.push("/item/item-catalogue");

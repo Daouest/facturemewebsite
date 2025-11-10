@@ -5,6 +5,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
 import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
+import ActionsCard from "@/app/components/ActionsCard";
 import { Table } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
@@ -148,31 +149,26 @@ export default function ItemCatalogue() {
                 <aside className="lg:col-span-4">
                   <div className="sticky top-[96px] space-y-6">
                     {/* Actions Card */}
-                    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
-                      <h3 className="text-sm font-semibold text-slate-200 mb-4">
-                        Actions
-                      </h3>
-                      <div className="space-y-3">
-                        <Link
-                          href="/invoices/create"
-                          className="w-full inline-flex items-center justify-center rounded-lg bg-sky-500 px-4 py-2 text-white font-medium shadow hover:bg-sky-400 transition-colors ring-1 ring-sky-400/40"
-                        >
-                          Nouvelle facture
-                        </Link>
-                        <Link
-                          href={"/item/historique-factures"}
-                          className="w-full inline-flex items-center justify-center rounded-lg border border-white/10 px-4 py-2 text-slate-200 font-medium hover:bg-white/10 transition-colors"
-                        >
-                          {t("historicInvoices")}
-                        </Link>
-                      </div>
-                    </div>
+                    <ActionsCard
+                      actions={[
+                        {
+                          href: "/invoices/create",
+                          label: t("newInvoice"),
+                          variant: "primary",
+                        },
+                        {
+                          href: "/item/historique-factures",
+                          label: t("historicInvoices"),
+                          variant: "secondary",
+                        },
+                      ]}
+                    />
 
                     {/* Filters Card */}
                     {factures && factures?.length > 0 && (
                       <div className="hidden lg:block rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
                         <h3 className="text-sm font-semibold text-slate-200 mb-4">
-                          Filtres
+                          {t("filters")}
                         </h3>
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">

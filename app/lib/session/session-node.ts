@@ -25,8 +25,14 @@ export function setSessionCookieOnResponse(res: NextResponse, token: string, max
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: Math.floor(maxAgeMs / 1000)
+        maxAge: Math.floor(maxAgeMs / 1000),
+        // Ensure cookies are isolated and prevent CSRF
+        priority: "high"
     })
+    // Set additional security headers
+    res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    res.headers.set("X-Content-Type-Options", "nosniff");
+    res.headers.set("X-Frame-Options", "DENY");
     return res
 }
 

@@ -6,6 +6,7 @@ import Input from "./Input";
 import { useUser as useUserContext } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AuthMode = "login" | "signup";
 type AuthFormProps = { initialMode?: AuthMode };
@@ -32,6 +33,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
   const { setUser } = useUserContext();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +102,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
           return;
         }
+
+        // Clear all React Query cache to remove any stale data from previous sessions
+        queryClient.clear();
 
         setUser({
           id: data.user.idUser,

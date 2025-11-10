@@ -7,12 +7,14 @@ import { useUser } from "@/app/context/UserContext";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { LogOut, LogIn } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Header() {
   const { user, setUser } = useUser();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   const isLoggedIn = !!(user?.id || user?.username || user?.email);
   const onAboutPage = pathname === "/about";
@@ -21,6 +23,10 @@ export default function Header() {
     try {
       setLoading(true);
       await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+
+      // Clear all React Query cache to remove previous user's data
+      queryClient.clear();
+
       setUser?.(null);
       router.replace("/");
       router.refresh();

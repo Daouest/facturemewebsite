@@ -1,6 +1,5 @@
 import FormDetailItem from "@/app/components/formDetailItem";
-import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
+
 export default async function DetailItem({
   params,
 }: {
@@ -11,9 +10,7 @@ export default async function DetailItem({
 
   return (
     <>
-      <Header />
       <FormDetailItem idObjet={idObjet} />
-      <Footer />
     </>
   );
 }

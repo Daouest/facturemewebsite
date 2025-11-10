@@ -88,13 +88,18 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     const { name, value } = e.target;
 
     if (name === "prix") {
+      // Only allow numbers, spaces, commas, and periods
       const rawValue = value.replace(/\s/g, "").replace(",", ".");
-      if (rawValue === "." || /^\d+\.$/.test(rawValue)) {
+
+      // Allow empty string or just a decimal point
+      if (value === "" || rawValue === "." || /^\d+\.$/.test(rawValue)) {
         setPrice(rawValue.replace(".", ","));
         return;
       }
+
+      // Check if it's a valid number
       const numericValue = parseFloat(rawValue);
-      if (!isNaN(numericValue)) {
+      if (!isNaN(numericValue) && numericValue >= 0) {
         const formatted = numericValue
           .toLocaleString("fr-CA", {
             minimumFractionDigits: 0,
@@ -102,9 +107,8 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
           })
           .replace(/\u00A0/g, " ");
         setPrice(formatted);
-      } else {
-        setPrice(value);
       }
+      // If not a valid number, don't update (ignore the input)
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -350,10 +354,10 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                     <input
                       type="text"
                       id="Nom"
-                      name="Nom"
+                      name="itemNom"
                       value={formData?.itemNom}
-                      readOnly
-                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
+                      onChange={handleChange}
+                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border-2 border-white/10 hover:border-sky-400/40 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
 
@@ -369,8 +373,8 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                       id="description"
                       name="description"
                       value={formData?.description}
-                      readOnly
-                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
+                      onChange={handleChange}
+                      className="text-slate-100 placeholder:text-slate-400 bg-white/5 border-2 border-white/10 hover:border-sky-400/40 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
 

@@ -17,28 +17,27 @@ export default function ImageFromBd({ name, id }: ImageFromBdProps) {
         setLoading(true);
         const res = await fetch(`/api/image/${id}`);
         const { image } = await res.json();
-        setImageUrl(image);
+        // Set to null if image is empty string or falsy
+        setImageUrl(image && image !== "" ? image : null);
         setLoading(false);
       } catch (err) {
         console.error("Erreur chargement image:", err);
+        setImageUrl(null);
+        setLoading(false);
       }
     };
 
     fetchImage();
   }, [id, name]);
 
-  return imageUrl && imageUrl !== "" ? (
+  // Determine the source: valid imageUrl, or fallback
+  const src =
+    imageUrl || (loading ? "/image_loading.gif" : "/default_image.jpg");
+
+  return (
     <Image
-      src={imageUrl ? imageUrl : "/default_image.jpg"}
-      alt={`Image ${id}`}
-      width={80}
-      height={80}
-      className="object-cover w-20 h-20"
-    />
-  ) : (
-    <Image
-      src={loading ? "/image_loading.gif" : "/default_image.jpg"}
-      alt={`image_loading ${id}`}
+      src={src}
+      alt={imageUrl ? `Image ${id}` : `image_loading ${id}`}
       width={80}
       height={80}
       className="object-cover w-20 h-20"

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TableItemType, Facture } from "@/app/lib/definitions";
 import {
   isTableFacture,
@@ -15,11 +16,13 @@ import { useLangageContext } from "@/app/context/langageContext";
 type TableProps<T extends TableItemType | Facture> = {
   rows: T[];
   className?: string;
+  type?: "items" | "factures";
 };
 
 export function Table<T extends TableItemType | Facture>({
   rows,
   className,
+  type,
 }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
   const [isClick, setIsClick] = useState(false);
@@ -70,35 +73,74 @@ export function Table<T extends TableItemType | Facture>({
           "text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
         ].join(" ")}
       >
-        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30">
-          <svg
-            className="h-6 w-6 text-sky-300"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            aria-hidden="true"
+        {type === "items" ? (
+          <Link
+            href="/item/creation-item"
+            className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30 hover:bg-sky-500/25 transition-colors cursor-pointer"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
-          </svg>
-        </div>
-        <p className="text-slate-200 text-base font-semibold">{t("noData")}</p>
+            <svg
+              className="h-6 w-6 text-sky-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          </Link>
+        ) : (
+          <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30">
+            <svg
+              className="h-6 w-6 text-sky-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          </div>
+        )}
+        <p className="text-slate-200 text-base font-semibold">
+          {type === "items" ? t("noItems") : t("noData")}
+        </p>
         <p className="mt-1 text-sm text-slate-300/80">
           {/** Optional guidance; keep or remove */}
-          {langage === "fr"
+          {type === "items"
+            ? langage === "fr"
+              ? "Créez votre premier produit pour commencer."
+              : "Create your first product to get started."
+            : langage === "fr"
             ? "Ajoutez des éléments pour les voir apparaître ici."
             : "Add items to see them here."}
         </p>
+        {type === "items" && (
+          <Link
+            href="/item/creation-item"
+            className="mt-4 inline-flex items-center rounded-xl bg-sky-500 px-4 py-2 text-white font-medium shadow hover:bg-sky-400 transition-colors ring-1 ring-sky-400/40"
+          >
+            {langage === "fr" ? "Créer un produit" : "Create a product"}
+          </Link>
+        )}
       </div>
     );
   }
 
+  // Determine the type to show appropriate message
+  const isItems = isTableItem(rows[0]);
+
   // ITEMS TABLE
-  if (isTableItem(rows[0])) {
+  if (isItems) {
     const itemRows = rows as TableItemType[];
     return (
       <div

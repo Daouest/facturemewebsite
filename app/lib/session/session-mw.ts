@@ -2,22 +2,29 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 
 export const COOKIE_NAME = "fm_session"
-const ACCESS_TTL_MS = 100 * 60 * 100
+const ACCESS_TTL_MS = 100 * 60 * 1000
 
-const secret = process.env.SESSION_SECRET ?? "dev-secret"
-const key = new TextEncoder().encode(secret)
+// Use consistent environment variable name
+const secretKey = process.env.JWT_SECRET || process.env.SESSION_SECRET;
+if (!secretKey) {
+    throw new Error("JWT_SECRET or SESSION_SECRET environment variable must be set");
+}
+const key = new TextEncoder().encode(secretKey)
 
 export type SessionPayload = JWTPayload & { idUser: number; factureId: number }
 
 export async function encrypt(payload: SessionPayload, ttlMs = ACCESS_TTL_MS) {
     const expSeconds = Math.floor((Date.now() + ttlMs) / 1000)
+    const jti = randomBytes(16).toString("hex"); // Unique token ID
 
     return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(expSeconds)
+        .setJti(jti) // Add unique JWT ID to prevent token reuse
         .sign(key)
 }
 
@@ -38,7 +45,9 @@ export function setCookie(res: NextResponse, token: string, maxAgeMs = ACCESS_TT
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: Math.floor(maxAgeMs / 1000)
+        maxAge: Math.floor(maxAgeMs / 1000),
+        // Ensure cookies are isolated and prevent CSRF
+        priority: "high"
     })
 }
 

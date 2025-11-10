@@ -8,9 +8,10 @@ const fr = {
   sortByPaidInvoice: "Non payée",
   sortByNumber: "Numéro",
   archivedInvoices: "Factures actives",
-  creationItem: "Création d'item",
-  seeItems: "Voir mes items",
-  noData: "Vous n'avez aucune facture active!",
+  creationItem: "Création d'un produit",
+  seeItems: "Voir mes produits",
+  noData: "Aucune donnée disponible",
+  noItems: "Vous n'avez aucun produit pour l'instant!",
   clientName: "Nom du client",
   factureNumber: "Numéro de facture",
   dateFacture: "Date de la facture",
@@ -24,7 +25,7 @@ const fr = {
   dashboard: "Vite fait, bien fait!",
   // Sidebar
   invoices: "Mes factures",
-  createItem: "Créer un item",
+  createItem: "Créer un produit",
   newInvoice: "Nouvelle facture",
   catalogue: "Mes produits",
   profile: "Profil",
@@ -52,7 +53,15 @@ const fr = {
   today: "Aujourd'hui",
 
   //LANGAGE
-  chooseLanguage: "choisir une langue"
+  chooseLanguage: "choisir une langue",
+
+  // 404 Page
+  pageNotFound: "Page non trouvée",
+  pageNotFoundMessage: "Cette page n'existe pas! Avez-vous le bon lien?",
+  backToHome: "Retour à l'accueil",
+
+  // Filters
+  filters: "Filtres"
 } as const;
 
 
@@ -67,7 +76,8 @@ const en = {
   archivedInvoices: " Actives Invoices ",
   creationItem: "Creation of item",
   seeItems: "See my items",
-  noData: "Nothing to see here yet!",
+  noData: "No data available",
+  noItems: "You don't have any products yet!",
   clientName: "Client Name",
   factureNumber: "Facture Number",
   dateFacture: "Date of the facture",
@@ -112,7 +122,15 @@ const en = {
 
   invoice: "Invoice",
   //langage
-  chooseLanguage: "Choose a language"
+  chooseLanguage: "Choose a language",
+
+  // 404 Page
+  pageNotFound: "Page Not Found",
+  pageNotFoundMessage: "This page doesn't exist! Do you have the right link?",
+  backToHome: "Back to Home",
+
+  // Filters
+  filters: "Filters"
 }
 
 type TranslationKey = keyof typeof fr;
