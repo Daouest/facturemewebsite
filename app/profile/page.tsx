@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import EditProfileForm from "./EditProfileForm";
+import EditBusinessForm from "./EditBusinessForm";
 
 export default function ProfilePage() {
   return (
@@ -29,6 +30,7 @@ export default function ProfilePage() {
                 <div className="my-4 border-t border-white/10" />
 
                 <EditProfileForm />
+                <EditBusinessForm />
               </div>
             </div>
           </div>
