@@ -203,7 +203,7 @@ export function Table<T extends TableItemType | HourlyRateType | Facture>({
             {itemRows.map((row) => (
               <tr
                 key={row.idObjet}
-                // onClick={() => router.push(`/item/detail/${row.idObjet}`)} //onclick --> voir les details
+                onClick={() => router.push(`/hourlyRates/details/${row.idObjet}`)} //onclick --> voir les details
                 className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
               >
                 <td className="px-4 py-3 text-slate-200 align-top">

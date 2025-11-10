@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getAllHourlyRates } from "@/app/lib/data";
 import { getUserFromCookies } from "@/app/lib/session/session-node";
-import { insertHourlyRate } from "@/app/lib/data";
+import { insertHourlyRate, updateHourlyRate } from "@/app/lib/data";
 
 export async function GET(req: NextRequest) {
   try {
@@ -55,5 +55,30 @@ export async function POST(request: NextRequest) {
     console.error("Erreur dans GET /api/hourlyRates/create :", error);
 
     return NextResponse.json({ error: "Impossible d'insérer le taux horaire" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+
+  try {
+    //Data from request
+    const body = await request.json();
+    let itemData = body.formData;
+
+    //M.A.J.
+    const result = await updateHourlyRate(itemData);
+
+    //Echec
+    if (!result.success) {
+      return NextResponse.json(result, { status: 500 });
+    }
+
+    //Succes
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+
+    console.error("Erreur dans GET /api/hourlyRates/update :", error);
+
+    return NextResponse.json({ error: "Impossible de M.A.J. le taux horaire" }, { status: 500 });
   }
 }

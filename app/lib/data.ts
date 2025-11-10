@@ -450,11 +450,11 @@ export async function getAllItems(id: number = 0) {
     }
 }
 
-export async function getAllHourlyRates(){
+export async function getAllHourlyRates() {
     try {
         const user = await getUserFromCookies();
         const idUser = user?.idUser;
-        const data = await DbTauxHoraire.find({idUser: idUser});
+        const data = await DbTauxHoraire.find({ idUser: idUser });
         return { success: true, message: "Succès dans la récupération des taux horaire", hourlyRates: data }
 
     } catch (err) {
@@ -540,9 +540,50 @@ export async function insertHourlyRate(data: TauxHoraire) {
 
 }
 
+export async function updateHourlyRate(data: TauxHoraire) {
+    try {
 
+        //Chercher l'item dans la BD
+        await connectToDatabase();
+        const existingItem = await DbTauxHoraire.findOne({ idObjet: data.idObjet, idUser: data.idUser });
 
+        //Si l'item n'existe pas, on lance une erreur
+        if (!existingItem) {
+            console.error("Taux Horaire non trouvé ou vous n'avez pas la permission de le modifier");
+            return {
+                success: false,
+                message: "Taux Horaire non modifié ",
+            }
+        }
 
+        //M.A.J. du taux horaire
+        const Today: Date = new Date();
+        await DbTauxHoraire.findByIdAndUpdate(
+            existingItem._id,
+            {
+                $set: {
+                    clientName: data.clientName,
+                    workPosition: data.workPosition,
+                    hourlyRate: data.hourlyRate,
+                    enforcementDate: Today
+                }
+            }, { new: true } // renvoie l'item mis à jour
+        );
+
+        //Envoi du succes
+        return {
+            success: true,
+            message: "Taux Horaire modifié avec succès",
+            hourlyRate: data,
+        }
+    } catch (err) {
+        console.error("Erreur dans le controller update taux horaire", err)
+        return {
+            success: false,
+            message: "Taux horaire non modifié",
+        }
+    }
+}
 
 export async function updateItem(userData: UserData, itemData: any) {
     try {
