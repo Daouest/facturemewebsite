@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { FormDataProvider } from "@/app/context/FormContext";
+import {HourlyFormDataProvider} from "@/app/context/HourlyRateFormContext";
 import { AppUser, UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session/session-node";
@@ -8,6 +9,7 @@ import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
+import HourlyRates from "./hourlyRates/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,7 +52,9 @@ export default async function RootLayout({
         <UserProvider initialUser={user}>
           <LangageProvider>
             <FormDataProvider>
+              <HourlyFormDataProvider>
               <ReactQueryWrapper>{children}</ReactQueryWrapper>
+              </HourlyFormDataProvider>
             </FormDataProvider>
           </LangageProvider>
         </UserProvider>

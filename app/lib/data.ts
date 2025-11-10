@@ -159,6 +159,11 @@ export async function fetchNextObjetId() {
     return lastObjet ? lastObjet.idObjet + 1 : 1;
 }
 
+export async function fetchNextHourlyRateId() {
+    const lastObjet = await DbTauxHoraire.findOne().sort({ idObjet: -1 }).lean<Objet | null>();
+    return lastObjet ? lastObjet.idObjet + 1 : 1;
+}
+
 export async function fetchObjectById(id: number) {
     const obj = await DbObjet.findOne({ idObjet: id }).lean<Objet | null>();
     return obj;
@@ -442,14 +447,27 @@ export async function getAllItems(id: number = 0) {
     try {
         const itemsData = await DbObjet.find({ idUser: id });
         // console.log("itemsData", itemsData);
-        return { success: true, message: "Succès dans la récupération des items", items: itemsData }
+        return { success: true, message: "Succès dans la récupération des produits", items: itemsData }
 
     } catch (err) {
         console.error("Erreur dans la fonctions getAllItems", err)
-        return { success: false, message: "Erreur dans la récupération des items" }
+        return { success: false, message: "Erreur dans la récupération des produits" }
     }
-
 }
+
+export async function getAllHourlyRates() {
+    try {
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+        const data = await DbTauxHoraire.find({ idUser: idUser });
+        return { success: true, message: "Succès dans la récupération des taux horaire", hourlyRates: data }
+
+    } catch (err) {
+        console.error("Erreur dans la fonctions getAllHourlyRates", err)
+        return { success: false, message: "Erreur dans la récupération des taux horaire" }
+    }
+}
+
 export async function insertItem(userData: UserData, itemData: ItemData) {
     try {
 
@@ -488,6 +506,115 @@ export async function insertItem(userData: UserData, itemData: ItemData) {
     }
 
 }
+
+export async function insertHourlyRate(data: TauxHoraire) {
+    try {
+
+        await connectToDatabase();
+
+        const count = await fetchNextHourlyRateId();
+
+        const newItem = new DbTauxHoraire({
+            idUser: data.idUser,
+            idObjet: count,
+            clientName: data.clientName,
+            workPosition: data.workPosition,
+            hourlyRate: data.hourlyRate,
+            enforcementDate: data.enforcementDate,
+            idParent: -1
+        });
+
+        console.log("new Item: ", newItem);
+        await newItem.save();
+
+        console.log("Nouveau taux horaire: ", data);
+
+        return {
+            success: true,
+            message: "Item créé avec succès",
+            hourlyRate: newItem,
+        }
+
+    } catch (err) {
+        console.error("Erreur dans le controller insert hourly rate", err)
+        return {
+            success: false,
+            message: "Taux Horaire non créé",
+        }
+    }
+
+}
+
+export async function updateHourlyRate(data: TauxHoraire) {
+    try {
+
+        //Chercher l'item dans la BD
+        await connectToDatabase();
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+        const existingItem = await DbTauxHoraire.findOne({ idObjet: data.idObjet, idUser: idUser });
+
+        //Si l'item n'existe pas, on lance une erreur
+        if (!existingItem) {
+            console.error("Taux Horaire non trouvé ou vous n'avez pas la permission de le modifier");
+            return {
+                success: false,
+                message: "Taux Horaire non modifié ",
+            }
+        }
+
+        //M.A.J. du taux horaire
+        const Today: Date = new Date();
+        await DbTauxHoraire.findByIdAndUpdate(
+            existingItem._id,
+            {
+                $set: {
+                    clientName: data.clientName,
+                    workPosition: data.workPosition,
+                    hourlyRate: data.hourlyRate,
+                    enforcementDate: Today
+                }
+            }, { new: true } // renvoie l'item mis à jour
+        );
+
+        //Envoi du succes
+        return {
+            success: true,
+            message: "Taux Horaire modifié avec succès",
+            hourlyRate: data,
+        }
+    } catch (err) {
+        console.error("Erreur dans le controller update taux horaire", err)
+        return {
+            success: false,
+            message: "Taux horaire non modifié",
+        }
+    }
+}
+
+export async function deleteHourlyRateById(id: number){
+    try {
+        //GET USER ID
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+
+        //DELETE
+        console.log("id: ", id);
+        console.log("idUser: ", idUser);
+        await DbTauxHoraire.deleteOne({ idObjet: id, idUser: idUser });
+
+        //TEST
+        const item = await DbTauxHoraire.findOne({ idObjet: id, idUser: idUser });
+        console.log("Item: ", item);
+        if (!item) return { success: true }
+
+        return { success: false }
+    } catch (err) {
+        console.error("Erreur dans la suppression deleteHourlyRateById", err)
+        return { success: false, message: "Erreur le taux horaire n'a pas été supprimé" }
+    }
+}
+
 export async function updateItem(userData: UserData, itemData: any) {
     try {
 

@@ -62,7 +62,7 @@ const tauxHoraireSchema = new Schema({
     clientName: { type: String },
     workPosition: { type: String },
     hourlyRate: { type: Number },
-    enforcmentDate: { type: Date },
+    enforcementDate: { type: Date },
     idParent: { type: Number }
 }, { collection: 'objetsTauxHoraire' });
 
