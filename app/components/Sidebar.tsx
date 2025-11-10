@@ -77,6 +77,14 @@ export default function Sidebar() {
           <span className="truncate">{t("catalogue")}</span>
         </Link>
 
+         <Link
+          href="/hourlyRates"
+          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+        >
+          <Package className="w-4 h-4 flex-shrink-0" />
+          <span className="truncate">{t("hourlyRatePage")}</span>
+        </Link>
+
         <Link
           href="/clients-catalogue"
           className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"

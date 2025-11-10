@@ -8,17 +8,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { refreshSeconds } from "@/app/lib/constante";
-
-//todo
 import { HourlyRateType } from "@/app/lib/definitions";
 import { Table } from "@/components/ui/table";
+import { useLangageContext } from "../context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function HourlyRates() {
+    const { langage } = useLangageContext();
+    const t = createTranslator(langage);
     const countRef = useRef<string | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    //fetch data here
-    //todo
 
     const fetchData = async () => {
         //Appel de l'API
@@ -49,6 +48,7 @@ export default function HourlyRates() {
         return tableRows ?? [];
     };
 
+    //Loading des donnees
     const {
         data: hourlyRates,
         isLoading,
@@ -128,7 +128,7 @@ export default function HourlyRates() {
                                 <div className="grid grid-cols-3 items-center">
                                     <div className="col-span-1" />
                                     <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-100 text-center">
-                                        Mes produits
+                                        {t("hourlyRatePage")}
                                     </h1>
                                     <div className="col-span-1 flex justify-end">
                                         {/* Create Item button */} {/* todo */}

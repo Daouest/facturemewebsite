@@ -31,6 +31,7 @@ const fr = {
   newClient: "Nouveau client",
 
   // HourlyRate
+  hourlyRatePage: "Mes Taux Horaire",
   hourlyRateClient: "Client",
   hourlyRateWorkPosition: "Poste de travail",
   hourlyRateRate: "Taux horaire",
@@ -94,6 +95,7 @@ const en = {
   newClient: "New client",
 
   // HourlyRate
+  hourlyRatePage: "My Hourly Rates",
   hourlyRateClient: "Client",
   hourlyRateWorkPosition: "Work position",
   hourlyRateRate: "Hourly Rate",
