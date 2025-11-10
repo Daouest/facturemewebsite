@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Link from "next/link";
+import { set } from "mongoose";
 
 export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) {
   //traduction
@@ -35,7 +36,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   const queryClient = useQueryClient();
   const { formData, setFormData } = useFormData();
   const [rate, setRate] = useState<string>("");
-  const [lastRate, setLastRate] = useState(0);
 
   //Query --> va chercher l'objet selon son id
   const { data, isLoading, isError } = useQuery({
@@ -59,7 +59,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
         hourlyRate: data?.hourlyRate ?? 0,
         workPosition: data?.workPosition ?? "",
       }));
-      setLastRate(data.hourlyRate ?? 0);
       setRate(
         (data.hourlyRate ?? 0)
           .toLocaleString("fr-CA", {
@@ -83,6 +82,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
       }
       const numericValue = parseFloat(rawValue);
       if (!isNaN(numericValue)) {
+        setFormData({ ...formData, [name]: numericValue });
         const formatted = numericValue
           .toLocaleString("fr-CA", {
             minimumFractionDigits: 0,
@@ -177,7 +177,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
             idParent: -1,
             enforcementDate: new Date(),
           });
-          setLastRate(0);
+          setRate("0");
           router.push("/hourlyRates");
         }, 1500);
       },
