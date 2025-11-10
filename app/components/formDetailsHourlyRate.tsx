@@ -11,7 +11,6 @@ import { useEffect, useState, useRef } from "react";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator, formatIntoDecimal } from "@/app/lib/utils";
 import { useFormData } from "@/app/context/HourlyRateFormContext";
-// import { useUser } from "@/app/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
@@ -26,14 +25,13 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   //router et alertes
   const [showAlert, setShowAlert] = useState(false);
   const router = useRouter();
-  const [fileChanged, setFileChanged] = useState(false);
+  // const [fileChanged, setFileChanged] = useState(false);
   const [Errormessage, setErrorMessage] = useState({
     error: false,
     message: "",
   });
 
   //form
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
   const { formData, setFormData } = useFormData();
   const [rate, setRate] = useState<string>("");
@@ -157,28 +155,14 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
 
   const updateItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formVerified()) {
-      setErrorMessage({
-        error: true,
-        message: "Erreur dans le formulaire: aucun champs modifié",
-      });
-      setShowAlert(true);
-      setTimeout(() => {
-        setShowAlert(false);
-        setErrorMessage({ error: false, message: "" });
-      }, 3000);
-      return;
-    }
-
     setShowAlert(true);
 
-    let numericPrice: number | undefined;
     let dataToSend = formData;
 
-    if (!fileChanged) {
-      numericPrice = parseFloat(rate.replace(/\s/g, "").replace(",", "."));
-      dataToSend = { ...formData, hourlyRate: numericPrice };
-    }
+    // if (!fileChanged) {
+    //   numericPrice = parseFloat(rate.replace(/\s/g, "").replace(",", "."));
+    //   dataToSend = { ...formData, hourlyRate: numericPrice };
+    // }
 
     mutation.mutate(dataToSend, {
       onSuccess: () => {
@@ -200,12 +184,11 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
     });
   };
 
-  const formVerified = (): boolean => {
-    const p = parseFloat(rate.replace(/\s/g, "").replace(",", "."));
-    if (p !== lastRate && p > 0) return true;
-    if (p === lastRate && fileChanged) return true;
-    return false;
-  };
+  // const formVerified = (): boolean => {
+  //   const p = parseFloat(rate.replace(/\s/g, "").replace(",", "."));
+  //   if (p !== lastRate && p > 0) return true;
+  //   return false;
+  // };
 
   // ---------- LOADING ----------
   if (isLoading) {
@@ -213,10 +196,10 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
         <Header />
         <Link
-          href="/item/item-catalogue"
+          href="/hourlyRates"
           className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
-          aria-label="Retour"
-          title="Retour"
+          aria-label={t("hourlyRateReturn")}
+          title={t("hourlyRateReturn")}
         >
           <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
         </Link>
@@ -224,7 +207,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
           <div className="max-w-4xl mx-auto px-6 pb-10">
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">
-                Détails
+                {t("hourlyRateDetails")}
               </h1>
               <div className="my-4 border-t border-white/10" />
               <Image
@@ -248,10 +231,10 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
         <Header />
         <Link
-          href="/item/item-catalogue"
+          href="/hourlyRates"
           className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
-          aria-label="Retour"
-          title="Retour"
+          aria-label={t("hourlyRateReturn")}
+          title={t("hourlyRateReturn")}
         >
           <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
         </Link>
@@ -259,11 +242,11 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
           <div className="max-w-4xl mx-auto px-6 pb-10">
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">
-                Détails
+                {t("hourlyRateDetails")}
               </h1>
               <div className="my-4 border-t border-white/10" />
               <p className="text-lg text-slate-300">
-                Erreur dans le chargement de l&apos;item
+                {t("hourlyRateError")}
               </p>
             </div>
           </div>
@@ -273,17 +256,17 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
     );
   }
 
-  // ---------- NORMAL ----------
+  // ---------- FORM ----------
   return (
     <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
       <Header />
 
       {/* Back arrow */}
       <Link
-        href="/item/item-catalogue"
+        href="/hourlyRates"
         className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
-        aria-label="Retour"
-        title="Retour"
+        aria-label={t("hourlyRateReturn")}
+        title={t("hourlyRateReturn")}
       >
         <AiOutlineArrowLeft className="h-5 w-5 text-slate-100" />
       </Link>
@@ -292,7 +275,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
         <div className="max-w-5xl mx-auto px-6 pb-10">
           <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 sm:p-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 text-center">
-              Détails
+              {t("hourlyRateDetails")}
             </h1>
             <div className="my-4 border-t border-white/10" />
 
@@ -308,7 +291,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                     <AlertTitle className="text-slate-100">Message</AlertTitle>
                     {!Errormessage.error ? (
                       <AlertDescription className="text-emerald-300">
-                        Formulaire envoyé avec succès.
+                        {t("formSentWithSucces")}
                       </AlertDescription>
                     ) : (
                       <AlertDescription className="text-rose-300">
@@ -341,7 +324,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                       id="clientName"
                       name="clientName"
                       value={formData?.clientName}
-                      readOnly
+                      onChange={handleChange}
                       className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
@@ -358,7 +341,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                       id="workPosition"
                       name="workPosition"
                       value={formData?.workPosition}
-                      readOnly
+                      onChange={handleChange}
                       className="text-slate-100 placeholder:text-slate-400 bg-white/5 border border-white/10 rounded-xl py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
                     />
                   </div>
@@ -395,16 +378,16 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                   variant="outline"
                   className="rounded-xl bg-sky-500 text-white hover:bg-sky-400 border border-sky-400/40 shadow-sm"
                 >
-                  Modifier
+                  {t("update")}
                 </Button>
 
                 <Button
                   type="button"
                   variant="outline"
                   className="rounded-xl bg-white/5 text-slate-100 hover:bg-white/10 border border-white/10"
-                  onClick={() => router.push("/item/item-catalogue")}
+                  onClick={() => router.push("/hourlyRates")}
                 >
-                  Retour
+                  {t("hourlyRateReturn")}
                 </Button>
 
                 <button
@@ -414,7 +397,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 focus:outline-none focus:ring-2 focus:ring-rose-400/30"
                 >
                   <AiOutlineDelete className="h-5 w-5" />
-                  Supprimer
+                  {t("delete")}
                 </button>
               </div>
             </form>

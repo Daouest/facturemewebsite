@@ -21,6 +21,9 @@ const fr = {
   noFacture: "Vous n'avez aucune facture pour l'instant",
   welcome: "Bienvenue",
   dashboard: "Vite fait, bien fait!",
+  delete: "Supprimer",
+  update: "Modifier",
+  formSentWithSucces: "Formulaire envoyé avec succès.",
 
   // Sidebar
   invoices: "Mes factures",
@@ -38,6 +41,9 @@ const fr = {
   hourlyRateWorkPosition: "Poste de travail",
   hourlyRateRate: "Taux horaire",
   seeHourlyRates: "Retourner aux taux horaire",
+  hourlyRateDetails: "Détails",
+  hourlyRateReturn: "Retour",
+  hourlyRateError: "Erreur pendant le chargement du taux horaire",
 
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
@@ -84,6 +90,9 @@ const en = {
   image: "Image",
   productName: "Product Name",
   noFacture: "Nothing to see here yet!",
+  delete: "Delete",
+  update: "Update",
+  formSentWithSucces: "Form was sent with success.",
 
   welcome: "Welcome",
   dashboard: "Nice and easy!",
@@ -104,6 +113,9 @@ const en = {
   hourlyRateWorkPosition: "Work position",
   hourlyRateRate: "Hourly Rate",
   seeHourlyRates: "See my hourly rates",
+  hourlyRateDetails: "Details",
+  hourlyRateReturn: "Return",
+  hourlyRateError: "Error while loading data",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",

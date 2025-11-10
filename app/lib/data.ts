@@ -545,7 +545,9 @@ export async function updateHourlyRate(data: TauxHoraire) {
 
         //Chercher l'item dans la BD
         await connectToDatabase();
-        const existingItem = await DbTauxHoraire.findOne({ idObjet: data.idObjet, idUser: data.idUser });
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+        const existingItem = await DbTauxHoraire.findOne({ idObjet: data.idObjet, idUser: idUser });
 
         //Si l'item n'existe pas, on lance une erreur
         if (!existingItem) {

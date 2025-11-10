@@ -65,6 +65,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     let itemData = body.formData;
 
+    //LOG
+    console.log("Modifications: ", itemData);
+
     //M.A.J.
     const result = await updateHourlyRate(itemData);
 
