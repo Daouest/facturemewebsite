@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getAllHourlyRates } from "@/app/lib/data";
 import { getUserFromCookies } from "@/app/lib/session/session-node";
-import { insertHourlyRate, updateHourlyRate } from "@/app/lib/data";
+import { insertHourlyRate, updateHourlyRate, deleteHourlyRateById } from "@/app/lib/data";
 
 export async function GET(req: NextRequest) {
   try {
@@ -83,5 +83,29 @@ export async function PUT(request: NextRequest) {
     console.error("Erreur dans GET /api/hourlyRates/update :", error);
 
     return NextResponse.json({ error: "Impossible de M.A.J. le taux horaire" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+
+    //Chercher les donnees
+    const body = await request.json();
+    const id = body.formData; //ceci retourne l'id de l'objet
+    
+    //Supprimer les donnees
+    const result = await deleteHourlyRateById(id);
+
+    if (!result.success) {
+      return NextResponse.json(result, { status: 500 });
+
+    }
+    return NextResponse.json({ status: 200 });
+
+  } catch (error) {
+
+    console.error("Erreur dans DELETE /api/hourlyRates:", error);
+
+    return NextResponse.json({ error: "Impossible de supprimer le taux horaire" }, { status: 500 });
   }
 }

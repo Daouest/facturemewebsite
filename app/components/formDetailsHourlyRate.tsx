@@ -13,8 +13,6 @@ import { createTranslator, formatIntoDecimal } from "@/app/lib/utils";
 import { useFormData } from "@/app/context/HourlyRateFormContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import Link from "next/link";
 import { set } from "mongoose";
 
@@ -194,7 +192,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   if (isLoading) {
     return (
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
-        <Header />
         <Link
           href="/hourlyRates"
           className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
@@ -220,7 +217,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -229,7 +225,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   if (isError) {
     return (
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
-        <Header />
         <Link
           href="/hourlyRates"
           className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur px-3 py-2 shadow hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
@@ -251,7 +246,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -259,7 +253,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   // ---------- FORM ----------
   return (
     <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
-      <Header />
 
       {/* Back arrow */}
       <Link
@@ -309,7 +302,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
               id="bigContainer"
               className="mt-6 w-full"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+              <div className="w-full">
                 {/* Right column (texts/price) */}
                 <div className="flex flex-col gap-6 md:gap-8 justify-center">
                   <div className="flex flex-col w-full gap-2">
@@ -404,8 +397,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

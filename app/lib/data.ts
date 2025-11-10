@@ -587,6 +587,29 @@ export async function updateHourlyRate(data: TauxHoraire) {
     }
 }
 
+export async function deleteHourlyRateById(id: number){
+    try {
+        //GET USER ID
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+
+        //DELETE
+        console.log("id: ", id);
+        console.log("idUser: ", idUser);
+        await DbTauxHoraire.deleteOne({ idObjet: id, idUser: idUser });
+
+        //TEST
+        const item = await DbTauxHoraire.findOne({ idObjet: id, idUser: idUser });
+        console.log("Item: ", item);
+        if (!item) return { success: true }
+
+        return { success: false }
+    } catch (err) {
+        console.error("Erreur dans la suppression deleteHourlyRateById", err)
+        return { success: false, message: "Erreur le taux horaire n'a pas été supprimé" }
+    }
+}
+
 export async function updateItem(userData: UserData, itemData: any) {
     try {
 
