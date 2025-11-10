@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { TableItemType, TableFactureType, InvoiceFormItem, Objet, TauxHoraire, ItemTable, ItemIdentifier, Facture } from "@/app/lib/definitions"
+import { TableItemType, TableFactureType, HourlyRateType, InvoiceFormItem, Objet, TauxHoraire, ItemTable, ItemIdentifier, Facture } from "@/app/lib/definitions"
 import { translations } from "@/app/lib/constante"
 
 
@@ -203,14 +203,21 @@ export function isObjet(item: any): item is Objet {
         "price" in item;
 }
 
-export function isTableItem(row: TableItemType | Facture | undefined): row is TableItemType {
-    if (typeof row === "object" && "idObjet" in row) {
+export function isTableItem(row: TableItemType | Facture | HourlyRateType | undefined): row is TableItemType {
+    if (typeof row === "object" && "idObjet" in row && !("hourlyRate" in row)) {
         return true;
     }
     return false;
 }
 
-export function isTableFacture(row: TableItemType | Facture | undefined): row is Facture {
+export function isTableHourlyRate(row: HourlyRateType | Facture | TableItemType | undefined): row is HourlyRateType {
+    if (typeof row === "object" && "idObjet" in row && "hourlyRate" in row && !("idFacture" in row)) {
+        return true;
+    }
+    return false;
+}
+
+export function isTableFacture(row: TableItemType | Facture | HourlyRateType | undefined): row is Facture {
 
     if (typeof row === "object" && "idFacture" in row) {
         return true;

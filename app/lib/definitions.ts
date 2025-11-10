@@ -68,7 +68,7 @@ export type TauxHoraire = {
     clientName: string;
     workPosition: string;
     hourlyRate: number;
-    enforcmentDate: Date;
+    enforcementDate: Date;
     idParent: number | null;
 };
 
@@ -105,6 +105,18 @@ export type TableItemType = {
     price: number;
     productPhoto: string;
     idFacture: number;
+}
+
+export type HourlyRateType = {
+    idObjet: number,
+    idUser: number,
+    clientName: string,
+    workPosition: string,
+    hourlyRate: number,
+
+    //things to implement later:
+    //idParent
+    //enforcementDate
 }
 
 export type CustomerField = {

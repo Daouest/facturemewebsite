@@ -8,8 +8,8 @@ const fr = {
   sortByPaidInvoice: "Non payée",
   sortByNumber: "Numéro",
   archivedInvoices: "Factures actives",
-  creationItem: "Création d'item",
-  seeItems: "Voir mes items",
+  creationItem: "Création de produit",
+  seeItems: "Voir mes produits",
   noData: "Vous n'avez aucune facture active!",
   clientName: "Nom du client",
   factureNumber: "Numéro de facture",
@@ -22,14 +22,29 @@ const fr = {
   noFacture: "Vous n'avez aucune facture pour l'instant",
   welcome: "Bienvenue",
   dashboard: "Vite fait, bien fait!",
+  delete: "Supprimer",
+  update: "Modifier",
+  formSentWithSucces: "Formulaire envoyé avec succès.",
+
   // Sidebar
   invoices: "Mes factures",
-  createItem: "Créer un item",
+  createItem: "Créer un produit",
   newInvoice: "Nouvelle facture",
   catalogue: "Mes produits",
   profile: "Profil",
   myClients: "Mes clients",
   newClient: "Nouveau client",
+
+  // HourlyRate
+  creationHourlyRate: "Ajouter un taux horaire",
+  hourlyRatePage: "Mes Taux Horaire",
+  hourlyRateClient: "Client",
+  hourlyRateWorkPosition: "Poste de travail",
+  hourlyRateRate: "Taux horaire",
+  seeHourlyRates: "Retourner aux taux horaire",
+  hourlyRateDetails: "Détails",
+  hourlyRateReturn: "Retour",
+  hourlyRateError: "Erreur pendant le chargement du taux horaire",
 
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
@@ -65,8 +80,8 @@ const en = {
   sortByNumber: "Sort by facture number",
   sortByPaidInvoice: "Sort by status",
   archivedInvoices: " Actives Invoices ",
-  creationItem: "Creation of item",
-  seeItems: "See my items",
+  creationItem: "Create product",
+  seeItems: "See my products",
   noData: "Nothing to see here yet!",
   clientName: "Client Name",
   factureNumber: "Facture Number",
@@ -77,18 +92,32 @@ const en = {
   image: "Image",
   productName: "Product Name",
   noFacture: "Nothing to see here yet!",
+  delete: "Delete",
+  update: "Update",
+  formSentWithSucces: "Form was sent with success.",
 
   welcome: "Welcome",
   dashboard: "Nice and easy!",
 
   // Sidebar
   invoices: "My invoices",
-  createItem: "Create an item",
+  createItem: "Create a product",
   newInvoice: "New invoice",
-  catalogue: "My items",
+  catalogue: "My products",
   profile: "Profile",
   myClients: "My clients",
   newClient: "New client",
+
+  // HourlyRate
+  creationHourlyRate: "Add an hourly rate",
+  hourlyRatePage: "My Hourly Rates",
+  hourlyRateClient: "Client",
+  hourlyRateWorkPosition: "Work position",
+  hourlyRateRate: "Hourly Rate",
+  seeHourlyRates: "See my hourly rates",
+  hourlyRateDetails: "Details",
+  hourlyRateReturn: "Return",
+  hourlyRateError: "Error while loading data",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",
