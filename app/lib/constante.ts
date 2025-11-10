@@ -30,6 +30,11 @@ const fr = {
   myClients: "Mes clients",
   newClient: "Nouveau client",
 
+  // HourlyRate
+  hourlyRateClient: "Client",
+  hourlyRateWorkPosition: "Poste de travail",
+  hourlyRateRate: "Taux horaire",
+
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
   chooseOption: "Choisissez une option :",
@@ -87,6 +92,11 @@ const en = {
   profile: "Profile",
   myClients: "My clients",
   newClient: "New client",
+
+  // HourlyRate
+  hourlyRateClient: "Client",
+  hourlyRateWorkPosition: "Work position",
+  hourlyRateRate: "Hourly Rate",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",

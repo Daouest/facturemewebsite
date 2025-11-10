@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TableItemType, Facture } from "@/app/lib/definitions";
+import { TableItemType, Facture, HourlyRateType } from "@/app/lib/definitions";
 import {
+  isTableHourlyRate,
   isTableFacture,
   isTableItem,
   dateToSting,
@@ -12,12 +13,12 @@ import {
 import ImageFromBd from "@/components/ui/images";
 import { useLangageContext } from "@/app/context/langageContext";
 
-type TableProps<T extends TableItemType | Facture> = {
+type TableProps<T extends TableItemType | HourlyRateType | Facture> = {
   rows: T[];
   className?: string;
 };
 
-export function Table<T extends TableItemType | Facture>({
+export function Table<T extends TableItemType | HourlyRateType | Facture>({
   rows,
   className,
 }: TableProps<T>) {
@@ -156,6 +157,63 @@ export function Table<T extends TableItemType | Facture>({
                   <div className="ring-1 ring-white/10 rounded-md overflow-hidden inline-block">
                     <ImageFromBd id={row.idObjet} name={row.productName} />
                   </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Hourly Rates TABLE
+  if(isTableHourlyRate(rows[0])){
+    const itemRows = rows as HourlyRateType[];
+    return (
+      <div
+        className={["w-full overflow-x-auto rounded-xl", className ?? ""].join(
+          " "
+        )}
+      >
+        <table className="min-w-full border-separate border-spacing-0 text-sm">
+          <thead>
+            <tr className="bg-white/5 backdrop-blur">
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("hourlyRateClient")}
+              </th>
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("hourlyRateWorkPosition")}
+              </th>
+              <th
+                scope="col"
+                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
+              >
+                {t("hourlyRateRate")}
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-white/10">
+            {itemRows.map((row) => (
+              <tr
+                key={row.idObjet}
+                // onClick={() => router.push(`/item/detail/${row.idObjet}`)} //onclick --> voir les details
+                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
+              >
+                <td className="px-4 py-3 text-slate-200 align-top">
+                  {row.clientName}
+                </td>
+                <td className="px-4 py-3 text-slate-200 align-top">
+                  {row.workPosition}
+                </td>
+                <td className="px-4 py-3 text-slate-100 align-top">
+                  {formatIntoDecimal(row.hourlyRate, "fr-CA", "CAD")}
                 </td>
               </tr>
             ))}

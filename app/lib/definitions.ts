@@ -107,6 +107,18 @@ export type TableItemType = {
     idFacture: number;
 }
 
+export type HourlyRateType = {
+    idObjet: number,
+    idUser: number,
+    clientName: string,
+    workPosition: string,
+    hourlyRate: number,
+
+    //things to implement later:
+    //idParent
+    //enforcementDate
+}
+
 export type CustomerField = {
     id: number;
     name: string;

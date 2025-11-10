@@ -437,14 +437,27 @@ export async function getAllItems(id: number = 0) {
     try {
         const itemsData = await DbObjet.find({ idUser: id });
         // console.log("itemsData", itemsData);
-        return { success: true, message: "Succès dans la récupération des items", items: itemsData }
+        return { success: true, message: "Succès dans la récupération des produits", items: itemsData }
 
     } catch (err) {
         console.error("Erreur dans la fonctions getAllItems", err)
-        return { success: false, message: "Erreur dans la récupération des items" }
+        return { success: false, message: "Erreur dans la récupération des produits" }
     }
-
 }
+
+export async function getAllHourlyRates(){
+    try {
+        const user = await getUserFromCookies();
+        const idUser = user?.idUser;
+        const data = await DbTauxHoraire.find({idUser: idUser});
+        return { success: true, message: "Succès dans la récupération des taux horaire", hourlyRates: data }
+
+    } catch (err) {
+        console.error("Erreur dans la fonctions getAllHourlyRates", err)
+        return { success: false, message: "Erreur dans la récupération des taux horaire" }
+    }
+}
+
 export async function insertItem(userData: UserData, itemData: ItemData) {
     try {
 
