@@ -21,6 +21,7 @@ const fr = {
   noFacture: "Vous n'avez aucune facture pour l'instant",
   welcome: "Bienvenue",
   dashboard: "Vite fait, bien fait!",
+
   // Sidebar
   invoices: "Mes factures",
   createItem: "Créer un produit",
@@ -31,10 +32,12 @@ const fr = {
   newClient: "Nouveau client",
 
   // HourlyRate
+  creationHourlyRate: "Ajouter un taux horaire",
   hourlyRatePage: "Mes Taux Horaire",
   hourlyRateClient: "Client",
   hourlyRateWorkPosition: "Poste de travail",
   hourlyRateRate: "Taux horaire",
+  seeHourlyRates: "Retourner aux taux horaire",
 
   // Dropdown
   dropdownTitle: "Next.js Exemple de menu déroulant",
@@ -95,10 +98,12 @@ const en = {
   newClient: "New client",
 
   // HourlyRate
+  creationHourlyRate: "Add an hourly rate",
   hourlyRatePage: "My Hourly Rates",
   hourlyRateClient: "Client",
   hourlyRateWorkPosition: "Work position",
   hourlyRateRate: "Hourly Rate",
+  seeHourlyRates: "See my hourly rates",
 
   // Dropdown
   dropdownTitle: "Next.js Select Dropdown Example",

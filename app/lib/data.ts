@@ -154,6 +154,11 @@ export async function fetchNextObjetId() {
     return lastObjet ? lastObjet.idObjet + 1 : 1;
 }
 
+export async function fetchNextHourlyRateId() {
+    const lastObjet = await DbTauxHoraire.findOne().sort({ idObjet: -1 }).lean<Objet | null>();
+    return lastObjet ? lastObjet.idObjet + 1 : 1;
+}
+
 export async function fetchObjectById(id: number) {
     const obj = await DbObjet.findOne({ idObjet: id }).lean<Objet | null>();
     return obj;
@@ -496,6 +501,48 @@ export async function insertItem(userData: UserData, itemData: ItemData) {
     }
 
 }
+
+export async function insertHourlyRate(data: TauxHoraire) {
+    try {
+
+        await connectToDatabase();
+
+        const count = await fetchNextHourlyRateId();
+
+        const Today: Date = new Date();
+        const newItem = new DbTauxHoraire({
+            idUser: data.idUser,
+            idObjet: count,
+            clientName: data.clientName,
+            workPosition: data.workPosition,
+            hourlyRate: data.hourlyRate,
+            enforcementDate: Today,
+            idParent: -1
+        });
+        await newItem.save();
+
+        console.log("Nouveau taux horaire: ", data);
+
+        return {
+            success: true,
+            message: "Item créé avec succès",
+            hourlyRate: newItem,
+        }
+
+    } catch (err) {
+        console.error("Erreur dans le controller insert hourly rate", err)
+        return {
+            success: false,
+            message: "Taux Horaire non créé",
+        }
+    }
+
+}
+
+
+
+
+
 export async function updateItem(userData: UserData, itemData: any) {
     try {
 

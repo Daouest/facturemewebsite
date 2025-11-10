@@ -132,13 +132,13 @@ export default function HourlyRates() {
                                     </h1>
                                     <div className="col-span-1 flex justify-end">
                                         {/* Create Item button */} {/* todo */}
-                                        {/* <Link
-                                            href="/item/creation-item"
+                                        <Link
+                                            href="/hourlyRates/create"
                                             className="inline-flex items-center rounded-xl bg-sky-500 px-4 py-2 text-white font-medium shadow hover:bg-sky-400 transition-colors ring-1 ring-sky-400/40"
-                                            aria-label="Créer un item"
+                                            aria-label="Créer un taux horaire"
                                         >
                                             +
-                                        </Link> */}
+                                        </Link>
                                     </div>
                                 </div>
 
