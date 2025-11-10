@@ -71,7 +71,7 @@ export const DbTauxHoraire = getModel('TauxHoraire', tauxHoraireSchema);
 const businessSchema = new Schema({
     idBusiness: { type: Number },
     businessName: { type: String },
-    businessLogo: { type: String },
+    businessLogo: { type: String, default: null },
     idAddress: { type: Number },
     businessNumber: { type: String },
     TVSnumber: { type: String, default: null },
