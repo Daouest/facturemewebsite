@@ -9,7 +9,7 @@ type FormData = {
     workPosition: string,
     hourlyRate: number,
     idParent: -1,
-    enforcementDate: ""
+    enforcementDate: Date,
 }
 
 type FormDataContextType = {
@@ -20,7 +20,8 @@ type FormDataContextType = {
 const FormDataContext = createContext<FormDataContextType | undefined>(undefined)// creation du context
 
 export const HourlyFormDataProvider = ({ children }: { children: React.ReactNode }) => {
-    const [formData, setFormData] = useState<FormData>({ clientName: '', idUser: -1, workPosition: '', hourlyRate: 0, idParent: -1, enforcementDate: ""})
+    const Today : Date = new Date();
+    const [formData, setFormData] = useState<FormData>({ clientName: '', idUser: -1, workPosition: '', hourlyRate: 0, idParent: -1, enforcementDate: Today})
     return (
         <FormDataContext.Provider value={{ formData, setFormData }}>
             {children}

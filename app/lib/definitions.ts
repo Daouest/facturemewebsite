@@ -68,7 +68,7 @@ export type TauxHoraire = {
     clientName: string;
     workPosition: string;
     hourlyRate: number;
-    enforcmentDate: Date;
+    enforcementDate: Date;
     idParent: number | null;
 };
 

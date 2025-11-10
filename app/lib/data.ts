@@ -509,16 +509,17 @@ export async function insertHourlyRate(data: TauxHoraire) {
 
         const count = await fetchNextHourlyRateId();
 
-        const Today: Date = new Date();
         const newItem = new DbTauxHoraire({
             idUser: data.idUser,
             idObjet: count,
             clientName: data.clientName,
             workPosition: data.workPosition,
             hourlyRate: data.hourlyRate,
-            enforcementDate: Today,
+            enforcementDate: data.enforcementDate,
             idParent: -1
         });
+
+        console.log("new Item: ", newItem);
         await newItem.save();
 
         console.log("Nouveau taux horaire: ", data);

@@ -10,8 +10,6 @@ import { createTranslator } from "@/app/lib/utils";
 import { useLangageContext } from "@/app/context/langageContext";
 
 export default function FormCreationHourlyRate() {
-    //todo: translation of labels and placeholders
-
     // Traduction
     const { langage } = useLangageContext();
     const t = createTranslator(langage);
@@ -153,7 +151,7 @@ export default function FormCreationHourlyRate() {
                     htmlFor="hourlyClientName"
                     className="text-slate-200 font-semibold sm:w-1/3"
                 >
-                    Nom du client
+                    {t("hourlyRateClient")}
                 </label>
                 <input
                     className={[
@@ -165,7 +163,7 @@ export default function FormCreationHourlyRate() {
                     type="text"
                     id="clientName"
                     name="clientName"
-                    placeholder="Nom du client"
+                    placeholder={t("hourlyRateClient")}
                     value={formData.clientName}
                     onChange={handleChange}
                     required
@@ -178,7 +176,7 @@ export default function FormCreationHourlyRate() {
                     htmlFor="workPosition"
                     className="text-slate-200 font-semibold sm:w-1/3"
                 >
-                    Poste de travail
+                    {t("hourlyRateWorkPosition")}
                 </label>
                 <input
                     className={[
@@ -190,7 +188,7 @@ export default function FormCreationHourlyRate() {
                     type="text"
                     id="workPosition"
                     name="workPosition"
-                    placeholder="Poste de travail"
+                    placeholder={t("hourlyRateWorkPosition")}
                     value={formData.workPosition}
                     onChange={handleChange}
                     required
@@ -200,7 +198,7 @@ export default function FormCreationHourlyRate() {
             {/* Taux Horaire */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <label htmlFor="tauxHoraire" className="text-slate-200 font-semibold sm:w-1/3">
-                    Taux horaire
+                    {t("hourlyRateRate")}
                 </label>
                 <input
                     className={[
@@ -213,7 +211,7 @@ export default function FormCreationHourlyRate() {
                     id="hourlyRate"
                     autoComplete="on"
                     name="hourlyRate"
-                    placeholder="Le taux horaire"
+                    placeholder={t("hourlyRateRate")}
                     value={hourlyRate}
                     onChange={handleChange}
                     required
@@ -226,7 +224,7 @@ export default function FormCreationHourlyRate() {
                         type="submit"
                         className="w-full sm:w-2/3 h-12 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors border border-sky-400/40 shadow-sm"
                     >
-                        Ajouter le taux horaire
+                        {t("creationHourlyRate")}
                     </Button>
                 </div>
             </div>
