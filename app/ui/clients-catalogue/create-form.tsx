@@ -5,8 +5,12 @@ import { ClientForm, Address } from "@/app/lib/definitions";
 import { createClient } from "@/app/lib/actions/clients-actions";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Form() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
   const [isPending, setisPending] = useState(false);
   const [address, setAddress] = useState<Address>({
     idAddress: -1,
@@ -43,7 +47,7 @@ export default function Form() {
 
     if (!isFormValid()) {
       setMessage({
-        text: "Veuillez remplir tous les champs requis.",
+        text: t("fillRequiredFields"),
         type: "error",
       });
       return;
@@ -55,7 +59,7 @@ export default function Form() {
     // Simulate a delay
     setTimeout(() => {
       setisPending(false);
-      setMessage({ text: "Client ajouté avec succès !", type: "success" });
+      setMessage({ text: t("clientAddedSuccess"), type: "success" });
 
       // action
       createClient(formData);
@@ -106,15 +110,15 @@ export default function Form() {
             className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4"
           >
             <p className="mb-3 block font-semibold text-slate-100 flex items-center gap-2">
-              Nom du client
+              {t("clientNameLabel")}
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3">
-                Nom
+                {t("nameLabel")}
               </label>
               <input
                 required
-                placeholder="ex.: John Pork"
+                placeholder={t("clientNamePlaceholder")}
                 pattern="^[^\d]+$"
                 onChange={(e) =>
                   setFormData({ ...formData, clientName: e.target.value })
@@ -130,18 +134,18 @@ export default function Form() {
             className="flex flex-col gap-1 bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4"
           >
             <p className="mb-3 block font-semibold text-slate-100 flex items-center gap-2">
-              Addresse du client
+              {t("clientAddressLabel")}
             </p>
 
             {/*Premier ligne: addresse, ville*/}
             <div className="flex flex-col md:flex-row w-full gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
                 <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  Addresse
+                  {t("addressLabel")}
                 </label>
                 <input
                   required
-                  placeholder="ex.: 123, rue des Alphabets"
+                  placeholder={t("addressPlaceholder")}
                   onChange={(e) =>
                     setAddress({ ...address, address: e.target.value })
                   }
@@ -150,12 +154,12 @@ export default function Form() {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
                 <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  Ville
+                  {t("cityLabel")}
                 </label>
                 <input
                   required
                   pattern="^[^\d]+$"
-                  placeholder="ex.: Montréal"
+                  placeholder={t("cityPlaceholder")}
                   onChange={(e) =>
                     setAddress({ ...address, city: e.target.value })
                   }
@@ -168,11 +172,11 @@ export default function Form() {
             <div className="flex flex-col md:flex-row w-full gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
                 <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  Code postal
+                  {t("postalCodeLabel")}
                 </label>
                 <input
                   required
-                  placeholder="ex.: A1B 2C3"
+                  placeholder={t("postalCodePlaceholder")}
                   value={address.zipCode}
                   minLength={6}
                   maxLength={7}
@@ -185,7 +189,7 @@ export default function Form() {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
                 <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  Province
+                  {t("provinceLabel")}
                 </label>
                 <Provinces
                   value={address.province}
@@ -218,7 +222,7 @@ export default function Form() {
                   d="M6 18 18 6M6 6l12 12"
                 />
               </svg>
-              Annuler
+              {t("cancelButton")}
             </Link>
             <button
               type="submit"
@@ -228,7 +232,7 @@ export default function Form() {
               {isPending ? (
                 <>
                   <span className="animate-spin h-4 w-4 border-2 border-sky-200 border-t-transparent rounded-full"></span>
-                  Ajout...
+                  {t("addingClient")}
                 </>
               ) : (
                 <>
@@ -246,7 +250,7 @@ export default function Form() {
                       d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                     />
                   </svg>
-                  Ajouter le client
+                  {t("addClientButton")}
                 </>
               )}
             </button>
@@ -258,6 +262,9 @@ export default function Form() {
 }
 
 export function Provinces({ value, onChange }: ProvincesProps) {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   const provinces = [
     "AB",
     "BC",
@@ -286,7 +293,7 @@ export function Provinces({ value, onChange }: ProvincesProps) {
         </option>
       ))}
       <option value="" disabled className="bg-slate-800">
-        Sélectionner
+        {t("selectProvince")}
       </option>
     </select>
   );

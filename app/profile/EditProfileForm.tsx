@@ -10,9 +10,13 @@ import {
   PasswordSchema,
 } from "../lib/schemas/profile";
 import Input from "../components/Input";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function EditProfileForm() {
   const { user, setUser } = useUser();
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
 
   const [form, setForm] = useState<ProfileInput>({
     username: user?.username ?? "",
@@ -149,7 +153,7 @@ export default function EditProfileForm() {
       {/* Section: Infos du profil */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
-          Informations du profil
+          {t("profileInformation")}
         </h2>
         <div className="my-4 border-t border-white/10" />
 
@@ -159,7 +163,7 @@ export default function EditProfileForm() {
         >
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Prénom
+              {t("firstName")}
             </label>
             <Input
               value={form.firstName}
@@ -171,7 +175,7 @@ export default function EditProfileForm() {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Nom
+              {t("lastName")}
             </label>
             <Input
               value={form.lastName}
@@ -183,7 +187,7 @@ export default function EditProfileForm() {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Nom d'utilisateur
+              {t("username")}
             </label>
             <Input
               value={form.username}
@@ -195,7 +199,7 @@ export default function EditProfileForm() {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Courriel
+              {t("email")}
             </label>
             <Input
               value={form.email}
@@ -212,15 +216,13 @@ export default function EditProfileForm() {
               className="rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium px-4 py-2 hover:bg-sky-500/30 disabled:opacity-60 transition-colors"
               type="submit"
             >
-              {saving ? "En traitement..." : "Sauvegarder"}
+              {saving ? t("saving") : t("save")}
             </button>
             {saved === "ok" && (
-              <span className="text-green-300 text-sm">Sauvegardé!</span>
+              <span className="text-green-300 text-sm">{t("saved")}</span>
             )}
             {saved === "err" && (
-              <span className="text-red-300 text-sm">
-                Erreur dans la sauvegarde!
-              </span>
+              <span className="text-red-300 text-sm">{t("saveError")}</span>
             )}
           </div>
         </form>
@@ -229,7 +231,7 @@ export default function EditProfileForm() {
       {/* Section: Mot de passe */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
-          Mot de passe
+          {t("passwordSection")}
         </h2>
         <div className="my-4 border-t border-white/10" />
 
@@ -239,7 +241,7 @@ export default function EditProfileForm() {
         >
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Mot de passe actuel
+              {t("currentPassword")}
             </label>
             <input
               value={password.currentPassword}
@@ -254,7 +256,7 @@ export default function EditProfileForm() {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Nouveau mot de passe
+              {t("newPassword")}
             </label>
             <input
               value={password.newPassword}
@@ -269,7 +271,7 @@ export default function EditProfileForm() {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Confirmer le nouveau
+              {t("confirmPassword")}
             </label>
             <input
               value={password.confirmNewPassword}
@@ -291,17 +293,15 @@ export default function EditProfileForm() {
               className="rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium px-4 py-2 hover:bg-sky-500/30 disabled:opacity-60 transition-colors"
               type="submit"
             >
-              {savingPassword ? "En traitement..." : "Changer le mot de passe"}
+              {savingPassword ? t("saving") : t("changePassword")}
             </button>
             {savedPassword === "ok" && (
               <span className="text-green-300 text-sm">
-                Mot de passe modifié
+                {t("passwordChanged")}
               </span>
             )}
             {savedPassword === "err" && (
-              <span className="text-red-300 text-sm">
-                Erreur dans la modification
-              </span>
+              <span className="text-red-300 text-sm">{t("passwordError")}</span>
             )}
           </div>
         </form>
