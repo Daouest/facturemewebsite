@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
+import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Menu, X } from "lucide-react";
 import { useLangageContext } from "../context/langageContext";
 import { createTranslator } from "../lib/utils";
 
@@ -38,7 +38,6 @@ export default function CalendarPage() {
     {}
   );
   const [loading, setLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const year = currentMonth.getFullYear();
   const monthIndex = currentMonth.getMonth();
@@ -134,46 +133,12 @@ export default function CalendarPage() {
           <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
         </div>
 
-        <main className="flex-1 pt-20">
+        <main className="flex-1 pt-20 pb-24 md:pb-32">
           <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Sidebar Toggle Button */}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden fixed bottom-6 right-6 z-50 inline-flex items-center justify-center w-14 h-14 rounded-full bg-sky-500 text-white shadow-lg hover:bg-sky-400 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/50"
-              aria-label="Toggle sidebar"
-            >
-              {isSidebarOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-
-            {/* Mobile backdrop */}
-            {isSidebarOpen && (
-              <div
-                className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
-
-            {/* Sidebar - Slide in from left on mobile, always visible on desktop */}
-            <aside
-              className={`
-                fixed lg:relative top-20 lg:top-0 left-0 h-[calc(100vh-5rem)] lg:h-auto
-                w-64 lg:w-auto
-                transform transition-transform duration-300 ease-in-out
-                ${
-                  isSidebarOpen
-                    ? "translate-x-0"
-                    : "-translate-x-full lg:translate-x-0"
-                }
-                z-50 lg:z-auto
-                lg:flex-shrink-0
-              `}
-            >
+            {/* Mobile Sidebar with Toggle */}
+            <MobileSidebarWrapper>
               <Sidebar />
-            </aside>
+            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1">

@@ -346,7 +346,9 @@ export default function Form({ customers, businesses, objects }: Props) {
                         onChange={() => updateField("numberType", "auto")}
                         className="h-4 w-4 text-sky-400"
                       />
-                      <span className="text-sm">Automatique</span>
+                      <span className="text-sm text-slate-200">
+                        Automatique
+                      </span>
                     </label>
 
                     <label className="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 border border-white/10 bg-white/5 hover:bg-white/10 transition">
@@ -358,7 +360,9 @@ export default function Form({ customers, businesses, objects }: Props) {
                         onChange={() => updateField("numberType", "custom")}
                         className="h-4 w-4 text-sky-400"
                       />
-                      <span className="text-sm">Personnalisé</span>
+                      <span className="text-sm text-slate-200">
+                        Personnalisé
+                      </span>
                     </label>
                   </div>
 

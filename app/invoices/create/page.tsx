@@ -6,7 +6,7 @@ import Form from "@/app/ui/invoices/create-form";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
-import { Menu, X } from "lucide-react";
+import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { useUser } from "@/app/context/UserContext";
 import type {
   CustomerField,
@@ -17,7 +17,6 @@ import type {
 export default function Page() {
   const router = useRouter();
   const { user, ready } = useUser();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [customers, setCustomers] = useState<CustomerField[]>([]);
   const [businesses, setBusinesses] = useState<BusinessField[]>([]);
   const [objects, setObjects] = useState<ItemFieldWithPrice[]>([]);
@@ -55,9 +54,19 @@ export default function Page() {
           })
         );
 
+        // Transform items to match ItemFieldWithPrice format
+        const transformedObjects = (objectsData || []).map((item: any) => ({
+          id: item.idObjet,
+          name: item.productName || item.workPosition || "Unknown Item",
+          type: item.price !== undefined ? "product" : "hourly",
+          ...(item.price !== undefined
+            ? { price: item.price }
+            : { hourlyRate: item.hourlyRate || 0 }),
+        }));
+
         setCustomers(transformedCustomers);
         setBusinesses(businessesData.businesses || []);
-        setObjects(objectsData || []);
+        setObjects(transformedObjects);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -87,37 +96,10 @@ export default function Page() {
 
         <main className="flex-1 pt-20">
           <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Toggle Button */}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden fixed bottom-6 right-6 z-50 inline-flex items-center justify-center w-14 h-14 rounded-full bg-sky-500 text-white shadow-lg hover:bg-sky-400 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/50"
-              aria-label="Toggle sidebar"
-            >
-              {isSidebarOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-
-            {/* Mobile backdrop */}
-            {isSidebarOpen && (
-              <div
-                className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
-
             {/* Sidebar */}
-            <aside
-              className={`fixed lg:relative top-20 lg:top-0 left-0 h-[calc(100vh-5rem)] lg:h-auto w-64 lg:w-auto transform transition-transform duration-300 ease-in-out ${
-                isSidebarOpen
-                  ? "translate-x-0"
-                  : "-translate-x-full lg:translate-x-0"
-              } z-50 lg:z-auto lg:flex-shrink-0`}
-            >
+            <MobileSidebarWrapper>
               <Sidebar />
-            </aside>
+            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1">

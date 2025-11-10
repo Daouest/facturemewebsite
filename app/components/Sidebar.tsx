@@ -15,6 +15,7 @@ import {
   UserPlus,
   UserCircle,
   Home,
+  Calendar,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -55,15 +56,15 @@ export default function Sidebar() {
       <nav className="w-full flex flex-col gap-2">
         <Link
           href="/homePage"
-          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Home className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">Accueil</span>
+          <span className="truncate">{t("home")}</span>
         </Link>
 
         <Link
           href="/item/items-archives"
-          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("invoices")}</span>
@@ -71,7 +72,7 @@ export default function Sidebar() {
 
         <Link
           href="/item/item-catalogue"
-          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Package className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("catalogue")}</span>
@@ -79,15 +80,23 @@ export default function Sidebar() {
 
         <Link
           href="/clients-catalogue"
-          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Users className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("myClients")}</span>
         </Link>
 
         <Link
+          href="/calendar"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+        >
+          <Calendar className="w-4 h-4 flex-shrink-0" />
+          <span className="truncate">{t("calendar")}</span>
+        </Link>
+
+        <Link
           href="/profile"
-          className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+          className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <UserCircle className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("profile")}</span>

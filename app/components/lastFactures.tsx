@@ -40,37 +40,39 @@ export function LastFactures<T extends TableFactureType>({
         <Link
           href={`/previsualisation?factureId=${item.idFacture}`}
           key={index}
-          className="group relative rounded-xl border border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur p-5 shadow-lg hover:shadow-xl hover:border-sky-400/30 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+          className="group relative rounded-xl border border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur p-4 sm:p-5 shadow-lg hover:shadow-xl hover:border-sky-400/30 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
         >
           {/* Subtle gradient overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-sky-400/0 to-indigo-400/0 group-hover:from-sky-400/5 group-hover:to-indigo-400/5 transition-all duration-300" />
 
           <div className="relative z-10">
             {/* Customer name with icon */}
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
-                <User className="w-4 h-4 text-sky-300" />
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+                <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-300" />
               </div>
-              <h4 className="font-semibold text-slate-100 text-lg truncate">
+              <h4 className="font-semibold text-slate-100 text-base sm:text-lg truncate">
                 {item.nomClient}
               </h4>
             </div>
 
-            {/* Facture number - hidden on mobile */}
-            <div className="hidden sm:flex items-center gap-2 mb-2 text-slate-300">
-              <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              <p className="text-sm truncate">#{item.factureNumber}</p>
+            {/* Facture number - compact on mobile */}
+            <div className="flex items-center gap-2 mb-2 text-slate-300 ml-9 sm:ml-0">
+              <FileText className="hidden sm:block w-4 h-4 text-slate-400 flex-shrink-0" />
+              <p className="text-xs sm:text-sm truncate">
+                #{item.factureNumber}
+              </p>
             </div>
 
-            {/* Date - hidden on mobile */}
+            {/* Date - hidden on mobile, visible on tablet+ */}
             <div className="hidden sm:flex items-center gap-2 text-slate-400">
               <Calendar className="w-4 h-4 flex-shrink-0" />
               <p className="text-xs">{dateToSting(item.dateFacture)}</p>
             </div>
 
             {/* Arrow indicator on hover */}
-            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <ChevronRight className="w-5 h-5 text-sky-400" />
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
             </div>
           </div>
         </Link>

@@ -3,8 +3,9 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Sidebar from "@/app/components/Sidebar";
+import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { Table } from "@/components/ui/table";
-import { AiOutlineArrowLeft } from "react-icons/ai";
 import Link from "next/link";
 import Image from "next/image";
 import { Facture } from "@/app/lib/definitions";
@@ -83,82 +84,78 @@ export default function HistoricInvoices() {
 
   return (
     <>
-      <div className="min-h-dvh flex flex-col bg-gradient-to-r from-blue-50 to-blue-100 pb-8">
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
         <Header />
+        <main className="flex-1 pt-[80px] pb-24 md:pb-32">
+          <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
+            {/* Mobile Sidebar with Toggle */}
+            <MobileSidebarWrapper>
+              <Sidebar />
+            </MobileSidebarWrapper>
 
-        {/* Back arrow fixed under the header */}
-        <Link
-          href={"/item/items-archives"}
-          className="fixed left-4 top-[84px] z-50 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-2 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Retour"
-          title="Retour"
-        >
-          <AiOutlineArrowLeft className="h-5 w-5 text-gray-800" />
-        </Link>
-
-        <main className="flex-1 pt-[80px]">
-          <div className="max-w-6xl mx-auto px-6 pb-10">
-            <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8">
-              {/* Header row: centered title, switches on the right */}
-              <div className="grid grid-cols-3 items-center gap-4">
-                <div className="col-span-1" />
-                <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center">
+            {/* Main Content */}
+            <section className="flex-1">
+              <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 sm:p-6 lg:p-8 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+                {/* Title */}
+                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-100 text-center mb-4">
                   {t("historicInvoices")}
                 </h1>
-                <div className="col-span-1 flex items-center justify-end gap-6">
-                  <div className="text-center">
-                    <p className="text-xs text-gray-700 mb-1">
+
+                {/* Switches - Stack on mobile, horizontal on larger screens */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-4">
+                  <div className="flex items-center gap-3">
+                    <p className="text-xs sm:text-sm text-slate-300">
                       {t("sortByNumber")}
                     </p>
                     <Switch
-                      className="data-[state=checked]:bg-blue-400 transition-colors cursor-pointer"
+                      className="data-[state=checked]:bg-sky-500 transition-colors cursor-pointer"
                       checked={sorterByFactureNumber}
                       onCheckedChange={setSorterByFactureNumber}
                     />
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs text-gray-700 mb-1">
+                  <div className="flex items-center gap-3">
+                    <p className="text-xs sm:text-sm text-slate-300">
                       {t("sortByDate")}
                     </p>
                     <Switch
-                      className="data-[state=checked]:bg-blue-400 transition-colors cursor-pointer"
+                      className="data-[state=checked]:bg-sky-500 transition-colors cursor-pointer"
                       checked={sorterByDate}
                       onCheckedChange={setSorterByDate}
                     />
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs text-gray-700 mb-1">
+                  <div className="flex items-center gap-3">
+                    <p className="text-xs sm:text-sm text-slate-300">
                       {t("sortByPaidInvoice")}
                     </p>
                     <Switch
-                      className="data-[state=checked]:bg-blue-400 transition-colors cursor-pointer"
+                      className="data-[state=checked]:bg-sky-500 transition-colors cursor-pointer"
                       checked={sortByPaidInvoice}
                       onCheckedChange={setSortByPaidInvoice}
                     />
                   </div>
                 </div>
+
+                {/* Divider */}
+                <div className="mb-4 border-t border-white/10" />
+
+                {/* Body */}
+                {status !== "error" && isLoading ? (
+                  <div className="flex justify-center items-center py-10">
+                    <Image
+                      src="/Loading_Paperplane.gif"
+                      alt="loading"
+                      width={300}
+                      height={300}
+                      className="object-contain max-w-full h-auto"
+                    />
+                  </div>
+                ) : (
+                  <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <Table rows={sortedData} />
+                  </div>
+                )}
               </div>
-
-              {/* Divider */}
-              <div className="my-4 border-t border-gray-200" />
-
-              {/* Body */}
-              {status !== "error" && isLoading ? (
-                <div className="flex justify-center items-center py-10">
-                  <Image
-                    src="/Loading_Paperplane.gif"
-                    alt="loading"
-                    width={300}
-                    height={300}
-                    className="object-contain max-w-full h-auto"
-                  />
-                </div>
-              ) : (
-                <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar">
-                  <Table rows={sortedData} />
-                </div>
-              )}
-            </div>
+            </section>
           </div>
         </main>
 

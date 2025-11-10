@@ -1,6 +1,7 @@
 
 const fr = {
   hello: "Bonjour",
+  home: "Accueil",
   info: "FAQs",
   historicInvoices: " Historique des factures",
   sortByDate: "Date",
@@ -25,7 +26,7 @@ const fr = {
   invoices: "Mes factures",
   createItem: "Créer un item",
   newInvoice: "Nouvelle facture",
-  catalogue: "Mes items",
+  catalogue: "Mes produits",
   profile: "Profil",
   myClients: "Mes clients",
   newClient: "Nouveau client",
@@ -57,6 +58,7 @@ const fr = {
 
 const en = {
   hello: "Hi",
+  home: "Home",
   info: "FAQs",
   historicInvoices: "Invoice histories",
   sortByDate: "Sort by date",

@@ -82,7 +82,7 @@ export default function Form() {
     <form onSubmit={handleSubmit}>
       <div
         id="bigContainer"
-        className="flex flex-col items-center w-full max-w-5xl rounded-xl mt-20 mb-8"
+        className="flex flex-col items-center w-full max-w-5xl rounded-xl"
       >
         {/* Messages/alerte */}
         {message.text && (
@@ -108,8 +108,8 @@ export default function Form() {
             <p className="mb-3 block font-semibold text-slate-100 flex items-center gap-2">
               Nom du client
             </p>
-            <div className="flex flex-row items-center">
-              <label className="text-sm font-semibold text-slate-300 items-center mr-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3">
                 Nom
               </label>
               <input
@@ -134,9 +134,9 @@ export default function Form() {
             </p>
 
             {/*Premier ligne: addresse, ville*/}
-            <div className="flex flex-row w-full gap-4">
-              <div className="flex flex-row items-center w-full">
-                <label className="text-sm font-semibold text-slate-300 items-center mr-3">
+            <div className="flex flex-col md:flex-row w-full gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
+                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
                   Addresse
                 </label>
                 <input
@@ -148,8 +148,8 @@ export default function Form() {
                   className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                 />
               </div>
-              <div className="flex flex-row items-center w-full">
-                <label className="text-sm font-semibold text-slate-300 items-center mr-3">
+              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
+                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
                   Ville
                 </label>
                 <input
@@ -165,9 +165,9 @@ export default function Form() {
             </div>
 
             {/*Seconde ligne: code postal, province*/}
-            <div className="flex flex-row w-full gap-4">
-              <div className="flex flex-row items-center w-full">
-                <label className="text-sm font-semibold text-slate-300 items-center mr-3">
+            <div className="flex flex-col md:flex-row w-full gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
+                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
                   Code postal
                 </label>
                 <input
@@ -175,16 +175,16 @@ export default function Form() {
                   placeholder="ex.: A1B 2C3"
                   value={address.zipCode}
                   minLength={6}
-                  maxLength={6}
-                  pattern="^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$"
+                  maxLength={7}
+                  pattern="^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$"
                   onChange={(e) =>
                     setAddress({ ...address, zipCode: e.target.value })
                   }
                   className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
                 />
               </div>
-              <div className="flex flex-row items-center w-full">
-                <label className="text-sm font-semibold text-slate-300 items-center mr-3">
+              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
+                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
                   Province
                 </label>
                 <Provinces
@@ -196,10 +196,13 @@ export default function Form() {
           </div>
 
           {/*Boutons de soumission*/}
-          <div id="buttons" className="flex justify-end gap-4">
+          <div
+            id="buttons"
+            className="flex flex-col sm:flex-row sm:justify-end gap-4"
+          >
             <Link
               href="/clients-catalogue"
-              className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur text-slate-200 font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
+              className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur text-slate-200 font-medium hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
             >
               <svg
                 className="h-5 w-5"
@@ -219,7 +222,7 @@ export default function Form() {
             </Link>
             <button
               type="submit"
-              className="px-6 py-3 rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium hover:bg-sky-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-6 py-3 rounded-xl border border-sky-400/40 bg-sky-500/20 text-sky-200 font-medium hover:bg-sky-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               disabled={isPending}
             >
               {isPending ? (

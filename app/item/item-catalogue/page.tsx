@@ -1,19 +1,22 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
+import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { Table } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
 import { TableItemType } from "@/app/lib/definitions";
 import { useQuery } from "@tanstack/react-query";
 import { refreshSeconds } from "@/app/lib/constante";
-import { Menu, X } from "lucide-react";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function ItemCatalogue() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
   const countRef = useRef<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchData = async () => {
     const res = await fetch("/api/item-catalogue", {
@@ -66,55 +69,15 @@ export default function ItemCatalogue() {
 
   return (
     <>
-      <Header />
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+        <Header />
 
-      <div className="relative flex justify-center items-start pt-[80px] pb-8 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6">
-        {/* soft glows */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
-          <div className="absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-7xl">
-          <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Sidebar Toggle Button */}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden fixed bottom-6 right-6 z-50 inline-flex items-center justify-center w-14 h-14 rounded-full bg-sky-500 text-white shadow-lg hover:bg-sky-400 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/50"
-              aria-label="Toggle sidebar"
-            >
-              {isSidebarOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-
-            {/* Mobile backdrop */}
-            {isSidebarOpen && (
-              <div
-                className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
-
-            {/* Sidebar - Slide in from left on mobile, always visible on desktop */}
-            <aside
-              className={`
-                fixed lg:relative top-20 lg:top-0 left-0 h-[calc(100vh-5rem)] lg:h-auto
-                w-64 lg:w-auto
-                transform transition-transform duration-300 ease-in-out
-                ${
-                  isSidebarOpen
-                    ? "translate-x-0"
-                    : "-translate-x-full lg:translate-x-0"
-                }
-                z-50 lg:z-auto
-                lg:flex-shrink-0
-              `}
-            >
+        <main className="flex-1 pt-[80px] pb-24 md:pb-32">
+          <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
+            {/* Mobile Sidebar with Toggle */}
+            <MobileSidebarWrapper>
               <Sidebar />
-            </aside>
+            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1">
@@ -123,7 +86,7 @@ export default function ItemCatalogue() {
                 <div className="grid grid-cols-3 items-center">
                   <div className="col-span-1" />
                   <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-100 text-center">
-                    Mes produits
+                    {t("catalogue")}
                   </h1>
                   <div className="col-span-1 flex justify-end">
                     {/* Create Item button */}
@@ -158,10 +121,10 @@ export default function ItemCatalogue() {
               </div>
             </section>
           </div>
-        </div>
-      </div>
+        </main>
 
-      <Footer />
+        <Footer />
+      </div>
     </>
   );
 }
