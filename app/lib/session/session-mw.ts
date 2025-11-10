@@ -1,11 +1,8 @@
-"use server"
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-
-export const COOKIE_NAME = "fm_session"
-const ACCESS_TTL_MS = 100 * 60 * 1000
+import { COOKIE_NAME, ACCESS_TTL_MS } from "./session-crypto";
 
 // Use consistent environment variable name
 const secretKey = process.env.JWT_SECRET || process.env.SESSION_SECRET;
