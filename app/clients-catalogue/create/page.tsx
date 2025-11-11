@@ -5,8 +5,13 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
 import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Page() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   return (
     <>
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
@@ -26,7 +31,7 @@ export default function Page() {
                 <div className="grid grid-cols-3 items-center">
                   <div className="col-span-1" />
                   <h1 className="col-span-1 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-100 text-center">
-                    Créer un client
+                    {t("createClient")}
                   </h1>
                   <div className="col-span-1" />
                 </div>

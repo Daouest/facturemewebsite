@@ -79,7 +79,66 @@ const fr = {
   backToHome: "Retour à l'accueil",
 
   // Filters
-  filters: "Filtres"
+  filters: "Filtres",
+
+  // Profile Page
+  profileInfo: "Profil Info",
+  profileInformation: "Informations du profil",
+  firstName: "Prénom",
+  lastName: "Nom",
+  username: "Nom d'utilisateur",
+  email: "Courriel",
+  save: "Sauvegarder",
+  saving: "En traitement...",
+  saved: "Sauvegardé!",
+  saveError: "Erreur dans la sauvegarde!",
+
+  // Password Section
+  passwordSection: "Mot de passe",
+  currentPassword: "Mot de passe actuel",
+  newPassword: "Nouveau mot de passe",
+  confirmPassword: "Confirmer le nouveau",
+  changePassword: "Changer le mot de passe",
+  passwordChanged: "Mot de passe modifié",
+  passwordError: "Erreur dans la modification",
+
+  // Business Section
+  businessInformation: "Informations de votre compagnie",
+  companyName: "Nom de la compagnie",
+  businessNumber: "Numéro de compagnie",
+  address: "Addresse",
+  addressPlaceholder: "ex.: 123, rue des Alphabets",
+  city: "Ville",
+  cityPlaceholder: "ex.: Montréal",
+  postalCode: "Code postal",
+  postalCodePlaceholder: "ex.: A1B 2C3",
+  province: "Province",
+  country: "Pays",
+  taxNumbers: "Numéros de taxes",
+  tvqNumber: "Numéro de TVQ",
+  tvsNumber: "Numéro de TVS",
+  tvpNumber: "Numéro de TVP",
+  tvhNumber: "Numéro de TVH",
+  companyLogo: "Logo de la compagnie",
+  uploadLogo: "Télécharger un logo",
+  modifyCompany: "Modifier la compagnie",
+
+  // Client Creation Page
+  createClient: "Créer un client",
+  clientNameLabel: "Nom du client",
+  nameLabel: "Nom",
+  clientNamePlaceholder: "ex.: John Pork",
+  clientAddressLabel: "Addresse du client",
+  addressLabel: "Addresse",
+  cityLabel: "Ville",
+  postalCodeLabel: "Code postal",
+  provinceLabel: "Province",
+  selectProvince: "Sélectionner",
+  cancelButton: "Annuler",
+  addingClient: "Ajout...",
+  addClientButton: "Ajouter le client",
+  fillRequiredFields: "Veuillez remplir tous les champs requis.",
+  clientAddedSuccess: "Client ajouté avec succès !"
 } as const;
 
 
@@ -166,7 +225,66 @@ const en = {
   backToHome: "Back to Home",
 
   // Filters
-  filters: "Filters"
+  filters: "Filters",
+
+  // Profile Page
+  profileInfo: "Profile Info",
+  profileInformation: "Profile Information",
+  firstName: "First Name",
+  lastName: "Last Name",
+  username: "Username",
+  email: "Email",
+  save: "Save",
+  saving: "Processing...",
+  saved: "Saved!",
+  saveError: "Error saving!",
+
+  // Password Section
+  passwordSection: "Password",
+  currentPassword: "Current Password",
+  newPassword: "New Password",
+  confirmPassword: "Confirm New Password",
+  changePassword: "Change Password",
+  passwordChanged: "Password Changed",
+  passwordError: "Error changing password",
+
+  // Business Section
+  businessInformation: "Your Company Information",
+  companyName: "Company Name",
+  businessNumber: "Business Number",
+  address: "Address",
+  addressPlaceholder: "e.g.: 123 Main Street",
+  city: "City",
+  cityPlaceholder: "e.g.: Montreal",
+  postalCode: "Postal Code",
+  postalCodePlaceholder: "e.g.: A1B 2C3",
+  province: "Province",
+  country: "Country",
+  taxNumbers: "Tax Numbers",
+  tvqNumber: "TVQ Number",
+  tvsNumber: "TVS Number",
+  tvpNumber: "TVP Number",
+  tvhNumber: "TVH Number",
+  companyLogo: "Company Logo",
+  uploadLogo: "Upload a Logo",
+  modifyCompany: "Modify Company",
+
+  // Client Creation Page
+  createClient: "Create a Client",
+  clientNameLabel: "Client Name",
+  nameLabel: "Name",
+  clientNamePlaceholder: "e.g.: John Pork",
+  clientAddressLabel: "Client Address",
+  addressLabel: "Address",
+  cityLabel: "City",
+  postalCodeLabel: "Postal Code",
+  provinceLabel: "Province",
+  selectProvince: "Select",
+  cancelButton: "Cancel",
+  addingClient: "Adding...",
+  addClientButton: "Add Client",
+  fillRequiredFields: "Please fill in all required fields.",
+  clientAddedSuccess: "Client added successfully!"
 }
 
 type TranslationKey = keyof typeof fr;

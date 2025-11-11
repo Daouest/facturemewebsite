@@ -37,15 +37,18 @@ export default function Page() {
 
     const fetchData = async () => {
       try {
-        const [customersRes, businessesRes, objectsRes] = await Promise.all([
-          fetch("/api/clients-catalogue", { credentials: "include" }),
-          fetch("/api/profile", { credentials: "include" }),
-          fetch("/api/item-catalogue", { credentials: "include" }),
-        ]);
+        const [customersRes, businessesRes, productsRes, hourlyRatesRes] =
+          await Promise.all([
+            fetch("/api/clients-catalogue", { credentials: "include" }),
+            fetch("/api/profile", { credentials: "include" }),
+            fetch("/api/item-catalogue", { credentials: "include" }),
+            fetch("/api/hourlyRates", { credentials: "include" }),
+          ]);
 
         const customersData = await customersRes.json();
         const businessesData = await businessesRes.json();
-        const objectsData = await objectsRes.json();
+        const productsData = await productsRes.json();
+        const hourlyRatesData = await hourlyRatesRes.json();
 
         const transformedCustomers = (customersData.clients || []).map(
           (client: any) => ({
@@ -54,19 +57,30 @@ export default function Page() {
           })
         );
 
-        // Transform items to match ItemFieldWithPrice format
-        const transformedObjects = (objectsData || []).map((item: any) => ({
+        // Transform products
+        const transformedProducts = (productsData || []).map((item: any) => ({
           id: item.idObjet,
-          name: item.productName || item.workPosition || "Unknown Item",
-          type: item.price !== undefined ? "product" : "hourly",
-          ...(item.price !== undefined
-            ? { price: item.price }
-            : { hourlyRate: item.hourlyRate || 0 }),
+          name: item.productName || "Unknown Product",
+          type: "product" as const,
+          price: item.price || 0,
         }));
+
+        // Transform hourly rates
+        const transformedHourlyRates = (hourlyRatesData || []).map(
+          (rate: any) => ({
+            id: rate.idObjet,
+            name: rate.workPosition || "Unknown Position",
+            type: "hourly" as const,
+            hourlyRate: rate.hourlyRate || 0,
+          })
+        );
+
+        // Combine both arrays
+        const allObjects = [...transformedProducts, ...transformedHourlyRates];
 
         setCustomers(transformedCustomers);
         setBusinesses(businessesData.businesses || []);
-        setObjects(transformedObjects);
+        setObjects(allObjects);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

@@ -68,14 +68,31 @@ export default function Form({ customers, businesses, objects }: Props) {
   }, [state.errors, state.formData]);
 
   // ---------- Derived lists ----------
-  const productObjects = useMemo(
-    () => objects.filter((obj) => obj.type === "product"),
-    [objects]
-  );
-  const hourlyObjects = useMemo(
-    () => objects.filter((obj) => obj.type === "hourly"),
-    [objects]
-  );
+  const productObjects = useMemo(() => {
+    const products = objects.filter((obj) => obj.type === "product");
+    // Remove duplicates based on id
+    const seen = new Set<number>();
+    return products.filter((obj) => {
+      if (seen.has(obj.id)) {
+        return false;
+      }
+      seen.add(obj.id);
+      return true;
+    });
+  }, [objects]);
+
+  const hourlyObjects = useMemo(() => {
+    const hourly = objects.filter((obj) => obj.type === "hourly");
+    // Remove duplicates based on id
+    const seen = new Set<number>();
+    return hourly.filter((obj) => {
+      if (seen.has(obj.id)) {
+        return false;
+      }
+      seen.add(obj.id);
+      return true;
+    });
+  }, [objects]);
 
   // ---------- Calculate total ----------
   const invoiceTotal = useMemo(() => {
