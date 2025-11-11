@@ -2,6 +2,7 @@ type Props = {
   canSubmit: boolean;
   customerId: string;
   businessId: string;
+  invoiceType: "company" | "personal";
   itemsCount: number;
   t: (key: any) => string;
 };
@@ -10,6 +11,7 @@ export default function ValidationWarning({
   canSubmit,
   customerId,
   businessId,
+  invoiceType,
   itemsCount,
   t,
 }: Props) {
@@ -35,7 +37,7 @@ export default function ValidationWarning({
           <p className="font-medium text-sm">{t("pleaseCompleteFields")}</p>
           <ul className="mt-2 text-sm space-y-1 list-disc list-inside">
             {!customerId && <li>{t("selectClient")}</li>}
-            {!businessId && <li>{t("selectBusiness")}</li>}
+            {invoiceType === "company" && !businessId && <li>{t("selectBusiness")}</li>}
             {itemsCount === 0 && <li>{t("addAtLeastOneItem")}</li>}
           </ul>
         </div>

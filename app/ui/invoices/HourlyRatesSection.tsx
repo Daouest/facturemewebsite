@@ -18,6 +18,7 @@ type Props = {
     customerId?: string[];
     number?: string[];
     businessId?: string[];
+    invoiceType?: string[];
     items?: { [itemIndex: number]: { [field: string]: string[] } };
     general?: string[];
   };

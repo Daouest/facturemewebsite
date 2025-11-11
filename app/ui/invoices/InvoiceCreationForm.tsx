@@ -20,6 +20,7 @@ import { startTransition, useActionState } from "react";
 import { useMemo, useState, useEffect, useId } from "react";
 import CustomerSelect from "@/app/ui/invoices/CustomerSelect";
 import BusinessSelect from "@/app/ui/invoices/BusinessSelect";
+import InvoiceTypeSelector from "@/app/ui/invoices/InvoiceTypeSelector";
 import { useLangageContext } from "@/app/context/langageContext";
 import InvoiceNumberSection from "@/app/ui/invoices/InvoiceNumberSection";
 import ValidationWarning from "@/app/ui/invoices/ValidationWarning";
@@ -41,6 +42,7 @@ export default function Form({ customers, businesses, objects }: Props) {
   const [form, setForm] = useState<InvoiceForm>({
     customerId: "",
     businessId: "",
+    invoiceType: "company",
     numberType: "auto",
     number: "",
     items: [],
@@ -79,12 +81,19 @@ export default function Form({ customers, businesses, objects }: Props) {
     }
   }, [state.errors, state.formData]);
 
-  // Auto-select business if there's only one
+  // Auto-select business if there's only one and invoice type is 'company'
   useEffect(() => {
-    if (businesses.length === 1 && !form.businessId) {
+    if (form.invoiceType === "company" && businesses.length === 1 && !form.businessId) {
       updateField("businessId", String(businesses[0].id));
     }
-  }, [businesses, form.businessId]);
+  }, [businesses, form.businessId, form.invoiceType]);
+
+  // Clear businessId when switching to personal invoice type
+  useEffect(() => {
+    if (form.invoiceType === "personal" && form.businessId) {
+      updateField("businessId", "");
+    }
+  }, [form.invoiceType, form.businessId]);
 
   // ---------- Derived lists ----------
   const productObjects = useMemo(() => {
@@ -255,7 +264,7 @@ export default function Form({ customers, businesses, objects }: Props) {
 
   const canSubmit =
     !!form.customerId &&
-    !!form.businessId &&
+    (form.invoiceType === "personal" || !!form.businessId) &&
     (form.numberType === "auto" ||
       (form.numberType === "custom" && !!form.number)) &&
     form.items.length > 0;
@@ -310,17 +319,28 @@ export default function Form({ customers, businesses, objects }: Props) {
                   />
                 </section>
 
-                {/* Business */}
+                {/* Invoice Type Selection */}
                 <section className="rounded-xl ring-1 ring-white/10 bg-white/0 p-4">
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30">
-                      <svg
-                        className="h-4 w-4 text-emerald-300"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        <path
+                  <InvoiceTypeSelector
+                    value={form.invoiceType}
+                    onChange={(val) => updateField("invoiceType", val)}
+                    disabled={isPending}
+                    error={state.errors?.invoiceType}
+                  />
+                </section>
+
+                {/* Business - Only show when invoice type is 'company' */}
+                {form.invoiceType === "company" && (
+                  <section className="rounded-xl ring-1 ring-white/10 bg-white/0 p-4">
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30">
+                        <svg
+                          className="h-4 w-4 text-emerald-300"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -339,6 +359,7 @@ export default function Form({ customers, businesses, objects }: Props) {
                     error={state.errors?.businessId}
                   />
                 </section>
+                )}
 
                 {/* Invoice Number Type */}
                 <InvoiceNumberSection
@@ -404,6 +425,7 @@ export default function Form({ customers, businesses, objects }: Props) {
                 canSubmit={canSubmit}
                 customerId={form.customerId}
                 businessId={form.businessId}
+                invoiceType={form.invoiceType}
                 itemsCount={form.items.length}
                 t={t}
               />
@@ -481,6 +503,7 @@ export default function Form({ customers, businesses, objects }: Props) {
           businesses={businesses}
           customerId={form.customerId}
           businessId={form.businessId}
+          invoiceType={form.invoiceType}
           itemsCount={form.items.length}
           numberType={form.numberType}
           customNumber={form.number}

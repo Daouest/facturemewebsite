@@ -7,6 +7,7 @@ type Props = {
   businesses: BusinessField[];
   customerId: string;
   businessId: string;
+  invoiceType: "company" | "personal";
   itemsCount: number;
   numberType: string;
   customNumber: string;
@@ -19,6 +20,7 @@ export default function InvoiceSummary({
   businesses,
   customerId,
   businessId,
+  invoiceType,
   itemsCount,
   numberType,
   customNumber,
@@ -44,13 +46,23 @@ export default function InvoiceSummary({
                   "—"}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span>{t("business")}</span>
-              <span className="font-medium">
-                {businesses?.find((b) => b.id === Number(businessId))?.name ??
-                  "—"}
-              </span>
-            </div>
+            {invoiceType === "company" && (
+              <div className="flex justify-between">
+                <span>{t("business")}</span>
+                <span className="font-medium">
+                  {businesses?.find((b) => b.id === Number(businessId))?.name ??
+                    "—"}
+                </span>
+              </div>
+            )}
+            {invoiceType === "personal" && (
+              <div className="flex justify-between">
+                <span>{t("invoiceType")}</span>
+                <span className="font-medium text-violet-300">
+                  {t("personalInvoice")}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>{t("items")}</span>
               <span className="font-medium">{itemsCount}</span>

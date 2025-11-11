@@ -160,6 +160,7 @@ export type BusinessField = {
 export type InvoiceForm = {
     customerId: string;
     businessId: string;
+    invoiceType: 'company' | 'personal';
     numberType: 'auto' | 'custom';
     number: string;
     items: InvoiceFormItem[];
