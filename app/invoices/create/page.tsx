@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Form from "@/app/ui/invoices/create-form";
+import Form from "@/app/ui/invoices/InvoiceCreationForm";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";

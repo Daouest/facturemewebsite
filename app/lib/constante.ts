@@ -1,11 +1,11 @@
 
 const fr = {
-        ticket:"Tickets",
+  ticket: "Tickets",
   hello: "Bonjour",
   home: "Accueil",
   info: "FAQs",
   users: "Utilisateurs",
-  admin_section:"Séction admin",
+  admin_section: "Séction admin",
   historicInvoices: " Historique des factures",
   sortByDate: "Date",
   sortByPaidInvoice: "Non payée",
@@ -138,18 +138,69 @@ const fr = {
   addingClient: "Ajout...",
   addClientButton: "Ajouter le client",
   fillRequiredFields: "Veuillez remplir tous les champs requis.",
-  clientAddedSuccess: "Client ajouté avec succès !"
+  clientAddedSuccess: "Client ajouté avec succès !",
+
+  // Item Detail Page
+  details: "Détails",
+  loadingText: "Chargement...",
+  errorLoadingItem: "Erreur dans le chargement de l'item",
+  message: "Message",
+  noFieldsModified: "Erreur dans le formulaire: aucun champs modifié",
+  itemName: "Nom de l'item",
+  modifyImage: "Modifier l'image",
+  change: "Changer",
+  modify: "Modifier",
+  return: "Retour",
+  deleteItem: "Supprimer",
+
+  // Invoice Creation Validation
+  pleaseCompleteFields: "Veuillez compléter les champs suivants :",
+  selectClient: "Sélectionner un client",
+  selectBusiness: "Sélectionner une entreprise",
+  addAtLeastOneItem: "Ajouter au moins un produit ou taux horaire",
+
+  // Invoice Creation Form
+  createNewInvoice: "Créer une nouvelle facture",
+  client: "Client",
+  business: "Entreprise",
+  invoiceNumber: "Numéro de facture",
+  automatic: "Automatique",
+  custom: "Personnalisé",
+  chooseInvoiceNumber: "Choisir un numéro de facture",
+  enterInvoiceNumber: "Entrer un numéro de facture",
+  products: "Produits",
+  selectProduct: "Sélectionner un produit",
+  add: "Ajouter",
+  hourlyRate: "Taux horaire",
+  selectHourlyRate: "Sélectionner un taux",
+  cancel: "Annuler",
+  createInvoice: "Créer la facture",
+  creating: "Création...",
+  missing: "Manquant",
+
+  // Invoice Summary
+  invoiceSummary: "Résumé facture",
+  items: "Articles",
+  numbering: "Numérotation",
+  total: "Total",
+
+  // Customer Business Section
+  clientAndBusiness: "Client et Entreprise",
+  selectClientLabel: "Sélectionner un client",
+  chooseClient: "Choisir un client",
+  selectBusinessLabel: "Sélectionner une entreprise",
+  chooseBusiness: "Choisir une entreprise"
 } as const;
 
 
 const en = {
-        ticket:"Tickets",
+  ticket: "Tickets",
   users: "Users",
 
   hello: "Hi",
   home: "Home",
   info: "FAQs",
-  admin_section:"Admin section",
+  admin_section: "Admin section",
   historicInvoices: "Invoice histories",
   sortByDate: "Sort by date",
   sortByNumber: "Sort by facture number",
@@ -284,7 +335,58 @@ const en = {
   addingClient: "Adding...",
   addClientButton: "Add Client",
   fillRequiredFields: "Please fill in all required fields.",
-  clientAddedSuccess: "Client added successfully!"
+  clientAddedSuccess: "Client added successfully!",
+
+  // Item Detail Page
+  details: "Details",
+  loadingText: "Loading...",
+  errorLoadingItem: "Error loading item",
+  message: "Message",
+  noFieldsModified: "Form error: no fields modified",
+  itemName: "Item name",
+  modifyImage: "Modify image",
+  change: "Change",
+  modify: "Modify",
+  return: "Return",
+  deleteItem: "Delete",
+
+  // Invoice Creation Validation
+  pleaseCompleteFields: "Please complete the following fields:",
+  selectClient: "Select a client",
+  selectBusiness: "Select a business",
+  addAtLeastOneItem: "Add at least one product or hourly rate",
+
+  // Invoice Creation Form
+  createNewInvoice: "Create a new invoice",
+  client: "Client",
+  business: "Business",
+  invoiceNumber: "Invoice Number",
+  automatic: "Automatic",
+  custom: "Custom",
+  chooseInvoiceNumber: "Choose an invoice number",
+  enterInvoiceNumber: "Enter an invoice number",
+  products: "Products",
+  selectProduct: "Select a product",
+  add: "Add",
+  hourlyRate: "Hourly Rate",
+  selectHourlyRate: "Select a rate",
+  cancel: "Cancel",
+  createInvoice: "Create Invoice",
+  creating: "Creating...",
+  missing: "Missing",
+
+  // Invoice Summary
+  invoiceSummary: "Invoice Summary",
+  items: "Items",
+  numbering: "Numbering",
+  total: "Total",
+
+  // Customer Business Section
+  clientAndBusiness: "Client and Business",
+  selectClientLabel: "Select a client",
+  chooseClient: "Choose a client",
+  selectBusinessLabel: "Select a business",
+  chooseBusiness: "Choose a business"
 }
 
 type TranslationKey = keyof typeof fr;

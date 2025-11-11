@@ -156,7 +156,7 @@ export default function ItemCatalogue() {
                         />
                       </div>
                     ) : (
-                      <div className="max-h-[70vh] overflow-y-auto rounded-xl border border-white/10 bg-white/0 custom-scrollbar">
+                      <div className="h-[500px] overflow-y-auto rounded-xl border border-white/10 bg-white/0 custom-scrollbar">
                         <Table rows={filteredItems ?? []} type="items" />
                       </div>
                     )}

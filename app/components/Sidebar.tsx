@@ -30,7 +30,6 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const t = createTranslator(langage);
   const { setShowPage } = useSidebarContext();
 
-
   return (
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] lg:self-start lg:sticky lg:top-20">
       <div className="flex flex-col items-center">
@@ -45,8 +44,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
           {t("hello") + " "}
           <TextType
             text={[
-              `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${user?.firstName?.substring(1, 5) ?? ""
-              } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${user?.lastName?.substring(1, 5) ?? ""
+              `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${
+                user?.firstName?.substring(1, 5) ?? ""
+              } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${
+                user?.lastName?.substring(1, 5) ?? ""
               }`,
             ]}
             className="font-semibold text-slate-100"
@@ -116,32 +117,28 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
           <span className="truncate">{t("profile")}</span>
         </Link>
 
-        {/* {
-          user?.isAdmin && ( */}
-        <>
-          {
-            !showPageInAdmin &&
-            (
+        {user?.isAdmin && (
+          <>
+            {!showPageInAdmin && (
               <Link
                 href="/admin"
                 className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
               >
                 {t("admin_section")}
-
-
               </Link>
-            )
-          }
+            )}
 
-          {
-            showPageInAdmin && (
+            {showPageInAdmin && (
               <>
                 <Button
                   variant={"ghost"}
                   className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
                   onClick={() => {
-                    setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
-
+                    setShowPage((prev) => ({
+                      ...prev,
+                      tickePage: false,
+                      stats: false,
+                    }));
                   }}
                 >
                   {t("users")}
@@ -150,9 +147,13 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
                   variant={"ghost"}
                   className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
                   onClick={() => {
-                    setShowPage((prev) => ({ ...prev, tickePage: true, stats: false }))
-
-                  }}              >
+                    setShowPage((prev) => ({
+                      ...prev,
+                      tickePage: true,
+                      stats: false,
+                    }));
+                  }}
+                >
                   🧾{t("ticket")}
                 </Button>
 
@@ -160,18 +161,19 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
                   variant={"ghost"}
                   className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
                   onClick={() => {
-                    setShowPage((prev) => ({ ...prev, tickePage: false, stats: true }))
-
-                  }}              >
+                    setShowPage((prev) => ({
+                      ...prev,
+                      tickePage: false,
+                      stats: true,
+                    }));
+                  }}
+                >
                   statistiques
                 </Button>
-
               </>
-            )
-          }
-        </>
-        {/* )
-        } */}
+            )}
+          </>
+        )}
       </nav>
     </aside>
   );
