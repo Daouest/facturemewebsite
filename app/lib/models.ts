@@ -93,6 +93,7 @@ const factureSchema = new Schema({
     isPaid: { type: Boolean, required: [true, "Paid status is required"] },
     isBusinessInvoice: { type: Boolean, required: [true, "Business invoice status is required"] },
     idClient: { type: Number, required: [true, "Client ID is required"] },
+    idBusiness: { type: Number },
 
 }, { collection: 'factures_users' });
 

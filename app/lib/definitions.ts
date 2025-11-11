@@ -9,6 +9,7 @@ export type Facture = {
     isPaid: boolean;
     isBusinessInvoice: boolean;
     idClient: number;
+    idBusiness?: number;
     nomClient: string;
 };
 
