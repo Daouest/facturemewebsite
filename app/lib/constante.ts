@@ -190,6 +190,13 @@ const fr = {
   chooseClient: "Choisir un client",
   selectBusinessLabel: "Sélectionner une entreprise",
   chooseBusiness: "Choisir une entreprise",
+  
+  // Invoice Type Selection
+  invoiceType: "Type de facturation",
+  withCompany: "Avec une entreprise",
+  withPersonalAddress: "Avec mon adresse personnelle",
+  companyInvoice: "Facture d'entreprise",
+  personalInvoice: "Facture personnelle",
 
   // Address autocomplete
   addressRequired: "L'adresse est requise",
@@ -398,6 +405,13 @@ const en = {
   chooseClient: "Choose a client",
   selectBusinessLabel: "Select a business",
   chooseBusiness: "Choose a business",
+  
+  // Invoice Type Selection
+  invoiceType: "Invoice Type",
+  withCompany: "With a company",
+  withPersonalAddress: "With my personal address",
+  companyInvoice: "Company invoice",
+  personalInvoice: "Personal invoice",
 
   // Address autocomplete
   addressRequired: "Address is required",

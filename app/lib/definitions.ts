@@ -9,6 +9,7 @@ export type Facture = {
     isPaid: boolean;
     isBusinessInvoice: boolean;
     idClient: number;
+    idBusiness?: number;
     nomClient: string;
 };
 
@@ -160,6 +161,7 @@ export type BusinessField = {
 export type InvoiceForm = {
     customerId: string;
     businessId: string;
+    invoiceType: 'company' | 'personal';
     numberType: 'auto' | 'custom';
     number: string;
     items: InvoiceFormItem[];
