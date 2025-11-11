@@ -196,7 +196,11 @@ const fr = {
   cityRequired: "La ville est requise",
   provinceRequired: "La province est requise",
   postalCodeRequired: "Le code postal est requis",
-  countryRequired: "Le pays est requis"
+  countryRequired: "Le pays est requis",
+
+  // Address management
+  addressInformation: "Informations d'adresse",
+  saveAddress: "Enregistrer l'adresse"
 } as const;
 
 
@@ -400,7 +404,11 @@ const en = {
   cityRequired: "City is required",
   provinceRequired: "Province is required",
   postalCodeRequired: "Postal code is required",
-  countryRequired: "Country is required"
+  countryRequired: "Country is required",
+
+  // Address management
+  addressInformation: "Address Information",
+  saveAddress: "Save Address"
 }
 
 type TranslationKey = keyof typeof fr;

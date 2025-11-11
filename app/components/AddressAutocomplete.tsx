@@ -29,6 +29,7 @@ type AddressAutocompleteProps = {
     country?: string;
   };
   disabled?: boolean;
+  variant?: "default" | "profile"; // default for signup/auth forms, profile for profile page
 };
 
 export default function AddressAutocomplete({
@@ -36,6 +37,7 @@ export default function AddressAutocomplete({
   initialAddress = {},
   errors = {},
   disabled = false,
+  variant = "default",
 }: AddressAutocompleteProps) {
   const [address, setAddress] = useState(initialAddress.address || "");
   const [city, setCity] = useState(initialAddress.city || "");
@@ -46,6 +48,23 @@ export default function AddressAutocomplete({
 
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
+
+  // Style configurations based on variant
+  const styles = {
+    label: variant === "profile" 
+      ? "block text-sm font-medium text-slate-300 mb-1"
+      : "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1",
+    input: variant === "profile"
+      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
+      : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
+    select: variant === "profile"
+      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
+      : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
+    error: variant === "profile" ? "mt-1 text-xs text-red-400" : "mt-1 text-xs text-red-600",
+    inputClass: variant === "profile"
+      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
+      : "", // empty string means use Input component's default styling
+  };
 
   // Load Google Places API script
   useEffect(() => {
@@ -239,7 +258,7 @@ export default function AddressAutocomplete({
       <div>
         <label
           htmlFor="address-autocomplete"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
+          className={styles.label}
         >
           Adresse
         </label>
@@ -263,10 +282,10 @@ export default function AddressAutocomplete({
           required
           disabled={disabled}
           autoComplete="off"
-          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          className={styles.input}
         />
         {errors.address && (
-          <p className="mt-1 text-xs text-red-600">{errors.address}</p>
+          <p className={styles.error}>{errors.address}</p>
         )}
       </div>
 
@@ -291,9 +310,10 @@ export default function AddressAutocomplete({
             }}
             required
             disabled={disabled}
+            className={styles.inputClass}
           />
           {errors.city && (
-            <p className="mt-1 text-xs text-red-600">{errors.city}</p>
+            <p className={styles.error}>{errors.city}</p>
           )}
         </div>
 
@@ -314,11 +334,14 @@ export default function AddressAutocomplete({
                 country,
               });
             }}
+            pattern="^[A-Za-z0-9\s-]+$"
+            title={country === "CA" ? "Format canadien: A1B 2C3" : "Lettres, chiffres, espaces ou tirets"}
             required
             disabled={disabled}
+            className={styles.inputClass}
           />
           {errors.zipCode && (
-            <p className="mt-1 text-xs text-red-600">{errors.zipCode}</p>
+            <p className={styles.error}>{errors.zipCode}</p>
           )}
         </div>
       </div>
@@ -327,7 +350,7 @@ export default function AddressAutocomplete({
         <div>
           <label
             htmlFor="province"
-            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
+            className={styles.label}
           >
             Province / État
           </label>
@@ -347,7 +370,7 @@ export default function AddressAutocomplete({
             }}
             required
             disabled={disabled}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className={styles.select}
           >
             <option value="">Sélectionner</option>
             {provinces.map((p) => (
@@ -357,14 +380,14 @@ export default function AddressAutocomplete({
             ))}
           </select>
           {errors.province && (
-            <p className="mt-1 text-xs text-red-600">{errors.province}</p>
+            <p className={styles.error}>{errors.province}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="country"
-            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
+            className={styles.label}
           >
             Pays
           </label>
@@ -385,13 +408,13 @@ export default function AddressAutocomplete({
             }}
             required
             disabled={disabled}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className={styles.select}
           >
             <option value="CA">Canada</option>
             <option value="US">États-Unis</option>
           </select>
           {errors.country && (
-            <p className="mt-1 text-xs text-red-600">{errors.country}</p>
+            <p className={styles.error}>{errors.country}</p>
           )}
         </div>
       </div>

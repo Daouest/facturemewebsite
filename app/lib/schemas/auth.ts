@@ -23,7 +23,10 @@ export const AddressSchema = z.object({
     address: z.string().min(1, "L'adresse est requise").max(255),
     city: z.string().min(1, "La ville est requise").max(100),
     province: z.string().min(2, "La province est requise").max(3),
-    zipCode: z.string().min(1, "Le code postal est requis").max(20),
+    zipCode: z.string()
+        .min(1, "Le code postal est requis")
+        .regex(/^[A-Za-z0-9\s-]+$/, "Le code postal doit contenir seulement des lettres, chiffres, espaces ou tirets")
+        .max(10),
     country: z.string().min(2, "Le pays est requis").max(2),
 })
 
