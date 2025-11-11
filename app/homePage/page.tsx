@@ -165,7 +165,7 @@ export default function HomePage() {
                       alt="loading"
                       width={50}
                       height={100}
-                      className="object-contain max-w-full h-auto opacity-80"
+                      className="object-contain max-w-full h-auto opacity-80 bg-none"
                     />
                   </div>
                 ) : (

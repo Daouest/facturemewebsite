@@ -18,8 +18,10 @@ const monthsLabel = [
 
 export default function StatsFactureMe() {
   return (
-    <Box sx={{ width: '100%', height: 300 }}>
+    <Box sx={{ width: '100%', height: 300 }} >
       <BarChart
+      sx={{color:'white'}}
+      className='text-white'
         series={[
           {
             data: prints,

@@ -73,7 +73,7 @@ export default function TickePage() {
 
             <main className="flex-1 pt-[80px]">
                 <div className="max-w-6xl mx-auto px-6 pb-10">
-                    <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8">
+                    <div className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur  shadow-lg rounded-2xl p-6 sm:p-8">
 
                         <div className="my-4 border-t border-gray-200" />
                         {status !== "error" && isLoading ? (

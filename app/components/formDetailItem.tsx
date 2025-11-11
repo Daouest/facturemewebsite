@@ -181,7 +181,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
             file: "",
           });
           setLastPrice(0);
-          router.push("/item/item-catalogue");
+      window.location.href = "/item/item-catalogue";
         }, 1500);
       },
     });
@@ -214,7 +214,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     mutationFn: deleteItemRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      router.push("/item/item-catalogue");
+      window.location.href = "/item/item-catalogue";
     },
     onError: (error) => {
       console.error("Erreur de suppression :", error);

@@ -53,7 +53,7 @@ export default function ItemCatalogue() {
     isLoading,
     status,
   } = useQuery<TableItemType[]>({
-    queryKey: ["items"],
+    queryKey: ["catalogueItems"],
     queryFn: async () => {
       try {
         return await fetchData();

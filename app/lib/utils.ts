@@ -347,3 +347,4 @@ export function showLongText(message:string){
     }
     return udpdateMessage;
  }
+

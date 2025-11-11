@@ -28,7 +28,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const { langage } = useLangageContext();
   const { user } = useUser();
   const t = createTranslator(langage);
-  const {  setShowPage } = useSidebarContext();
+  const { setShowPage } = useSidebarContext();
 
 
   return (
@@ -118,53 +118,59 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         {/* {
           user?.isAdmin && ( */}
-            <>
+        <>
+          {
+            !showPageInAdmin &&
+            (
               <Link
                 href="/admin"
                 className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
               >
                 {t("admin_section")}
 
+
               </Link>
+            )
+          }
 
-              {
-                showPageInAdmin && (
-                  <>
-                    <Button
-                      variant={"ghost"}
-                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                      onClick={() => {
-                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+          {
+            showPageInAdmin && (
+              <>
+                <Button
+                  variant={"ghost"}
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  onClick={() => {
+                    setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
 
-                      }}
-                    >
-                      {t("users")}
-                    </Button>
-                    <Button
-                      variant={"ghost"}
-                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                      onClick={() => {
-                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+                  }}
+                >
+                  {t("users")}
+                </Button>
+                <Button
+                  variant={"ghost"}
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  onClick={() => {
+                    setShowPage((prev) => ({ ...prev, tickePage: true, stats: false }))
 
-                      }}              >
-                      🧾{t("ticket")}
-                    </Button>
+                  }}              >
+                  🧾{t("ticket")}
+                </Button>
 
-                    <Button
-                      variant={"ghost"}
-                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                      onClick={() => {
-                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+                <Button
+                  variant={"ghost"}
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  onClick={() => {
+                    setShowPage((prev) => ({ ...prev, tickePage: false, stats: true }))
 
-                      }}              >
-                      statistiques
-                    </Button>
+                  }}              >
+                  statistiques
+                </Button>
 
-                  </>
-                )
-              }
-            </>
-          {/* )
+              </>
+            )
+          }
+        </>
+        {/* )
         } */}
       </nav>
     </aside>

@@ -92,12 +92,12 @@ export default function AdminAcceuil() {
 
     const renderedList = useMemo(() => {
         if (dataOutput.length === 0) {
-            return <p className="self-center text-gray-700">Aucune donnée trouvée</p>;
+            return <p className="self-center text-white">Aucune donnée trouvée</p>;
         }
 
         if (showData.users) {
             return (dataOutput as UserData[]).map((u, index) => (
-                <div key={index} className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur user-card user-card" onClick={() => router.push("/clients-catalogue")}>
+                <div key={index} className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur user-card" onClick={() => router.push("/clients-catalogue")}>
                     <div className="user-avatar">{u?.firstName?.charAt(0) ?? ""}</div>
                     <div className="user-info">
                         <h3 className="user-name">{u.lastName}</h3>

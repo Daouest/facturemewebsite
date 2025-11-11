@@ -925,3 +925,14 @@ export async function deleteTicket(id: number) {
 
 }
 
+export async function getAllUsers() {
+    try {
+        const userData = await DbUsers.find();
+
+        if (!userData) return null
+        return userData;
+    } catch (err) {
+        console.error("Erreur dans la fonctions getUserInfo", err);
+        return null;
+    }
+}

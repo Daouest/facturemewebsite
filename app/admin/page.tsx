@@ -1,32 +1,28 @@
 "use client"
 import React, { useState, useEffect, Suspense } from "react"
-import { useUser } from "@/app/context/UserContext";
 import { useLangageContext } from "../context/langageContext";
 import { getDateNow, createTranslator } from "@/app/lib/utils";
-import Image from "next/image";
 import Header from "@/app/components/Header";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import TextType from "@/app/components/TextType";
-import { useRouter } from "next/navigation";
 import AdminAcceuil from "@/app/components/adminAcceuil";
 import StatsFactureMe from "@/app/components/stats";
 import Sidebar from "../components/Sidebar";
 import { useSidebarContext } from "@/app/context/SidebarContext";
-
+import { useUser } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 export default function AdminPage() {
-    const { user } = useUser();
     const { langage } = useLangageContext();
     const t = createTranslator(langage);
     const TickePage = React.lazy(() => import("../components/Ticket"));
-    const router = useRouter()
-  const { showPage } = useSidebarContext();
+    const { showPage } = useSidebarContext();
+    const { user } = useUser();
+    const router = useRouter();
 
-    // useEffect(() => {
-    //     if (!user?.isAdmin) router.push("/homePage");
-    // }, [])
-
+    useEffect(() => {
+        if (user?.isAdmin == false) router.push("/homePage");
+    }, [])
+ 
     return (
         <>
             <Header />
@@ -67,7 +63,7 @@ export default function AdminPage() {
                             )}
                             {
                                 !showPage.stats && !showPage.tickePage && (
-                                        <AdminAcceuil />
+                                    <AdminAcceuil />
 
                                 )
                             }
