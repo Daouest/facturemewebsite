@@ -1,337 +1,341 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { TableItemType, Facture, HourlyRateType } from "@/app/lib/definitions";
+import { TableItemType, Facture, Ticket } from "@/app/lib/definitions";
+import Modal from 'react-modal';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 import {
-  isTableHourlyRate,
   isTableFacture,
   isTableItem,
   dateToSting,
   formatIntoDecimal,
   createTranslator,
+  isTableTicket,
+  showLongText,
 } from "@/app/lib/utils";
 import ImageFromBd from "@/components/ui/images";
 import { useLangageContext } from "@/app/context/langageContext";
 
-type TableProps<T extends TableItemType | HourlyRateType | Facture> = {
+type TableProps<T extends TableItemType | Facture | Ticket> = {
   rows: T[];
   className?: string;
-  type?: "items" | "factures";
 };
 
-export function Table<T extends TableItemType | HourlyRateType | Facture>({
+export function Table<T extends TableItemType | Facture | Ticket>({
   rows,
   className,
-  type,
 }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
-  const [isClick, setIsClick] = useState(false);
+  const [isClick, setIsClick] = useState({ facture: false, ticketMessage: false, ticketStatus: false });
+  const [messageTicket, setMessageTicket] = useState({ client: "", message: "" });
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
   const router = useRouter();
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const etagRef = useRef<string | null>(null);
 
+  useEffect(() => {// setAppElement doit être exécuté après le montage sinon le DOM n'existe pas encore
+
+    if (typeof window === "undefined") return;
+    const rootEl = document.getElementById("__next") ?? document.body; //_next est un ID automatiquement ajouté par Next.js à la racine de ton application côté client.
+    Modal.setAppElement(rootEl);
+  }, []);
+
+
+
+  const closeModal = () => {
+    setIsOpen(false);
+  }
   useEffect(() => {
-    if (id == null || !isClick) return;
-
-    let isCancelled = false;
-    const controller = new AbortController();
-
     const setMySession = async () => {
-      try {
-        const res = await fetch("/api/set-facture", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ factureId: id }),
-          signal: controller.signal,
-        });
+      const res = await fetch("/api/set-facture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          factureId: id ?? null,
+        }),
+      });
 
-        // even if API returns a payload, we only need success here
-        if (!isCancelled && res.ok) {
-          router.push("/previsualisation");
-        } else if (!res.ok) {
-          console.error("Failed to set session");
-        }
-      } catch (e) {
-        if (!isCancelled) console.error("Session error:", e);
+      if (res.ok) {
+        router.push("/previsualisation");
+        console.log("Session set!");
+      } else {
+        console.error("Failed to set session");
       }
     };
 
-    setMySession();
-    return () => {
-      isCancelled = true;
-      controller.abort();
-    };
+    if (id !== null && isClick) {
+      console.log("id dans le useEffect de table:", id);
+      setMySession();
+    }
   }, [id, isClick, router]);
 
-  // Empty state
-  if (!rows || rows.length === 0) {
-    return (
-      <div
-        className={[
-          "rounded-2xl p-6 border border-dashed border-white/15 bg-white/5 backdrop-blur",
-          "text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
-        ].join(" ")}
-      >
-        {type === "items" ? (
-          <Link
-            href="/item/creation-item"
-            className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30 hover:bg-sky-500/25 transition-colors cursor-pointer"
-          >
-            <svg
-              className="h-6 w-6 text-sky-300"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </Link>
-        ) : (
-          <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 ring-1 ring-sky-400/30">
-            <svg
-              className="h-6 w-6 text-sky-300"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </div>
-        )}
-        <p className="text-slate-200 text-base font-semibold">
-          {type === "items" ? t("noItems") : t("noData")}
-        </p>
-        <p className="mt-1 text-sm text-slate-300/80">
-          {/** Optional guidance; keep or remove */}
-          {type === "items"
-            ? langage === "fr"
-              ? "Créez votre premier produit pour commencer."
-              : "Create your first product to get started."
-            : langage === "fr"
-            ? "Ajoutez des éléments pour les voir apparaître ici."
-            : "Add items to see them here."}
-        </p>
-        {type === "items" && (
-          <Link
-            href="/item/creation-item"
-            className="mt-4 inline-flex items-center rounded-xl bg-sky-500 px-4 py-2 text-white font-medium shadow hover:bg-sky-400 transition-colors ring-1 ring-sky-400/40"
-          >
-            {langage === "fr" ? "Créer un produit" : "Create a product"}
-          </Link>
-        )}
-      </div>
-    );
+
+
+  const {
+    data: tickets,
+  } = useQuery<Ticket[]>({
+    queryKey: ["tickets"],
+    queryFn: async () => {
+      const res = await fetch("/api/ticket", {
+        cache: "no-store",
+        headers: {
+          "if-None-Match": etagRef.current ?? "",
+        },
+      });
+      const newEtag = res.headers.get("Etag");
+
+      if (newEtag) etagRef.current = newEtag; console.log(" etagRef.current", etagRef.current)
+
+      if (!res.ok) throw new Error("Erreur lors de la récupération");
+      return res.json();
+    },
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 8000 //  les données son considérées comme bonne après 8 secondes
+
+  })
+
+  const handleChangeStatus = async ({ idClient, idTicket, status }: { idClient: number, idTicket: number, status: boolean }) => {
+    const res = await fetch("/api/ticket", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idClient: idClient,
+        idTicket: idTicket,
+        status: status
+      }),
+    });
+    // const data = await res.json()
+    if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+    return res.json();
   }
 
-  // Determine the type to show appropriate message
-  const isItems = isTableItem(rows[0]);
 
-  // ITEMS TABLE
-  if (isItems) {
+  const mutation = useMutation({
+    mutationFn: handleChangeStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] }); // fait un relaod coté serveur
+    },
+    onError: (error) => {
+      console.error("Erreur de la modification :", error);
+    },
+  });
+
+
+  const update = (idClient: number, idTicket: number, status: boolean) => {
+
+    mutation.mutate({ idClient, idTicket, status }, {
+      onSuccess: () => {
+        console.log("Modification complétée");
+      }
+    });
+  }
+
+  // Sécurité : si rows est vide, on ne rend rien
+  if (!rows || rows.length === 0) return null;
+
+  // TABLE DES ITEMS
+  if (isTableItem(rows[0])) {
     const itemRows = rows as TableItemType[];
     return (
-      <div
-        className={["w-full overflow-x-auto rounded-xl", className ?? ""].join(
-          " "
-        )}
+      <table
+        className={`min-w-full border border-white shadow-2xl ${className ?? ""}`}
       >
-        <table className="min-w-full border-separate border-spacing-0 text-sm">
-          <thead>
-            <tr className="bg-white/5 backdrop-blur">
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("productName")}
-              </th>
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("description")}
-              </th>
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("price")}
-              </th>
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("image")}
-              </th>
+        <thead className="bg-gray-300">
+          <tr>
+            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
+              {t("productName")}
+            </th>
+            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
+              {t("description")}
+            </th>
+            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
+              {t("price")}
+            </th>
+            <th className="px-8 py-4 text-left text-lg font-semibold text-black border">
+              {t("image")}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="border border-white">
+          {itemRows.map((row, index) => (
+            <tr
+              key={index}
+              onClick={() =>
+                router.push(`/item/detail/${btoa(String(row.idObjet))}`)
+              }
+              className="cursor-pointer bg-gray-50 hover:bg-gray-400 transition"
+            >
+              <td className="px-8 py-4 text-base text-black border">
+                {row.productName}
+              </td>
+              <td className="px-8 py-4 text-base text-black border">
+                {row.description}
+              </td>
+              <td className="px-8 py-4 text-base text-black border">
+                {formatIntoDecimal(row.price, "fr-CA", "CAD")}
+              </td>
+              <td className="px-8 py-4 text-base text-black border">
+                <ImageFromBd id={row.idObjet} name={row.productName} />
+              </td>
             </tr>
-          </thead>
-
-          <tbody className="divide-y divide-white/10">
-            {itemRows.map((row) => (
-              <tr
-                key={row.idObjet}
-                onClick={() => router.push(`/item/detail/${row.idObjet}`)}
-                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-3 text-slate-200 align-top">
-                  {row.productName}
-                </td>
-                <td className="px-4 py-3 text-slate-300/90 align-top">
-                  {row.description}
-                </td>
-                <td className="px-4 py-3 text-slate-100 align-top">
-                  {formatIntoDecimal(row.price, "fr-CA", "CAD")}
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <div className="ring-1 ring-white/10 rounded-md overflow-hidden inline-block">
-                    <ImageFromBd id={row.idObjet} name={row.productName} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     );
   }
 
-  // Hourly Rates TABLE
-  if (isTableHourlyRate(rows[0])) {
-    const itemRows = rows as HourlyRateType[];
-    return (
-      <div
-        className={["w-full overflow-x-auto rounded-xl", className ?? ""].join(
-          " "
-        )}
-      >
-        <table className="min-w-full border-separate border-spacing-0 text-sm">
-          <thead>
-            <tr className="bg-white/5 backdrop-blur">
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("hourlyRateClient")}
-              </th>
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("hourlyRateWorkPosition")}
-              </th>
-              <th
-                scope="col"
-                className="sticky top-0 z-[1] text-left font-semibold text-slate-200 px-4 py-3 border-b border-white/10"
-              >
-                {t("hourlyRateRate")}
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-white/10">
-            {itemRows.map((row) => (
-              <tr
-                key={row.idObjet}
-                onClick={() =>
-                  router.push(`/hourlyRates/details/${row.idObjet}`)
-                } //onclick --> voir les details
-                className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-3 text-slate-200 align-top">
-                  {row.clientName}
-                </td>
-                <td className="px-4 py-3 text-slate-200 align-top">
-                  {row.workPosition}
-                </td>
-                <td className="px-4 py-3 text-slate-100 align-top">
-                  {formatIntoDecimal(row.hourlyRate, "fr-CA", "CAD")}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-
-  // FACTURES LIST
+  // TABLE DES FACTURES
   if (isTableFacture(rows[0])) {
     const factureRows = rows as Facture[];
     return (
-      <div className={["grid gap-3", className ?? ""].join(" ")}>
-        {factureRows.map((row) => (
-          <button
-            key={row.idFacture}
+      <div className={`grid gap-4 ${className ?? ""} `}>
+        {factureRows.map((row, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between p-4 rounded-xl shadow-lg bg-white hover:bg-gray-300 transition cursor-pointer"
             onClick={() => {
-              setIsClick(true);
+              setIsClick({ ...isClick, facture: true });
               setId(row.idFacture);
             }}
-            className={[
-              "w-full text-left rounded-xl px-4 py-4",
-              "border border-white/10 bg-white/5 backdrop-blur",
-              "shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
-              "hover:bg-white/10 hover:border-white/20 transition-colors",
-              "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
-            ].join(" ")}
-            aria-label={`${t("invoice")} #${row.factureNumber} - ${
-              row.nomClient
-            }`}
           >
-            <div className="flex items-center justify-between gap-4">
-              {/* Left: client + invoice number */}
-              <div className="min-w-0">
-                <h4 className="text-base font-semibold text-slate-100 truncate">
-                  {t("clientName")}: {row.nomClient}
-                </h4>
-                <p className="text-xs text-slate-300/80">
-                  {t("invoice")} #{row.factureNumber}
-                </p>
-              </div>
-
-              {/* Right: meta */}
-              <div className="flex flex-row items-center gap-6">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-sky-300">
-                    {row.typeFacture}
-                  </p>
-                </div>
-                <div className="text-xs text-slate-300/80 whitespace-nowrap">
-                  {dateToSting(row.dateFacture)}
-                </div>
-                <div
-                  className={[
-                    "text-sm font-semibold whitespace-nowrap",
-                    row.isPaid ? "text-emerald-300" : "text-rose-300",
-                  ].join(" ")}
-                >
-                  {row.isPaid
-                    ? langage === "fr"
-                      ? "PAYÉE"
-                      : "PAID"
-                    : langage === "fr"
-                    ? "NON PAYÉE"
-                    : "UNPAID"}
-                </div>
-              </div>
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                {t("clientName")}: {row.nomClient}
+              </h4>
+              <p className="text-sm text-gray-500">
+                {t("invoice")} #{row.factureNumber}
+              </p>
             </div>
-          </button>
+
+            <div className="lg:ml-[60%] text-right sm:flex flex-col">
+              <p className="text-sm font-medium text-blue-600">
+                {row.typeFacture}
+              </p>
+              <p className="text-xs text-gray-500">
+                {dateToSting(row.dateFacture)}
+              </p>
+            </div>
+
+            <div
+              className={`text-sm ${row.isPaid
+                ? "text-green-600"
+                : "text-red-600 ml-[-30px] max-sm:text-xs"
+                }`}
+            >
+              <p>{row.isPaid ? "PAYÉE" : "NON PAYÉE"}</p>
+            </div>
+          </div>
         ))}
       </div>
     );
   }
+  if (isTableTicket(rows[0])) {
+    const ticketRows = rows as Ticket[];
+    console.log("ticketRows",ticketRows);
+    return (
+      <>
+        <table className="min-w-full border border-gray-300 shadow-lg rounded-xl bg-white">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                Client
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                Message
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                Date
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                Statut
+              </th>
+            </tr>
+          </thead>
 
+          <tbody>
+            {ticketRows.map((row, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-200 hover:bg-gray-100 transition duration-200 text-center"
+              >
+                {/* Nom du client */}
+                <td className="px-4 py-2 text-sm font-semibold text-gray-800">
+                  {row.nomClient}
+                  {/* Marc */}
+                </td>
+
+                {/* Message */}
+                <td
+                  className="px-4 py-2 text-sm text-black border-2 border-gray-100 hover:cursor-pointer"
+                  onClick={() => {
+                    setIsClick({ ...isClick, ticketMessage: !isClick.ticketMessage });
+                    setIsOpen(true);
+                    setMessageTicket({
+                      ...messageTicket,
+                      client: row.nomClient,
+                      message: row.message,
+                    });
+                  }}
+                >
+                  {showLongText(row.message)}
+                </td>
+
+                {/* Date */}
+                <td className="px-4 py-2 text-xs text-gray-500">
+                  {dateToSting(row.date)}
+                </td>
+
+                {/* Statut */}
+                <td
+                  className="px-4 py-2 text-sm hover:cursor-pointer"
+                  onClick={() => {
+                    setIsClick({ ...isClick, ticketStatus: !isClick.ticketStatus });
+                    update(row.idClient, row.idTicket, !isClick.ticketStatus);
+                  }}
+                >
+                  {row.isCompleted  ? (
+                    <Badge className="bg-blue-500">Complété</Badge>
+                  ) : (
+                    <Badge variant="destructive">Non complété</Badge>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+
+
+        {
+          isClick.ticketMessage && (
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={closeModal}
+              className="bg-white p-6 flex flex-col rounded-xl shadow-xl max-w-md mx-auto outline-none relative z-50 top-30  left-60 transform -translate-y-1/2 -translate-x-1/2"
+              overlayClassName="fixed inset-0 bg-black/40 flex justify-center items-center z-40"
+              contentLabel=" Modal"
+            >
+              <div className="text-start font-semibold">{messageTicket.client}:</div>
+              <div className="text-center">{messageTicket.message}</div>
+              <Button className="flex self-center mt-5 hover:cursor hover:cursor-pointer " onClick={closeModal}>Fermer</Button>
+
+            </Modal>
+
+          )
+        }
+      </>
+    );
+  }
+
+
+  // Aucun type reconnu
   return null;
 }

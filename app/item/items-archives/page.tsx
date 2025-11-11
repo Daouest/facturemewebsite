@@ -67,11 +67,11 @@ export default function ItemCatalogue() {
   };
 
   const {
-    data: factures,
+    data: archivedFactures,
     isLoading,
     status,
   } = useQuery<Facture[]>({
-    queryKey: ["factures"],
+    queryKey: ["archivedFactures"],
     queryFn: async () => {
       try {
         return await fetchData();
@@ -91,16 +91,16 @@ export default function ItemCatalogue() {
 
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
-    if (!factures) return [];
+    if (!archivedFactures) return [];
     if (sorterByFactureNumber) {
-      return getFacturesUsersByFactureNumber(factures ?? []);
+      return getFacturesUsersByFactureNumber(archivedFactures ?? []);
     } else if (sortByPaidInvoice) {
-      return getFacturesUsersPaidInvoice(factures ?? []);
+      return getFacturesUsersPaidInvoice(archivedFactures ?? []);
     } else if (sorterByDate) {
-      return getFacturesUsersByDate(factures ?? []);
+      return getFacturesUsersByDate(archivedFactures ?? []);
     }
-    return factures;
-  }, [factures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
+    return archivedFactures;
+  }, [archivedFactures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
 
   return (
     <>
@@ -165,7 +165,7 @@ export default function ItemCatalogue() {
                     />
 
                     {/* Filters Card */}
-                    {factures && factures?.length > 0 && (
+                    {archivedFactures && archivedFactures?.length > 0 && (
                       <div className="hidden lg:block rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
                         <h3 className="text-sm font-semibold text-slate-200 mb-4">
                           {t("filters")}
@@ -211,7 +211,7 @@ export default function ItemCatalogue() {
               {/* Mobile switches - below the table */}
               <div
                 className={`${
-                  factures && factures?.length > 0 ? "flex" : "hidden"
+                  archivedFactures && archivedFactures?.length > 0 ? "flex" : "hidden"
                 } md:hidden flex-col gap-4 mt-6 px-6`}
               >
                 <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 backdrop-blur px-4 py-3">

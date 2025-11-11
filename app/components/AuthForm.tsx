@@ -7,6 +7,7 @@ import { useUser as useUserContext } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
+import useLocalStorage from "@/app/lib/hooks/useLocalStorage";
 
 type AuthMode = "login" | "signup";
 type AuthFormProps = { initialMode?: AuthMode };
@@ -37,11 +38,95 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBlocked, setIsBlocked] = useState<boolean | null>(false);
 
   // Live availability checking
   const [availability, setAvailability] = useState<Availability>({});
   const [checking, setChecking] = useState(false);
+  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>("errorCount", 4);
+  const [isUserIsFind, setIsUserIsFind] = useState(true);
+  const [stopTimeout, setStopTimeout] = useState<boolean>(false);
 
+  useEffect(() => {
+    console.log("storedErrorCount", storedErrorCount);
+
+    if (storedErrorCount !== 0) return;
+    fetchBlock();
+  }, [storedErrorCount]);
+  useEffect(() => {
+    setStoredErrorCount(4);
+    setIsUserIsFind(true);
+  }, []);
+
+  useEffect(() => {
+    setStopTimeout(false);
+
+    if (storedErrorCount !== 0) return;
+
+
+    const interval = setInterval(() => {
+      expiredBlockUser(); // appel initial
+      console.log("stopTimeout", stopTimeout)
+      if (stopTimeout) {
+        clearInterval(interval);
+        return;
+      }
+      expiredBlockUser();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [storedErrorCount, stopTimeout]);
+
+  const fetchBlock = async () => {
+    // On envoie une requête au serveur pour créer le cookie
+    try {
+      const res = await fetch("/api/auth/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockUser: true }),
+      })
+      if (!res.ok) {
+        console.error("Erreur lors de la création du cookie");
+        return;
+      }
+      console.log("Cookie de blocage défini avec succès !");
+
+    } catch (err) {
+      console.error("Erreur dans le blockage de cookie", err)
+    }
+  }
+
+  const expiredBlockUser = async () => {
+    let falseCount = 0;
+    try {
+      const res = await fetch("/api/auth/status");
+      const data = await res.json();
+      console.log("data.blockUser", data.blockUser);
+
+      if (data.blockUser === false) {
+        falseCount++;
+        if (falseCount >= 1) {
+          console.log("dans if flaseCount", falseCount)
+          setIsBlocked(false);
+          setStoredErrorCount(5);
+          setStopTimeout(false);
+          return;
+        }
+
+      } else {
+        falseCount = 0;
+        setIsBlocked(true);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la vérification du cookie", err);
+    }
+
+
+  };
+  useEffect(() => {
+    console.log("isUserIsFind ", isUserIsFind)
+
+  }, [isUserIsFind])
   const checkAvailability = useMemo(
     () =>
       debounce(async (emailVal: string, usernameVal: string) => {
@@ -100,6 +185,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
         if (!res.ok) {
           setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
+          setStoredErrorCount(prev => (prev > 1 ? prev - 1 : 0));
+          setIsUserIsFind(false);
           return;
         }
 
@@ -112,6 +199,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           email: data.user.email,
           firstName: data.user.firstName,
           lastName: data.user.lastName,
+          isAdmin: data.user.isAdmin,
+
         });
 
         router.replace("/homePage");
@@ -192,6 +281,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
             {mode === "login" ? "Connexion" : "Inscription"}
           </h2>
+              <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
+            {errors.form !== ""  && !isUserIsFind ? `Il vous reste ${storedErrorCount } ${storedErrorCount <= 1 ? "tentavive" : "tentavives"} ` : ""}
+          </p>
+          <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
+            {storedErrorCount === 0 ? `Vous avez étét bloqué revenez dans 1 minute` : ""}
+          </p>
+
 
           {/* SIGNUP fields */}
           {mode === "signup" && (
@@ -339,8 +435,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Courriel"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mb-5"
+              className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               autoComplete="email"
+              disabled={isBlocked ? true : false}
               required
             />
           )}
@@ -389,7 +486,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mb-7"
+              className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
+              disabled={isBlocked ? true : false}
               required
             />
           )}
@@ -398,8 +496,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <div className="flex justify-center mt-4">
             <Button
               type="submit"
-              className="px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors"
-              disabled={
+              className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors ${isBlocked || isSubmitting ? "" : "cursor cursor-pointer"}`}
+              disabled={ isBlocked ? true : false||
                 isSubmitting ||
                 (mode === "signup" &&
                   (availability.email || availability.username || checking))
@@ -408,8 +506,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               {isSubmitting
                 ? "En traitement"
                 : mode === "login"
-                ? "Connexion"
-                : "Inscription"}
+                  ? "Connexion"
+                  : "Inscription"}
             </Button>
           </div>
 

@@ -7,6 +7,7 @@ import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session/session-node";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SidebarProvider } from "@/app/context/SidebarContext";
 
 import "./globals.css";
 import HourlyRates from "./hourlyRates/page";
@@ -51,11 +52,13 @@ export default async function RootLayout({
       >
         <UserProvider initialUser={user}>
           <LangageProvider>
+            <SidebarProvider>
             <FormDataProvider>
               <HourlyFormDataProvider>
               <ReactQueryWrapper>{children}</ReactQueryWrapper>
               </HourlyFormDataProvider>
             </FormDataProvider>
+            </SidebarProvider>
           </LangageProvider>
         </UserProvider>
       </body>

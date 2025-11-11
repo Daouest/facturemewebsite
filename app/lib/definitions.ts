@@ -49,6 +49,8 @@ export type UserData = {
     password?: string;
     idAddress?: number;
     idBusiness?: number;
+    isOnline?: boolean;
+    isAdmin?: boolean;
 };
 
 export type Objet = {
@@ -89,7 +91,8 @@ export type Client = {
     idClient: number,
     idUser: number,
     nomClient: string,
-    idAddress: number
+    idAddress: number,
+    isOnline?:boolean,
 }
 
 export type ClientAffichage = {
@@ -97,7 +100,14 @@ export type ClientAffichage = {
     nomClient: string,
     address: Address
 }
-
+export type Ticket = {
+    idClient: number;
+    message: string;
+    isCompleted:string;
+    nomClient:string;
+    date: Date;
+    idTicket:number,
+};
 export type TableItemType = {
     idObjet: number,
     productName: string;

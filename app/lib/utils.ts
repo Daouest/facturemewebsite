@@ -330,4 +330,20 @@ export function getFacturesUsersPaidInvoice(data: Facture[], _isActive = true) {
     return sorted;
 
 }
+export function isTableTicket(row: TableItemType | Facture | Ticket| undefined): row is Ticket {
 
+    if (typeof row === "object" && "idTicket" in row) {
+        return true;
+    }
+    return false
+}
+export function showLongText(message:string){
+    let udpdateMessage = message;
+    if(message.length>20){
+         message  = message.slice(0,20);
+         
+         udpdateMessage = message + "...";
+         return udpdateMessage;
+    }
+    return udpdateMessage;
+ }

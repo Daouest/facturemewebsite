@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Link from "next/link";
-
+import { AiOutlineEdit } from 'react-icons/ai';
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
@@ -52,7 +52,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       setFormData((prev) => ({
         ...prev,
         _id: data._id,
-        idObjet,
+        idObjet: idObjet,
         itemNom: data?.productName ?? "",
         prix: data?.price ?? 0,
         description: data?.description ?? "",
@@ -76,10 +76,16 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     if (file && formData !== null) {
       const fileUrl = URL.createObjectURL(file);
       const reader = new FileReader();
+
       reader.onload = () => {
         const imageBase64 = reader.result as string;
-        setFormData({ ...formData, file: fileUrl, image: imageBase64 });
+        setFormData({
+          ...formData,
+          file: fileUrl,
+          image: imageBase64,
+        });
       };
+
       reader.readAsDataURL(file);
     }
   };
@@ -88,18 +94,13 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     const { name, value } = e.target;
 
     if (name === "prix") {
-      // Only allow numbers, spaces, commas, and periods
       const rawValue = value.replace(/\s/g, "").replace(",", ".");
-
-      // Allow empty string or just a decimal point
-      if (value === "" || rawValue === "." || /^\d+\.$/.test(rawValue)) {
+      if (rawValue === "." || /^\d+\.$/.test(rawValue)) {
         setPrice(rawValue.replace(".", ","));
         return;
       }
-
-      // Check if it's a valid number
       const numericValue = parseFloat(rawValue);
-      if (!isNaN(numericValue) && numericValue >= 0) {
+      if (!isNaN(numericValue)) {
         const formatted = numericValue
           .toLocaleString("fr-CA", {
             minimumFractionDigits: 0,
@@ -107,8 +108,9 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
           })
           .replace(/\u00A0/g, " ");
         setPrice(formatted);
+      } else {
+        setPrice(value);
       }
-      // If not a valid number, don't update (ignore the input)
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -119,54 +121,20 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     if (data === undefined || data === null) {
       router.push("/not-found");
     }
-  }, [data, isLoading, router]);
-
-  async function updateItemRequest(dataToSend: unknown) {
+  }, [data]);
+  async function updateItemRequest(dataToSend: nay) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ formData: dataToSend, userData: user }),
+      body: JSON.stringify({
+        formData: dataToSend,
+        userData: user,
+      }),
     });
     if (!res.ok) throw new Error("Erreur lors de la mise à jour");
     return true;
   }
-
-  const deleteItemRequest = async (id: any) => {
-    const res = await fetch("/api/item", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        formData: id ?? formData.idObjet,
-        userData: user,
-      }),
-    });
-    if (!res.ok) throw Error("Erreur lors de la suppréssion");
-    return true;
-  };
-
-  const mutation = useMutation({
-    mutationFn: updateItemRequest,
-    onSuccess: (ok) => {
-      queryClient.setQueryData(["items", idObjet], ok);
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-    },
-    onError: (error) => {
-      console.error("Erreur de la modification :", error);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteItemRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      router.push("/item/item-catalogue");
-    },
-    onError: (error) => {
-      console.error("Erreur de suppression :", error);
-    },
-  });
-
-  const updateItem = (e: React.FormEvent) => {
+  const updateItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formVerified()) {
       setErrorMessage({
@@ -176,22 +144,32 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       setShowAlert(true);
       setTimeout(() => {
         setShowAlert(false);
-        setErrorMessage({ error: false, message: "" });
+        setErrorMessage({
+          error: false,
+          message: "",
+        });
       }, 3000);
+
       return;
     }
 
     setShowAlert(true);
 
-    let numericPrice: number | undefined;
+    let numereicPrice;
     let dataToSend = formData;
-
     if (!fileChanged) {
-      numericPrice = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-      dataToSend = { ...formData, prix: numericPrice };
+      numereicPrice = parseFloat(
+        price
+          .replace(/\s/g, "") // retire les espaces
+          .replace(",", ".")
+      );
+      dataToSend = {
+        ...formData,
+        prix: numereicPrice,
+      };
     }
-
     mutation.mutate(dataToSend, {
+      //on lance la mutation
       onSuccess: () => {
         setTimeout(() => {
           setShowAlert(false);
@@ -208,10 +186,47 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       },
     });
   };
+  const deleteItemRequest = async (idObjet: any) => {
+    const res = await fetch("/api/item", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formData: idObjet ?? formData.idObjet,
+        userData: user,
+      }),
+    });
+    if (!res.ok) {
+      throw Error("Erreur lors de la suppréssion");
+    }
+    return true;
+  };
+  const mutation = useMutation({
+    mutationFn: updateItemRequest,
+    onSuccess: (updateItem) => {
+      queryClient.setQueryData(["items", idObjet], updateItem); // met à jour le cache du détail
+      queryClient.invalidateQueries({ queryKey: ["items"] }); // invalide la liste d'items pour un refresh
+    },
+    onError: (error) => {
+      console.error("Erreur de la modification :", error);
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteItemRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      router.push("/item/item-catalogue");
+    },
+    onError: (error) => {
+      console.error("Erreur de suppression :", error);
+    },
+  });
+
+
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-    if (p !== lastPrice && p > 0) return true;
+    if (p !== lastPrice && p > 0 && fileChanged) return true;
+    if (p !== lastPrice && p > 0 && !fileChanged) return true;
     if (p === lastPrice && fileChanged) return true;
     return false;
   };

@@ -6,6 +6,9 @@ import { useUser } from "@/app/context/UserContext";
 import { useLangageContext } from "../context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
 import TextType from "./TextType";
+import { Button } from "@/components/ui/button";
+import { useSidebarContext } from "@/app/context/SidebarContext";
+
 import {
   FileText,
   FilePlus,
@@ -17,11 +20,16 @@ import {
   Home,
   Calendar,
 } from "lucide-react";
+type SidebarProps = {
+  showPageInAdmin?: boolean;
+};
 
-export default function Sidebar() {
+export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const { langage } = useLangageContext();
   const { user } = useUser();
   const t = createTranslator(langage);
+  const {  setShowPage } = useSidebarContext();
+
 
   return (
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] lg:self-start lg:sticky lg:top-20">
@@ -37,10 +45,8 @@ export default function Sidebar() {
           {t("hello") + " "}
           <TextType
             text={[
-              `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${
-                user?.firstName?.substring(1, 5) ?? ""
-              } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${
-                user?.lastName?.substring(1, 5) ?? ""
+              `${user?.firstName?.charAt(0)?.toUpperCase() ?? ""}${user?.firstName?.substring(1, 5) ?? ""
+              } ${user?.lastName?.charAt(0)?.toUpperCase() ?? ""}${user?.lastName?.substring(1, 5) ?? ""
               }`,
             ]}
             className="font-semibold text-slate-100"
@@ -78,7 +84,7 @@ export default function Sidebar() {
           <span className="truncate">{t("catalogue")}</span>
         </Link>
 
-         <Link
+        <Link
           href="/hourlyRates"
           className="flex items-center gap-2 text-left px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
@@ -109,6 +115,57 @@ export default function Sidebar() {
           <UserCircle className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("profile")}</span>
         </Link>
+
+        {/* {
+          user?.isAdmin && ( */}
+            <>
+              <Link
+                href="/admin"
+                className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+              >
+                {t("admin_section")}
+
+              </Link>
+
+              {
+                showPageInAdmin && (
+                  <>
+                    <Button
+                      variant={"ghost"}
+                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                      onClick={() => {
+                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+
+                      }}
+                    >
+                      {t("users")}
+                    </Button>
+                    <Button
+                      variant={"ghost"}
+                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                      onClick={() => {
+                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+
+                      }}              >
+                      🧾{t("ticket")}
+                    </Button>
+
+                    <Button
+                      variant={"ghost"}
+                      className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                      onClick={() => {
+                        setShowPage((prev) => ({ ...prev, tickePage: false, stats: false }))
+
+                      }}              >
+                      statistiques
+                    </Button>
+
+                  </>
+                )
+              }
+            </>
+          {/* )
+        } */}
       </nav>
     </aside>
   );

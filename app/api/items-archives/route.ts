@@ -28,7 +28,6 @@ export async function GET(req: NextRequest) {
     // Calcul des métadonnées pour le cache
     const totalFactures = factures?.length ?? 0;
     const lastFactureDate = factures?.[totalFactures - 1]?.dateFacture?.toISOString() || new Date().toISOString();
-    const factureCount = totalFactures.toString();
 
     //Application des filtres ou tris selon les paramètres
     if (isLastFacturesRequested) {
@@ -37,12 +36,10 @@ export async function GET(req: NextRequest) {
 
     //  Vérification du cache côté client
     const clientEtag = req.headers.get("if-none-match");
-    const clientCount = req.headers.get("if-count-change");
 
-    const hasChangedForAccueil = isLastFacturesRequested && clientCount !== factureCount;
+    const hasChangedForAccueil = isLastFacturesRequested 
     const isCacheValid =
       clientEtag === lastFactureDate &&
-      clientCount === factureCount &&
       filterByPaid == null &&
       !hasChangedForAccueil &&
       (!sortBy || sortBy === "false");
@@ -54,7 +51,6 @@ export async function GET(req: NextRequest) {
     // Réponse avec les données et les headers de cache
     const response = NextResponse.json(factures);
     response.headers.set("Etag", lastFactureDate);
-    response.headers.set("Count", factureCount);
 
     return response;
   } catch (error) {

@@ -1,8 +1,11 @@
 
 const fr = {
+        ticket:"Tickets",
   hello: "Bonjour",
   home: "Accueil",
   info: "FAQs",
+  users: "Utilisateurs",
+  admin_section:"Séction admin",
   historicInvoices: " Historique des factures",
   sortByDate: "Date",
   sortByPaidInvoice: "Non payée",
@@ -81,9 +84,13 @@ const fr = {
 
 
 const en = {
+        ticket:"Tickets",
+  users: "Users",
+
   hello: "Hi",
   home: "Home",
   info: "FAQs",
+  admin_section:"Admin section",
   historicInvoices: "Invoice histories",
   sortByDate: "Sort by date",
   sortByNumber: "Sort by facture number",
@@ -170,8 +177,8 @@ export const translations: Record<"fr" | "en", Record<TranslationKey, string>> =
 
 
 export const refreshSeconds = {
-  seconds: 3600000,
-  staleTime: 3600000
+  seconds: 9000,
+  staleTime: 8000
 }
 
 export const CommentsData = [

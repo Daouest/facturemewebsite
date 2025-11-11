@@ -23,7 +23,6 @@ import {
 export default function HomePage() {
   const { langage, setLangage } = useLangageContext();
   const etagRef = useRef<string | null>(null);
-  const countRef = useRef<string | null>(null);
 
   const options = [
     { value: "fr", label: "Français" },
@@ -40,15 +39,11 @@ export default function HomePage() {
     const res = await fetch("/api/items-archives?lastFactures=true", {
       cache: "no-cache",
       headers: {
-        "if-None-Match": etagRef.current ?? "",
-        "if-count-change": countRef.current ?? "0",
-      },
+        "if-None-Match": etagRef.current ?? ""},
     });
     const newEtag = res.headers.get("Etag");
-    const newCount = res.headers.get("Count");
 
     if (newEtag) etagRef.current = newEtag;
-    if (newCount) countRef.current = newCount;
 
     const data = await res.json();
     const listeItems: TableFactureType[] = data.map((facture: any) => ({
@@ -206,6 +201,8 @@ export default function HomePage() {
                     <Calendar className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("calendar")}
                   </Link>
+
+                
                 </div>
               </div>
             </section>

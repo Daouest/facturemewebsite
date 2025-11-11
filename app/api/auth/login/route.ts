@@ -55,7 +55,8 @@ export async function POST(req: Request) {
             username: user.username,
             firstName: user.firstName,
             lastName: user.lastName,
-            email: user.email
+            email: user.email,
+            isAdmin: user.isAdmin
         },
     })
 

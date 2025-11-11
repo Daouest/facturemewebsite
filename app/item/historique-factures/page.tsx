@@ -47,7 +47,7 @@ export default function HistoricInvoices() {
     isLoading,
     status,
   } = useQuery<Facture[]>({
-    queryKey: ["factures"],
+    queryKey: ["historiqueFactures"],
     queryFn: async () => {
       try {
         return await fetchData();

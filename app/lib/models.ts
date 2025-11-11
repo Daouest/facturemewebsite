@@ -184,3 +184,15 @@ const UserSchema = new mongoose.Schema({
 export type UserDoc = InferSchemaType<typeof UserSchema>
 
 export const DbUsers: Model<UserDoc> = getModel<UserDoc>('User', UserSchema);
+
+
+const ticketSchema = new Schema({
+    _id: { type: String},
+    idClient: { type: Number },
+    message: { type: String },
+    isCompleted: { type: Boolean},
+    date: { type: Date },
+    nomClient:{type:String}
+}, { collection: 'tickets_client' });
+
+export const DbTicket = getModel('Ticket', ticketSchema);
