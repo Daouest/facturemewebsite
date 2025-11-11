@@ -53,10 +53,12 @@ export default function CalendarPage() {
           `/api/histories-invoices?start=${monthStartKey}&end=${monthEndKey}`,
           { credentials: "include" }
         );
+        
         if (!res.ok) {
           setInvoices({});
           return;
         }
+        
         const data = await res.json();
 
         const map: Record<string, InvoiceSummary[]> = {};
@@ -234,7 +236,7 @@ export default function CalendarPage() {
                           )}
                         </div>
 
-                        <div className="mt-0.5 sm:mt-1 flex-1 overflow-auto">
+                        <div className="mt-0.5 sm:mt-1 flex-1 overflow-auto calendar-scroll">
                           {loading ? (
                             <div className="text-[9px] sm:text-[11px] md:text-xs text-slate-400">
                               {t("loading")}
