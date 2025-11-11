@@ -16,6 +16,18 @@ export const ConfirmQuery = z.object({
 }).strict()
 
 //////////////////////////////////////////////////////////
+//le schema d'addresse
+//////////////////////////////////////////////////////////
+
+export const AddressSchema = z.object({
+    address: z.string().min(1, "L'adresse est requise").max(255),
+    city: z.string().min(1, "La ville est requise").max(100),
+    province: z.string().min(2, "La province est requise").max(3),
+    zipCode: z.string().min(1, "Le code postal est requis").max(20),
+    country: z.string().min(2, "Le pays est requis").max(2),
+})
+
+//////////////////////////////////////////////////////////
 //le schema de signup
 //////////////////////////////////////////////////////////
 
@@ -25,6 +37,7 @@ export const SignupSchema = z.object({
     lastName: z.string().min(1).max(15),
     email: z.email(),
     password: z.string().min(8),
+    address: AddressSchema,
 })
 
 ////////////////////////////////////////////////////////////

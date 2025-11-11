@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import useLocalStorage from "@/app/lib/hooks/useLocalStorage";
+import AddressAutocomplete, { type AddressData } from "./AddressAutocomplete";
 
 type AuthMode = "login" | "signup";
 type AuthFormProps = { initialMode?: AuthMode };
@@ -31,6 +32,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [addressData, setAddressData] = useState<AddressData>({
+    address: "",
+    city: "",
+    province: "",
+    zipCode: "",
+    country: "CA",
+  });
 
   const { setUser } = useUserContext();
   const router = useRouter();
@@ -222,6 +230,18 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       validationErrors.confirmEmail = "Emails do not match";
     if (password !== confirmPassword)
       validationErrors.confirmPassword = "Passwords do not match";
+    
+    // Address validation
+    if (!addressData.address.trim())
+      validationErrors["address.address"] = "L'adresse est requise";
+    if (!addressData.city.trim())
+      validationErrors["address.city"] = "La ville est requise";
+    if (!addressData.province.trim())
+      validationErrors["address.province"] = "La province est requise";
+    if (!addressData.zipCode.trim())
+      validationErrors["address.zipCode"] = "Le code postal est requis";
+    if (!addressData.country.trim())
+      validationErrors["address.country"] = "Le pays est requis";
 
     // If live availability says taken, reflect that before submit
     if (availability.username)
@@ -245,6 +265,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           lastName: lastName.trim(),
           email: email.trim().toLowerCase(),
           password,
+          address: addressData,
         }),
       });
       const data = await res.json();
@@ -423,6 +444,36 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                     </p>
                   )}
                 </div>
+              </div>
+
+              {/* Address Section */}
+              <div className="mb-5">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                  Adresse
+                </h3>
+                <AddressAutocomplete
+                  onAddressSelect={(address) => {
+                    setAddressData(address);
+                    // Clear address errors
+                    setErrors((e) => {
+                      const newErrors = { ...e };
+                      delete newErrors["address.address"];
+                      delete newErrors["address.city"];
+                      delete newErrors["address.province"];
+                      delete newErrors["address.zipCode"];
+                      delete newErrors["address.country"];
+                      return newErrors;
+                    });
+                  }}
+                  initialAddress={addressData}
+                  errors={{
+                    address: errors["address.address"],
+                    city: errors["address.city"],
+                    province: errors["address.province"],
+                    zipCode: errors["address.zipCode"],
+                    country: errors["address.country"],
+                  }}
+                />
               </div>
             </>
           )}
