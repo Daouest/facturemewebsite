@@ -168,6 +168,14 @@ const fr = {
   custom: "Personnalisé",
   chooseInvoiceNumber: "Choisir un numéro de facture",
   enterInvoiceNumber: "Entrer un numéro de facture",
+  
+  // Invoice Date Section
+  invoiceDate: "Date de facture",
+  currentDate: "Date actuelle",
+  futureDate: "Date future",
+  selectInvoiceDate: "Sélectionner une date de facture",
+  dateMustBeTodayOrLater: "La date doit être aujourd'hui ou dans le futur",
+  
   products: "Produits",
   selectProduct: "Sélectionner un produit",
   add: "Ajouter",
@@ -383,6 +391,14 @@ const en = {
   custom: "Custom",
   chooseInvoiceNumber: "Choose an invoice number",
   enterInvoiceNumber: "Enter an invoice number",
+  
+  // Invoice Date Section
+  invoiceDate: "Invoice Date",
+  currentDate: "Current Date",
+  futureDate: "Future Date",
+  selectInvoiceDate: "Select an invoice date",
+  dateMustBeTodayOrLater: "Date must be today or in the future",
+  
   products: "Products",
   selectProduct: "Select a product",
   add: "Add",

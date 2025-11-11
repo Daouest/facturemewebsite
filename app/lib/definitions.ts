@@ -162,6 +162,8 @@ export type InvoiceForm = {
     customerId: string;
     businessId: string;
     invoiceType: 'company' | 'personal';
+    dateType: 'current' | 'future';
+    invoiceDate: string;
     numberType: 'auto' | 'custom';
     number: string;
     items: InvoiceFormItem[];

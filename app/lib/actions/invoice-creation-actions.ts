@@ -15,6 +15,8 @@ export type InvoiceCreationFormState = {
         number?: string[];
         businessId?: string[];
         invoiceType?: string[];
+        dateType?: string[];
+        invoiceDate?: string[];
         items?: { [itemIndex: number]: { [field: string]: string[] } };
         general?: string[];
     };
@@ -88,7 +90,12 @@ export async function createInvoice(prevState: InvoiceCreationFormState, formDat
 
     // Prepare invoice data
     const idFacture = nextId;
-    const dateFacture = new Date();
+    
+    // Determine date based on dateType
+    const dateFacture = invoiceForm.dateType === 'future' && invoiceForm.invoiceDate
+        ? new Date(invoiceForm.invoiceDate)
+        : new Date();
+    
     const idClient = Number(invoiceForm.customerId);
     const idBusiness = invoiceForm.invoiceType === 'company' && invoiceForm.businessId 
         ? Number(invoiceForm.businessId) 
