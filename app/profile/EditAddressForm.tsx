@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@/app/context/UserContext";
 import AddressAutocomplete, { AddressData } from "../components/AddressAutocomplete";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
 import { AddressSchema } from "../lib/schemas/auth";
 
 export default function EditAddressForm() {
-  const { user } = useUser();
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
 
