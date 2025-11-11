@@ -74,12 +74,12 @@ export default function AdminAcceuil() {
         let filter;
         if (showData.users) {
             filter = (data as UserData[]).filter(i =>
-                i?.lastName.toLowerCase().includes(searche.toLowerCase())
+                i?.lastName?.toLowerCase().includes(searche.toLowerCase())
             );
         }
         if (showData.clients) {
             filter = (data as Client[])?.filter(i =>
-                i?.nomClient.toLowerCase().includes(searche.toLowerCase())
+                i?.nomClient?.toLowerCase().includes(searche.toLowerCase())
             );
         }
         setDataOutput(filter ?? []);
