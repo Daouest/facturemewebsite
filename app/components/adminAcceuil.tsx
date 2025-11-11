@@ -15,9 +15,9 @@ export default function AdminAcceuil() {
     const [dataOutput, setDataOutput] = useState<Client[] | UserData[]>([]);
 
     const { user } = useUser();
-    useEffect(() => {
-        if (!user?.isAdmin) router.push("/homePage");
-    }, []);
+    // useEffect(() => {
+    //     if (!user?.isAdmin) router.push("/homePage");
+    // }, []);
     const handleClients = async () => {
         let resquestString = "";
         if (showData.clients) {
