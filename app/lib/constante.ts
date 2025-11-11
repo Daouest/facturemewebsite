@@ -189,7 +189,18 @@ const fr = {
   selectClientLabel: "Sélectionner un client",
   chooseClient: "Choisir un client",
   selectBusinessLabel: "Sélectionner une entreprise",
-  chooseBusiness: "Choisir une entreprise"
+  chooseBusiness: "Choisir une entreprise",
+
+  // Address autocomplete
+  addressRequired: "L'adresse est requise",
+  cityRequired: "La ville est requise",
+  provinceRequired: "La province est requise",
+  postalCodeRequired: "Le code postal est requis",
+  countryRequired: "Le pays est requis",
+
+  // Address management
+  addressInformation: "Informations d'adresse",
+  saveAddress: "Enregistrer l'adresse"
 } as const;
 
 
@@ -386,7 +397,18 @@ const en = {
   selectClientLabel: "Select a client",
   chooseClient: "Choose a client",
   selectBusinessLabel: "Select a business",
-  chooseBusiness: "Choose a business"
+  chooseBusiness: "Choose a business",
+
+  // Address autocomplete
+  addressRequired: "Address is required",
+  cityRequired: "City is required",
+  provinceRequired: "Province is required",
+  postalCodeRequired: "Postal code is required",
+  countryRequired: "Country is required",
+
+  // Address management
+  addressInformation: "Address Information",
+  saveAddress: "Save Address"
 }
 
 type TranslationKey = keyof typeof fr;

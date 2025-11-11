@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import EditProfileForm from "./EditProfileForm";
 import EditBusinessForm from "./EditBusinessForm";
+import EditAddressForm from "./EditAddressForm";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
 
@@ -35,6 +36,11 @@ export default function ProfilePage() {
                 <div className="mb-6 border-t border-white/10" />
 
                 <EditProfileForm />
+
+                {/* Divider between sections */}
+                <div className="my-8 border-t border-white/10" />
+
+                <EditAddressForm />
 
                 {/* Divider between sections */}
                 <div className="my-8 border-t border-white/10" />

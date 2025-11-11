@@ -173,7 +173,7 @@ const UserSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     password: { type: String, required: true },
-    idAddress: { type: String, default: null },
+    idAddress: { type: Number, default: null },
     idBusiness: { type: Number, default: null },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
