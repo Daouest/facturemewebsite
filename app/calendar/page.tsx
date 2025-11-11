@@ -7,7 +7,6 @@ import Sidebar from "../components/Sidebar";
 import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useLangageContext } from "../context/langageContext";
 import { createTranslator } from "../lib/utils";
 

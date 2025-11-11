@@ -2,7 +2,12 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TableItemType, Facture, HourlyRateType, Ticket } from "@/app/lib/definitions";
+import {
+  TableItemType,
+  Facture,
+  HourlyRateType,
+  Ticket,
+} from "@/app/lib/definitions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   isTableHourlyRate,
@@ -12,26 +17,24 @@ import {
   formatIntoDecimal,
   createTranslator,
   showLongText,
-  isTableTicket
+  isTableTicket,
 } from "@/app/lib/utils";
 import ImageFromBd from "@/components/ui/images";
 import { useLangageContext } from "@/app/context/langageContext";
+// @ts-ignore
 import Modal from "react-modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-
-type TableProps<T extends TableItemType | HourlyRateType | Facture| Ticket> = {
+type TableProps<T extends TableItemType | HourlyRateType | Facture | Ticket> = {
   rows: T[];
   className?: string;
   type?: "items" | "factures";
 };
 
-export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket>({
-  rows,
-  className,
-  type,
-}: TableProps<T>) {
+export function Table<
+  T extends TableItemType | HourlyRateType | Facture | Ticket
+>({ rows, className, type }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
   const [isClick, setIsClick] = useState({
     facture: false,
@@ -130,7 +133,6 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
 
   if (!rows || rows.length === 0) return null;
 
-
   // Empty state
   if (!rows || rows.length === 0) {
     return (
@@ -188,8 +190,8 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
               ? "Créez votre premier produit pour commencer."
               : "Create your first product to get started."
             : langage === "fr"
-              ? "Ajoutez des éléments pour les voir apparaître ici."
-              : "Add items to see them here."}
+            ? "Ajoutez des éléments pour les voir apparaître ici."
+            : "Add items to see them here."}
         </p>
         {type === "items" && (
           <Link
@@ -209,7 +211,7 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
   // ITEMS TABLE
   if (isItems) {
     const itemRows = rows as TableItemType[];
-      
+
     return (
       <div
         className={["w-full overflow-x-auto rounded-xl", className ?? ""].join(
@@ -250,7 +252,8 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
             {itemRows.map((row) => (
               <tr
                 key={row.idObjet}
-                onClick={() => router.push(`/item/detail/${btoa(String(row.idObjet))}`)
+                onClick={() =>
+                  router.push(`/item/detail/${btoa(String(row.idObjet))}`)
                 }
                 className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
               >
@@ -339,10 +342,9 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
   if (isTableFacture(rows[0])) {
     const factureRows = rows as Facture[];
 
-      if(factureRows.length === 0){
-      return (<p className="text-slate-200 text-base font-semibold">
-        {t("noItems")}
-      </p>
+    if (factureRows.length === 0) {
+      return (
+        <p className="text-slate-200 text-base font-semibold">{t("noItems")}</p>
       );
     }
     return (
@@ -351,7 +353,11 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
           <button
             key={row.idFacture}
             onClick={() => {
-              setIsClick(true);
+              setIsClick({
+                facture: true,
+                ticketMessage: false,
+                ticketStatus: false,
+              });
               setId(row.idFacture);
             }}
             className={[
@@ -361,8 +367,9 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
               "hover:bg-white/10 hover:border-white/20 transition-colors",
               "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
             ].join(" ")}
-            aria-label={`${t("invoice")} #${row.factureNumber} - ${row.nomClient
-              }`}
+            aria-label={`${t("invoice")} #${row.factureNumber} - ${
+              row.nomClient
+            }`}
           >
             <div className="flex items-center justify-between gap-4">
               {/* Left: client + invoice number */}
@@ -396,8 +403,8 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
                       ? "PAYÉE"
                       : "PAID"
                     : langage === "fr"
-                      ? "NON PAYÉE"
-                      : "UNPAID"}
+                    ? "NON PAYÉE"
+                    : "UNPAID"}
                 </div>
               </div>
             </div>
@@ -427,7 +434,10 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
 
           <tbody className="divide-y divide-white/10">
             {ticketRows.map((row, index) => (
-              <tr key={index} className="hover:bg-white/5 transition-colors text-center">
+              <tr
+                key={index}
+                className="hover:bg-white/5 transition-colors text-center"
+              >
                 <td className="px-4 py-2 text-slate-100 font-semibold">
                   {row.nomClient}
                 </td>
@@ -461,7 +471,9 @@ export function Table<T extends TableItemType | HourlyRateType | Facture |Ticket
                   }}
                 >
                   {row.isCompleted ? (
-                    <Badge className="bg-emerald-500/80 text-white">Complété</Badge>
+                    <Badge className="bg-emerald-500/80 text-white">
+                      Complété
+                    </Badge>
                   ) : (
                     <Badge variant="destructive">Non complété</Badge>
                   )}

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { TableItemType, TableFactureType, HourlyRateType, InvoiceFormItem, Objet, TauxHoraire, ItemTable, ItemIdentifier, Facture } from "@/app/lib/definitions"
+import { TableItemType, TableFactureType, HourlyRateType, InvoiceFormItem, Objet, TauxHoraire, ItemTable, ItemIdentifier, Facture, Ticket } from "@/app/lib/definitions"
 import { translations } from "@/app/lib/constante"
 
 
@@ -203,21 +203,21 @@ export function isObjet(item: any): item is Objet {
         "price" in item;
 }
 
-export function isTableItem(row: TableItemType | Facture | HourlyRateType | undefined): row is TableItemType {
+export function isTableItem(row: TableItemType | Facture | HourlyRateType | Ticket | undefined): row is TableItemType {
     if (typeof row === "object" && "idObjet" in row && !("hourlyRate" in row)) {
         return true;
     }
     return false;
 }
 
-export function isTableHourlyRate(row: HourlyRateType | Facture | TableItemType | undefined): row is HourlyRateType {
+export function isTableHourlyRate(row: HourlyRateType | Facture | TableItemType | Ticket | undefined): row is HourlyRateType {
     if (typeof row === "object" && "idObjet" in row && "hourlyRate" in row && !("idFacture" in row)) {
         return true;
     }
     return false;
 }
 
-export function isTableFacture(row: TableItemType | Facture | HourlyRateType | undefined): row is Facture {
+export function isTableFacture(row: TableItemType | Facture | HourlyRateType | Ticket | undefined): row is Facture {
 
     if (typeof row === "object" && "idFacture" in row) {
         return true;
@@ -330,21 +330,21 @@ export function getFacturesUsersPaidInvoice(data: Facture[], _isActive = true) {
     return sorted;
 
 }
-export function isTableTicket(row: TableItemType | Facture | Ticket| undefined): row is Ticket {
+export function isTableTicket(row: TableItemType | Facture | Ticket | undefined): row is Ticket {
 
     if (typeof row === "object" && "idTicket" in row) {
         return true;
     }
     return false
 }
-export function showLongText(message:string){
+export function showLongText(message: string) {
     let udpdateMessage = message;
-    if(message.length>20){
-         message  = message.slice(0,20);
-         
-         udpdateMessage = message + "...";
-         return udpdateMessage;
+    if (message.length > 20) {
+        message = message.slice(0, 20);
+
+        udpdateMessage = message + "...";
+        return udpdateMessage;
     }
     return udpdateMessage;
- }
+}
 

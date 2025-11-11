@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Link from "next/link";
-import { AiOutlineEdit } from 'react-icons/ai';
+import { AiOutlineEdit } from "react-icons/ai";
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
@@ -122,7 +122,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       router.push("/not-found");
     }
   }, [data]);
-  async function updateItemRequest(dataToSend: nay) {
+  async function updateItemRequest(dataToSend: any) {
     const res = await fetch("/api/item", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -181,7 +181,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
             file: "",
           });
           setLastPrice(0);
-      window.location.href = "/item/item-catalogue";
+          window.location.href = "/item/item-catalogue";
         }, 1500);
       },
     });
@@ -220,8 +220,6 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       console.error("Erreur de suppression :", error);
     },
   });
-
-
 
   const formVerified = (): boolean => {
     const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
