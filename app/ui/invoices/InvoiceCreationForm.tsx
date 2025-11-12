@@ -23,6 +23,7 @@ import BusinessSelect from "@/app/ui/invoices/BusinessSelect";
 import InvoiceTypeSelector from "@/app/ui/invoices/InvoiceTypeSelector";
 import { useLangageContext } from "@/app/context/langageContext";
 import InvoiceNumberSection from "@/app/ui/invoices/InvoiceNumberSection";
+import InvoiceDateSelector from "@/app/ui/invoices/InvoiceDateSelector";
 import ValidationWarning from "@/app/ui/invoices/ValidationWarning";
 import InvoiceSummary from "@/app/ui/invoices/InvoiceSummary";
 import ProductsSection from "@/app/ui/invoices/ProductsSection";
@@ -43,6 +44,8 @@ export default function Form({ customers, businesses, objects }: Props) {
     customerId: "",
     businessId: "",
     invoiceType: "company",
+    dateType: "current",
+    invoiceDate: "",
     numberType: "auto",
     number: "",
     items: [],
@@ -243,6 +246,11 @@ export default function Form({ customers, businesses, objects }: Props) {
     const fd = new FormData();
     fd.set("customerId", form.customerId);
     fd.set("businessId", form.businessId);
+    fd.set("invoiceType", form.invoiceType);
+    fd.set("dateType", form.dateType);
+    if (form.dateType === "future") {
+      fd.set("invoiceDate", form.invoiceDate);
+    }
     fd.set("numberType", form.numberType);
     if (form.numberType === "custom") {
       fd.set("number", form.number);
@@ -367,6 +375,15 @@ export default function Form({ customers, businesses, objects }: Props) {
                   updateField={updateField}
                   numberGroupId={numberGroupId}
                   errors={state.errors}
+                />
+
+                {/* Date */}
+                <InvoiceDateSelector
+                  dateType={form.dateType}
+                  invoiceDate={form.invoiceDate}
+                  onDateTypeChange={(value) => updateField("dateType", value)}
+                  onInvoiceDateChange={(value) => updateField("invoiceDate", value)}
+                  errors={state.errors?.invoiceDate}
                 />
 
                 {/* Produits */}
@@ -504,6 +521,8 @@ export default function Form({ customers, businesses, objects }: Props) {
           customerId={form.customerId}
           businessId={form.businessId}
           invoiceType={form.invoiceType}
+          dateType={form.dateType}
+          invoiceDate={form.invoiceDate}
           itemsCount={form.items.length}
           numberType={form.numberType}
           customNumber={form.number}
