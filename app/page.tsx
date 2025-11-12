@@ -7,9 +7,9 @@ import Footer from "./components/Footer";
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
+      <main className="relative grid flex-1 grid-cols-1 lg:grid-cols-2">
         {/* Right: centered content - shows first on mobile */}
         <div className="relative flex items-center justify-center px-6 py-12 pt-24 lg:py-20 order-1 lg:order-2">
           <div className="w-full max-w-md">
@@ -46,6 +46,6 @@ export default function Home() {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

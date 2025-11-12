@@ -39,7 +39,8 @@ export default function HomePage() {
     const res = await fetch("/api/items-archives?lastFactures=true", {
       cache: "no-cache",
       headers: {
-        "if-None-Match": etagRef.current ?? ""},
+        "if-None-Match": etagRef.current ?? "",
+      },
     });
     const newEtag = res.headers.get("Etag");
 
@@ -87,11 +88,11 @@ export default function HomePage() {
   });
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
 
       {/* Background */}
-      <div className="relative flex justify-center items-start pt-[80px] pb-8 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6 overflow-hidden">
+      <div className="relative flex flex-1 justify-center items-start pt-[80px] pb-8 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6 overflow-hidden">
         {/* soft glows */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
@@ -201,8 +202,6 @@ export default function HomePage() {
                     <Calendar className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("calendar")}
                   </Link>
-
-                
                 </div>
               </div>
             </section>
@@ -211,6 +210,6 @@ export default function HomePage() {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 }

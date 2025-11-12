@@ -5,7 +5,7 @@ import { HelpCircle, Mail } from "lucide-react";
 export default function Footer() {
   return (
     <footer
-      className="w-full bg-slate-800/90 backdrop-blur border-t border-white/10 md:fixed md:bottom-0 md:left-0 md:right-0 md:z-50"
+      className="w-full bg-slate-800/90 backdrop-blur border-t border-white/10 mt-auto"
       aria-label="Footer"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
