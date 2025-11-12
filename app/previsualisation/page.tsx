@@ -360,16 +360,10 @@ function invoiceComponent(infoArray: any) {
               <span className="text-slate-300/80 mr-2">Numero de facture:</span>{" "}
               {infoArray["factureNumber"]}
             </p>
-            <div className="flex flex-row gap-4 mb-2">
-              <p className="mb-2">
-                <span className="text-slate-300/80 mr-2">Date:</span>{" "}
-                {infoArray["date"]}
-              </p>
-              <p className="mb-2">
-                <span className="text-slate-300/80 mr-2">Heure:</span>{" "}
-                {infoArray["time"]}
-              </p>
-            </div>
+            <p className="mb-2">
+              <span className="text-slate-300/80 mr-2">Date:</span>{" "}
+              {infoArray["date"]}
+            </p>
           </div>
 
           <div>
