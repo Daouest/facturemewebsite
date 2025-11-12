@@ -69,6 +69,25 @@ const fr = {
   calendar: "Calendrier",
 
   today: "Aujourd'hui",
+  downloadCalendar: "Télécharger le calendrier",
+  exportToCalendar: "Exporter vers calendrier",
+  downloadingCalendar: "Téléchargement...",
+  calendarExportSuccess: "Calendrier téléchargé avec succès",
+  calendarExportError: "Erreur lors du téléchargement du calendrier",
+  
+  // Calendar Subscription
+  calendarSubscription: "Abonnement au calendrier",
+  calendarSubscriptionDescription: "Copiez ce lien et ajoutez-le à votre application de calendrier pour synchroniser automatiquement vos factures.",
+  tokenExpiresIn: "Ce lien expire dans 30 jours",
+  copied: "Copié",
+  copyLink: "Copier le lien",
+  howToSubscribe: "Comment s'abonner :",
+  subscriptionInstructionsCopy: "Copiez le lien ci-dessus",
+  subscriptionInstructionsCalendarApp: "Ajoutez-le comme calendrier par URL dans votre application (Outlook, Google Calendar, Apple Calendar, etc.)",
+  subscriptionInstructionsAutoUpdate: "Votre calendrier se mettra à jour automatiquement avec vos factures",
+  loadingSubscription: "Génération du lien d'abonnement...",
+  subscriptionGenerationError: "Erreur lors de la génération du lien d'abonnement",
+  retry: "Réessayer",
 
   //LANGAGE
   chooseLanguage: "choisir une langue",
@@ -291,6 +310,25 @@ const en = {
   calendar: "Calendar",
 
   today: "Today",
+  downloadCalendar: "Download Calendar",
+  exportToCalendar: "Export to Calendar",
+  downloadingCalendar: "Downloading...",
+  calendarExportSuccess: "Calendar downloaded successfully",
+  calendarExportError: "Error downloading calendar",
+
+  // Calendar Subscription
+  calendarSubscription: "Calendar Subscription",
+  calendarSubscriptionDescription: "Copy this link and add it to your calendar application to automatically sync your invoices.",
+  tokenExpiresIn: "This link expires in 30 days",
+  copied: "Copied",
+  copyLink: "Copy Link",
+  howToSubscribe: "How to subscribe:",
+  subscriptionInstructionsCopy: "Copy the link above",
+  subscriptionInstructionsCalendarApp: "Add it as a calendar by URL in your application (Outlook, Google Calendar, Apple Calendar, etc.)",
+  subscriptionInstructionsAutoUpdate: "Your calendar will automatically update with your invoices",
+  loadingSubscription: "Generating subscription link...",
+  subscriptionGenerationError: "Error generating subscription link",
+  retry: "Retry",
 
   invoice: "Invoice",
   //langage

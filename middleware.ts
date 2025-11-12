@@ -6,7 +6,15 @@ const LOGIN_PATH = "/";
 
 // Public paths/prefixes that should bypass auth
 const PUBLIC_PATHS = new Set<string>(["/", "/about", "/favicon.ico"]);
-const PUBLIC_PREFIXES = ["/auth", "/_next", "/api/auth", "/api/google", "/images", "/fonts"];
+const PUBLIC_PREFIXES = [
+    "/auth", 
+    "/_next", 
+    "/api/auth", 
+    "/api/google", 
+    "/api/calendar/export",  // Calendar subscription endpoint (token-authenticated)
+    "/images", 
+    "/fonts"
+];
 
 function isPublic(pathname: string) {
     if (PUBLIC_PATHS.has(pathname)) return true;
