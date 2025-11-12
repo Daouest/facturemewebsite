@@ -45,6 +45,7 @@ export default function Header() {
               alt="FactureMe"
               width={32}
               height={32}
+              priority
               className="dark:invert"
             />
             <span className="text-lg font-bold text-white dark:text-gray-100">
