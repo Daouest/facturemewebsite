@@ -4,6 +4,7 @@ import { validateCalendarToken } from "@/app/lib/calendar-token";
 import { logCalendarAccess, detectSuspiciousActivity } from "@/app/lib/calendar-audit";
 import crypto from "crypto";
 
+
 // Configuration constants
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_CLEANUP_THRESHOLD = 100; // Clean up after 100 entries
