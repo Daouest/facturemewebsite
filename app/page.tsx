@@ -1,11 +1,35 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AuthForm from "@/app/components/AuthForm";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { useUser } from "./context/UserContext";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, ready } = useUser();
+
+  useEffect(() => {
+    // Wait for user context to be ready
+    if (ready && user) {
+      // Redirect to homePage if user is logged in
+      router.push("/homePage");
+    }
+  }, [user, ready, router]);
+
+  // Show loading or nothing while checking auth status
+  if (!ready) {
+    return null;
+  }
+
+  // If user exists, don't render the page (will redirect)
+  if (user) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
