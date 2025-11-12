@@ -249,7 +249,40 @@ const fr = {
 
   // Address management
   addressInformation: "Informations d'adresse",
-  saveAddress: "Enregistrer l'adresse"
+  saveAddress: "Enregistrer l'adresse",
+
+  // Loading states
+  loadingGeneric: "Chargement...",
+  loadingDashboard: "Chargement du tableau de bord...",
+  loadingInvoices: "Chargement des factures...",
+  loadingClients: "Chargement des clients...",
+  loadingHourlyRates: "Chargement des taux horaires...",
+  loadingCalendar: "Chargement du calendrier...",
+  loadingProfile: "Chargement du profil...",
+  loadingCatalogue: "Chargement du catalogue...",
+  loadingArchives: "Chargement des archives...",
+  loadingHistory: "Chargement de l'historique...",
+  loadingPreview: "Génération de l'aperçu...",
+
+  // Error states
+  errorGeneric: "Erreur",
+  errorOccurred: "Une erreur est survenue",
+  errorLoading: "Erreur de chargement",
+  errorLoadingPage: "Une erreur est survenue lors du chargement de la page.",
+  errorLoadingInvoices: "Impossible de charger les factures.",
+  errorLoadingClients: "Impossible de charger le catalogue clients.",
+  errorLoadingHourlyRates: "Impossible de charger les taux horaires.",
+  errorLoadingCalendar: "Impossible de charger le calendrier.",
+  errorLoadingProfile: "Impossible de charger le profil.",
+  errorLoadingCatalogue: "Impossible de charger le catalogue d'articles.",
+  errorLoadingArchives: "Impossible de charger les archives.",
+  errorLoadingHistory: "Impossible de charger l'historique.",
+  errorLoadingPreview: "Impossible de générer l'aperçu.",
+  errorAdmin: "Erreur d'administration",
+  errorLoadingAdmin: "Impossible de charger la page d'administration.",
+  errorSignup: "Erreur d'inscription",
+  errorDuringSignup: "Une erreur est survenue lors de l'inscription.",
+  tryAgain: "Réessayer"
 } as const;
 
 
@@ -506,7 +539,40 @@ const en = {
 
   // Address management
   addressInformation: "Address Information",
-  saveAddress: "Save Address"
+  saveAddress: "Save Address",
+
+  // Loading states
+  loadingGeneric: "Loading...",
+  loadingDashboard: "Loading dashboard...",
+  loadingInvoices: "Loading invoices...",
+  loadingClients: "Loading clients...",
+  loadingHourlyRates: "Loading hourly rates...",
+  loadingCalendar: "Loading calendar...",
+  loadingProfile: "Loading profile...",
+  loadingCatalogue: "Loading catalogue...",
+  loadingArchives: "Loading archives...",
+  loadingHistory: "Loading history...",
+  loadingPreview: "Generating preview...",
+
+  // Error states
+  errorGeneric: "Error",
+  errorOccurred: "An error occurred",
+  errorLoading: "Loading Error",
+  errorLoadingPage: "An error occurred while loading the page.",
+  errorLoadingInvoices: "Unable to load invoices.",
+  errorLoadingClients: "Unable to load client catalogue.",
+  errorLoadingHourlyRates: "Unable to load hourly rates.",
+  errorLoadingCalendar: "Unable to load calendar.",
+  errorLoadingProfile: "Unable to load profile.",
+  errorLoadingCatalogue: "Unable to load item catalogue.",
+  errorLoadingArchives: "Unable to load archives.",
+  errorLoadingHistory: "Unable to load history.",
+  errorLoadingPreview: "Unable to generate preview.",
+  errorAdmin: "Admin Error",
+  errorLoadingAdmin: "Unable to load admin page.",
+  errorSignup: "Signup Error",
+  errorDuringSignup: "An error occurred during signup.",
+  tryAgain: "Try again"
 }
 
 type TranslationKey = keyof typeof fr;

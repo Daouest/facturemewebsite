@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Error({
   error,
@@ -9,6 +11,9 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   useEffect(() => {
     console.error("Item creation error:", error);
   }, [error]);
@@ -18,17 +23,16 @@ export default function Error({
       <div className="bg-white/10 backdrop-blur-lg rounded-lg p-8 max-w-md mx-4 text-center">
         <div className="text-6xl mb-4">⚠️</div>
         <h2 className="text-2xl font-bold text-white mb-4">
-          Erreur | Error
+          {t("errorGeneric")}
         </h2>
         <p className="text-gray-200 mb-6">
-          Une erreur est survenue. |
-          An error occurred.
+          {t("errorOccurred")}
         </p>
         <button
           onClick={reset}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
         >
-          Réessayer | Try again
+          {t("tryAgain")}
         </button>
       </div>
     </div>
