@@ -33,15 +33,21 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const [showAlert, setShowAlert] = useState(false);
   const { user } = useUser();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching, isSuccess } = useQuery({
     queryKey: ["item", idObjet],
     queryFn: async () => {
       const res = await fetch(`/api/item-catalogue?id=${idObjet}`);
       if (!res.ok) throw new Error("Erreur lors de la récupération");
-      return res.json();
+      const items = await res.json();
+      return items;
     },
-    enabled: !!idObjet,
-    select: (data) => data.find((item: any) => item.idObjet === idObjet),
+    enabled: !!idObjet && idObjet > 0,
+    select: (data) => {
+      const found = data.find((item: any) => {
+        return Number(item.idObjet) === Number(idObjet);
+      });
+      return found;
+    },
   });
 
   useEffect(() => {
@@ -90,6 +96,11 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
+    // Only allow price changes - name and description are read-only
+    if (name === "itemNom" || name === "description") {
+      return;
+    }
+
     if (name === "prix") {
       const rawValue = value.replace(/\s/g, "").replace(",", ".");
       if (rawValue === "." || /^\d+\.$/.test(rawValue)) {
@@ -114,11 +125,22 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   };
 
   useEffect(() => {
-    if (isLoading) return;
-    if (data === undefined || data === null) {
-      router.push("/not-found");
+    // Don't do anything while loading or fetching
+    if (isLoading || isFetching) {
+      return;
     }
-  }, [data]);
+
+    // Only redirect if query completed successfully but no item was found
+    if (isSuccess && !isError && (data === undefined || data === null)) {
+      // Check if idObjet is valid before redirecting
+      if (idObjet && idObjet > 0) {
+        const timer = setTimeout(() => {
+          router.push("/not-found");
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [data, isLoading, isFetching, isSuccess, isError, router, idObjet]);
   async function updateItemRequest(dataToSend: any) {
     const res = await fetch("/api/item", {
       method: "PUT",
@@ -232,7 +254,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
   };
 
   // ---------- LOADING ----------
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">
@@ -318,8 +340,9 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                   id="Nom"
                   name="itemNom"
                   value={formData?.itemNom}
-                  onChange={handleChange}
-                  className="text-slate-100 text-base placeholder:text-slate-400 bg-white/5 border-2 border-white/10 hover:border-sky-400/40 rounded-lg py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
+                  readOnly
+                  disabled
+                  className="text-slate-100 text-base placeholder:text-slate-400 bg-slate-800/50 border-2 border-white/10 rounded-lg py-2 px-3 w-full outline-none cursor-not-allowed opacity-60"
                 />
               </div>
 
@@ -335,8 +358,9 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                   id="description"
                   name="description"
                   value={formData?.description}
-                  onChange={handleChange}
-                  className="text-slate-100 text-base placeholder:text-slate-400 bg-white/5 border-2 border-white/10 hover:border-sky-400/40 rounded-lg py-2 px-3 w-full outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/40"
+                  readOnly
+                  disabled
+                  className="text-slate-100 text-base placeholder:text-slate-400 bg-slate-800/50 border-2 border-white/10 rounded-lg py-2 px-3 w-full outline-none cursor-not-allowed opacity-60"
                 />
               </div>
 

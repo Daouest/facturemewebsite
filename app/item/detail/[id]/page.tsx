@@ -10,20 +10,19 @@ export default async function DetailItem({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  console.log("id encoder", id);
   let idObjet: number | null = null;
   try {
-    // Étape 1 : décoder les caractères d'URL (%3D -> =)
+    // Step 1: URL decode in case Next.js encoded the base64 string
     const urlDecoded = decodeURIComponent(id);
-    // Étape 2 : décoder la base64 ("MTQ=" -> "14")
+
+    // Step 2: Decode the base64 string
     const decoded = atob(urlDecoded);
 
-    // Étape 3: convertion en nombre
+    // Step 3: Convert to number
     idObjet = parseInt(decoded, 10);
   } catch (err) {
     console.error("Erreur dans le decode de l'id", err);
   }
-
   return (
     <>
       <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
