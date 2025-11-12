@@ -2,6 +2,13 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 import clsx from "clsx";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "À Propos - FactureMe | About - FactureMe",
+  description: "Découvrez l'équipe derrière FactureMe, votre solution de gestion de factures simplifiée. Créé par des étudiants passionnés pour faciliter la facturation des petites entreprises. | Discover the team behind FactureMe, your simplified invoice management solution. Created by passionate students to facilitate invoicing for small businesses.",
+  keywords: ["FactureMe", "équipe", "à propos", "facturation", "gestion", "team", "about", "invoicing", "management"],
+};
 
 type CreatorProps = {
   id: string;

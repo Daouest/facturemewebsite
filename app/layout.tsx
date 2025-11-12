@@ -23,8 +23,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FactureMe",
-  description: "Gestion des factures",
+  title: "FactureMe - Gestion de Factures | Invoice Management",
+  description: "Gestion des factures professionnelle et simplifiée. Créez, gérez et suivez vos factures facilement. | Professional and simplified invoice management. Create, manage and track your invoices easily.",
   icons: {
     icon: "/favicon.ico",
   },
