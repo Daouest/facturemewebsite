@@ -162,3 +162,30 @@ html {
 .calendar-scroll::-webkit-scrollbar-track {
     background-color: transparent;
 }
+
+/* Select dropdown styling */
+select {
+    color-scheme: dark;
+}
+
+select option {
+    background-color: oklch(0.18 0.04 254);
+    color: rgb(226, 232, 240); /* slate-200 */
+    padding: 0.5rem;
+}
+
+select option:hover,
+select option:focus {
+    background: linear-gradient(
+        to right,
+        oklch(0.22 0.05 254),
+        oklch(0.20 0.05 276)
+    );
+    color: rgb(240, 249, 255); /* sky-50 */
+}
+
+select option:checked {
+    background-color: oklch(0.25 0.06 254) !important;
+    color: rgb(186, 230, 253); /* sky-200 */
+    font-weight: 500;
+}

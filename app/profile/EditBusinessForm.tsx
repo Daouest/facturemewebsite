@@ -7,6 +7,7 @@ import Input from "../components/Input";
 import Image from "next/image";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import AddressAutocomplete, { type AddressData } from "../components/AddressAutocomplete";
 
 export default function EditBusinessForm() {
   const { user, setUser } = useUser();
@@ -98,12 +99,17 @@ export default function EditBusinessForm() {
     e.preventDefault();
     setSaved(null);
 
+    console.log("=== FORM SUBMIT DEBUG START ===");
+    console.log("1. Original form data:", JSON.stringify(form, null, 2));
+
     //on assure que certaines donnees sont bien optionelles.
     const normalized = { ...form };
 
     // Remove IDs if they're undefined
     if (normalized.idBusiness === undefined) delete normalized.idBusiness;
     if (normalized.idAddress === undefined) delete normalized.idAddress;
+
+    console.log("2. After removing undefined IDs:", JSON.stringify(normalized, null, 2));
 
     // Handle optional string fields
     const optionalFields = ["TVP", "TVQ", "TVH", "TVS", "logo"] as const;
@@ -116,15 +122,25 @@ export default function EditBusinessForm() {
       }
     });
 
+    //Formatting zip code
+    normalized.zipCode = normalized.zipCode.replace(/\s/g, "");
+
+    console.log("3. After normalizing optional fields:", JSON.stringify(normalized, null, 2));
+
     const parsed = BusinessSchema.safeParse(normalized);
     if (!parsed.success) {
-      console.log("Erreur de validation BusinessSchema");
+      console.error("❌ VALIDATION ERROR:");
+      console.error("Validation errors:", JSON.stringify(parsed.error.format(), null, 2));
+      console.error("Failed data:", JSON.stringify(normalized, null, 2));
       setSaved("err");
       return;
     }
 
+    console.log("✅ Validation passed! Parsed data:", JSON.stringify(parsed.data, null, 2));
+
     setSaving(true);
     try {
+      console.log("4. Sending PUT request to /api/profile/business");
       const res = await fetch("/api/profile/business", {
         method: "PUT",
         headers: {
@@ -133,19 +149,25 @@ export default function EditBusinessForm() {
         body: JSON.stringify(parsed.data),
       });
 
+      console.log("5. Response status:", res.status, res.statusText);
+
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
+        console.error("❌ API ERROR Response:", j);
         throw new Error(j?.message || "Erreur lors de la sauvegarde du profil");
       }
 
       const data = await res.json();
+      console.log("✅ SUCCESS! Response data:", data);
       setSaved("ok");
       setUser?.((u) => ({ ...(u ?? {}), ...data }));
     } catch (e) {
+      console.error("❌ EXCEPTION CAUGHT:");
       console.error(e);
       setSaved("err");
     } finally {
       setSaving(false);
+      console.log("=== FORM SUBMIT DEBUG END ===");
     }
   }
 
@@ -179,6 +201,8 @@ export default function EditBusinessForm() {
               <Input
                 value={form.businessNumber}
                 onChange={onChange("businessNumber")}
+                minLength={9}
+                maxLength={9}
                 className="w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
                 required
               />
@@ -193,75 +217,26 @@ export default function EditBusinessForm() {
               {t("address")}
             </p>
 
-            {/*Premier ligne: addresse, ville*/}
-            <div className="flex flex-col md:flex-row w-full gap-4">
-              <div className="flex flex-col w-full">
-                <label className="text-sm font-semibold text-slate-300 mb-2">
-                  {t("address")}
-                </label>
-                <input
-                  required
-                  placeholder={t("addressPlaceholder")}
-                  value={form.address}
-                  onChange={onChange("address")}
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col w-full">
-                <label className="text-sm font-semibold text-slate-300 mb-2">
-                  {t("city")}
-                </label>
-                <input
-                  required
-                  pattern="^[^\d]+$"
-                  placeholder={t("cityPlaceholder")}
-                  value={form.city}
-                  onChange={onChange("city")}
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-            </div>
-
-            {/*Seconde ligne: code postal, province, pays*/}
-            <div className="flex flex-col sm:flex-row w-full gap-4">
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label className="text-sm font-semibold text-slate-300 mb-2">
-                  {t("postalCode")}
-                </label>
-                <input
-                  required
-                  placeholder={t("postalCodePlaceholder")}
-                  value={form.zipCode}
-                  onChange={onChange("zipCode")}
-                  minLength={6}
-                  maxLength={6}
-                  pattern="^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$"
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label className="text-sm font-semibold text-slate-300 mb-2">
-                  {t("province")}
-                </label>
-                <Provinces
-                  value={form.province}
-                  onChange={(province) =>
-                    setForm((form) => ({ ...form, province }))
-                  }
-                />
-              </div>
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label className="text-sm font-semibold text-slate-300 mb-2">
-                  {t("country")}
-                </label>
-                <input
-                  required
-                  value="CA"
-                  disabled
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 opacity-60"
-                />
-              </div>
-            </div>
+            <AddressAutocomplete
+              onAddressSelect={(addressData: AddressData) => {
+                setForm((prev) => ({
+                  ...prev,
+                  address: addressData.address,
+                  city: addressData.city,
+                  province: addressData.province,
+                  zipCode: addressData.zipCode,
+                  country: addressData.country,
+                }));
+              }}
+              initialAddress={{
+                address: form.address,
+                city: form.city,
+                province: form.province,
+                zipCode: form.zipCode,
+                country: form.country,
+              }}
+              variant="profile"
+            />
           </div>
 
           {/*Logo et numéros de taxe*/}

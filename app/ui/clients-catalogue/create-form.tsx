@@ -7,6 +7,7 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import AddressAutocomplete, { type AddressData } from "@/app/components/AddressAutocomplete";
 
 export default function Form() {
   const { langage } = useLangageContext();
@@ -137,66 +138,26 @@ export default function Form() {
               {t("clientAddressLabel")}
             </p>
 
-            {/*Premier ligne: addresse, ville*/}
-            <div className="flex flex-col md:flex-row w-full gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("addressLabel")}
-                </label>
-                <input
-                  required
-                  placeholder={t("addressPlaceholder")}
-                  onChange={(e) =>
-                    setAddress({ ...address, address: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("cityLabel")}
-                </label>
-                <input
-                  required
-                  pattern="^[^\d]+$"
-                  placeholder={t("cityPlaceholder")}
-                  onChange={(e) =>
-                    setAddress({ ...address, city: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-            </div>
-
-            {/*Seconde ligne: code postal, province*/}
-            <div className="flex flex-col md:flex-row w-full gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("postalCodeLabel")}
-                </label>
-                <input
-                  required
-                  placeholder={t("postalCodePlaceholder")}
-                  value={address.zipCode}
-                  minLength={6}
-                  maxLength={7}
-                  pattern="^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$"
-                  onChange={(e) =>
-                    setAddress({ ...address, zipCode: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("provinceLabel")}
-                </label>
-                <Provinces
-                  value={address.province}
-                  onChange={(province) => setAddress({ ...address, province })}
-                />
-              </div>
-            </div>
+            <AddressAutocomplete
+              onAddressSelect={(addressData: AddressData) => {
+                setAddress({
+                  ...address,
+                  address: addressData.address,
+                  city: addressData.city,
+                  province: addressData.province,
+                  zipCode: addressData.zipCode,
+                  country: addressData.country,
+                });
+              }}
+              initialAddress={{
+                address: address.address,
+                city: address.city,
+                province: address.province,
+                zipCode: address.zipCode,
+                country: address.country,
+              }}
+              variant="profile"
+            />
           </div>
 
           {/*Boutons de soumission*/}

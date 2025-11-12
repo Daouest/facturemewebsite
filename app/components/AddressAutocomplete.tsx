@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useId } from "react";
 import Input from "./Input";
 
 // Extend Window interface for Google Maps
@@ -9,6 +9,13 @@ declare global {
     google?: any;
   }
 }
+
+type PlacePrediction = {
+  placeId: string;
+  text: { text: string };
+  mainText: { text: string };
+  secondaryText: { text: string };
+};
 
 export type AddressData = {
   address: string;
@@ -45,9 +52,33 @@ export default function AddressAutocomplete({
   const [zipCode, setZipCode] = useState(initialAddress.zipCode || "");
   const [country, setCountry] = useState(initialAddress.country || "CA");
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  
+  // Autocomplete state
+  const [inputValue, setInputValue] = useState("");
+  const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  
+  const sessionTokenRef = useRef<any>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const addressInputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<any>(null);
+  // Generate unique IDs for this instance
+  const uniqueId = useId();
+  const addressInputId = `address-input-${uniqueId}`;
+  const provinceId = `province-${uniqueId}`;
+
+  // Update local state when initialAddress changes (e.g., when data loads from API)
+  useEffect(() => {
+    if (initialAddress.address !== undefined) {
+      setAddress(initialAddress.address);
+      setInputValue(initialAddress.address); // Also set the input value
+    }
+    if (initialAddress.city !== undefined) setCity(initialAddress.city);
+    if (initialAddress.province !== undefined) setProvince(initialAddress.province);
+    if (initialAddress.zipCode !== undefined) setZipCode(initialAddress.zipCode);
+    if (initialAddress.country !== undefined) setCountry(initialAddress.country);
+  }, [initialAddress.address, initialAddress.city, initialAddress.province, initialAddress.zipCode, initialAddress.country]);
 
   // Style configurations based on variant
   const styles = {
@@ -70,113 +101,214 @@ export default function AddressAutocomplete({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Check if script already exists
-    if (window.google?.maps?.places) {
+    if (window.google?.maps?.places?.AutocompleteSuggestion) {
       setIsScriptLoaded(true);
       return;
     }
 
-    // Check if script is already being loaded
     const existingScript = document.querySelector(
       'script[src*="maps.googleapis.com"]'
     );
     if (existingScript) {
-      existingScript.addEventListener("load", () => setIsScriptLoaded(true));
-      return;
+      const checkLoaded = setInterval(() => {
+        if (window.google?.maps?.places?.AutocompleteSuggestion) {
+          clearInterval(checkLoaded);
+          setIsScriptLoaded(true);
+        }
+      }, 100);
+      return () => clearInterval(checkLoaded);
     }
 
-    // Load script
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=fr`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=fr&loading=async`;
     script.async = true;
     script.defer = true;
-    script.onload = () => setIsScriptLoaded(true);
+    script.onload = () => {
+      const checkLoaded = setInterval(() => {
+        if (window.google?.maps?.places?.AutocompleteSuggestion) {
+          clearInterval(checkLoaded);
+          setIsScriptLoaded(true);
+        }
+      }, 100);
+    };
     script.onerror = () => {
-      console.error("Failed to load Google Maps script - autocomplete will not be available");
+      console.error("Failed to load Google Maps script");
     };
     document.head.appendChild(script);
   }, []);
 
-  // Initialize autocomplete
+  // Initialize session token
   useEffect(() => {
-    if (!isScriptLoaded || !addressInputRef.current) return;
+    if (isScriptLoaded && !sessionTokenRef.current) {
+      const google = (window as any).google;
+      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+    }
+  }, [isScriptLoaded]);
+
+  // Fetch autocomplete predictions
+  const fetchPredictions = async (input: string) => {
+    if (!input || !isScriptLoaded || input.length < 3) {
+      setPredictions([]);
+      setShowDropdown(false);
+      return;
+    }
 
     try {
       const google = (window as any).google;
-      autocompleteRef.current = new google.maps.places.Autocomplete(
-        addressInputRef.current,
-        {
-          types: ["address"],
-          componentRestrictions: { country: ["ca", "us"] },
-          fields: ["address_components", "formatted_address"],
-        }
-      );
+      const request = {
+        input,
+        includedRegionCodes: ["ca"],
+        sessionToken: sessionTokenRef.current,
+      };
 
-      autocompleteRef.current.addListener("place_changed", handlePlaceSelect);
+      const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+      
+      const placePredictions = suggestions
+        .filter((s: any) => s.placePrediction)
+        .map((s: any) => s.placePrediction);
+      
+      setPredictions(placePredictions);
+      setShowDropdown(placePredictions.length > 0);
     } catch (error) {
-      console.error("Error initializing autocomplete:", error);
+      console.error("Error fetching predictions:", error);
+      setPredictions([]);
+      setShowDropdown(false);
     }
-
-    return () => {
-      if (autocompleteRef.current && (window as any).google) {
-        (window as any).google.maps.event.clearInstanceListeners(autocompleteRef.current);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScriptLoaded]);
-
-  const handlePlaceSelect = () => {
-    const place = autocompleteRef.current?.getPlace();
-    if (!place?.address_components) return;
-
-    let streetNumber = "";
-    let route = "";
-    let newCity = "";
-    let newProvince = "";
-    let newZipCode = "";
-    let newCountry = "";
-
-    place.address_components.forEach((component: any) => {
-      const types = component.types;
-
-      if (types.includes("street_number")) {
-        streetNumber = component.long_name;
-      }
-      if (types.includes("route")) {
-        route = component.long_name;
-      }
-      if (types.includes("locality")) {
-        newCity = component.long_name;
-      }
-      if (types.includes("administrative_area_level_1")) {
-        newProvince = component.short_name;
-      }
-      if (types.includes("postal_code")) {
-        newZipCode = component.long_name;
-      }
-      if (types.includes("country")) {
-        newCountry = component.short_name;
-      }
-    });
-
-    const fullAddress = `${streetNumber} ${route}`.trim();
-
-    setAddress(fullAddress);
-    setCity(newCity);
-    setProvince(newProvince);
-    setZipCode(newZipCode);
-    setCountry(newCountry);
-
-    onAddressSelect({
-      address: fullAddress,
-      city: newCity,
-      province: newProvince,
-      zipCode: newZipCode,
-      country: newCountry,
-    });
   };
 
-  const canadianProvinces = [
+  // Handle place selection
+  const handlePlaceSelect = async (prediction: any) => {
+    try {
+      const google = (window as any).google;
+      const place = prediction.toPlace();
+      
+      await place.fetchFields({
+        fields: ["addressComponents"],
+      });
+
+      let streetNumber = "";
+      let route = "";
+      let newCity = "";
+      let newProvince = "";
+      let newZipCode = "";
+      let newCountry = "";
+
+      if (place.addressComponents) {
+        place.addressComponents.forEach((component: any) => {
+          const types = component.types;
+
+          if (types.includes("street_number")) {
+            streetNumber = (component.longText || "").trim();
+          }
+          if (types.includes("route")) {
+            route = (component.shortText || "").trim();
+          }
+          if (types.includes("locality")) {
+            newCity = (component.longText || "").trim();
+          }
+          if (types.includes("administrative_area_level_1")) {
+            newProvince = (component.shortText || "").trim();
+          }
+          if (types.includes("postal_code")) {
+            newZipCode = (component.longText || "").trim();
+          }
+          if (types.includes("country")) {
+            newCountry = (component.shortText || "").trim();
+          }
+        });
+      }
+
+      const fullAddress = [streetNumber, route].filter(Boolean).join(" ").trim();
+
+      setAddress(fullAddress);
+      setInputValue(fullAddress);
+      setCity(newCity);
+      setProvince(newProvince);
+      setZipCode(newZipCode);
+      setCountry(newCountry);
+      setShowDropdown(false);
+      setPredictions([]);
+      setSelectedIndex(-1);
+
+      // Create new session token for next search
+      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+
+      onAddressSelect({
+        address: fullAddress,
+        city: newCity,
+        province: newProvince,
+        zipCode: newZipCode,
+        country: newCountry,
+      });
+    } catch (error) {
+      console.error("Error fetching place details:", error);
+    }
+  };
+
+  // Handle input change with debounce
+  useEffect(() => {
+    // Don't fetch predictions if input matches current address (editing existing)
+    if (inputValue === address && inputValue.length > 0) {
+      setPredictions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      fetchPredictions(inputValue);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || predictions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex((prev) => 
+          prev < predictions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          handlePlaceSelect(predictions[selectedIndex]);
+        }
+        break;
+      case "Escape":
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        break;
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const provinces = [
     { code: "AB", name: "Alberta" },
     { code: "BC", name: "Colombie-Britannique" },
     { code: "MB", name: "Manitoba" },
@@ -192,98 +324,74 @@ export default function AddressAutocomplete({
     { code: "YT", name: "Yukon" },
   ];
 
-  const usStates = [
-    { code: "AL", name: "Alabama" },
-    { code: "AK", name: "Alaska" },
-    { code: "AZ", name: "Arizona" },
-    { code: "AR", name: "Arkansas" },
-    { code: "CA", name: "California" },
-    { code: "CO", name: "Colorado" },
-    { code: "CT", name: "Connecticut" },
-    { code: "DE", name: "Delaware" },
-    { code: "FL", name: "Florida" },
-    { code: "GA", name: "Georgia" },
-    { code: "HI", name: "Hawaii" },
-    { code: "ID", name: "Idaho" },
-    { code: "IL", name: "Illinois" },
-    { code: "IN", name: "Indiana" },
-    { code: "IA", name: "Iowa" },
-    { code: "KS", name: "Kansas" },
-    { code: "KY", name: "Kentucky" },
-    { code: "LA", name: "Louisiana" },
-    { code: "ME", name: "Maine" },
-    { code: "MD", name: "Maryland" },
-    { code: "MA", name: "Massachusetts" },
-    { code: "MI", name: "Michigan" },
-    { code: "MN", name: "Minnesota" },
-    { code: "MS", name: "Mississippi" },
-    { code: "MO", name: "Missouri" },
-    { code: "MT", name: "Montana" },
-    { code: "NE", name: "Nebraska" },
-    { code: "NV", name: "Nevada" },
-    { code: "NH", name: "New Hampshire" },
-    { code: "NJ", name: "New Jersey" },
-    { code: "NM", name: "New Mexico" },
-    { code: "NY", name: "New York" },
-    { code: "NC", name: "North Carolina" },
-    { code: "ND", name: "North Dakota" },
-    { code: "OH", name: "Ohio" },
-    { code: "OK", name: "Oklahoma" },
-    { code: "OR", name: "Oregon" },
-    { code: "PA", name: "Pennsylvania" },
-    { code: "RI", name: "Rhode Island" },
-    { code: "SC", name: "South Carolina" },
-    { code: "SD", name: "South Dakota" },
-    { code: "TN", name: "Tennessee" },
-    { code: "TX", name: "Texas" },
-    { code: "UT", name: "Utah" },
-    { code: "VT", name: "Vermont" },
-    { code: "VA", name: "Virginia" },
-    { code: "WA", name: "Washington" },
-    { code: "WV", name: "West Virginia" },
-    { code: "WI", name: "Wisconsin" },
-    { code: "WY", name: "Wyoming" },
-  ];
-
-  const provinces =
-    country === "CA"
-      ? canadianProvinces
-      : country === "US"
-      ? usStates
-      : canadianProvinces;
-
   return (
     <div className="space-y-4">
-      {/* Address field with autocomplete */}
-      <div>
-        <label
-          htmlFor="address-autocomplete"
-          className={styles.label}
-        >
+      {/* Address field with custom autocomplete */}
+      <div className="relative" style={{ zIndex: 1 }}>
+        <label htmlFor={addressInputId} className={styles.label}>
           Adresse
         </label>
         <input
-          ref={addressInputRef}
-          id="address-autocomplete"
+          ref={inputRef}
+          id={addressInputId}
           type="text"
-          placeholder="ex.: 123 rue des Alphabets"
-          value={address}
-          onChange={(e) => {
-            const newAddress = e.target.value;
-            setAddress(newAddress);
-            onAddressSelect({
-              address: newAddress,
-              city,
-              province,
-              zipCode,
-              country,
-            });
+          placeholder="Commencez à taper une adresse..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (predictions.length > 0) setShowDropdown(true);
           }}
           required
           disabled={disabled}
-          autoComplete="off"
           className={styles.input}
         />
+        
+        {/* Dropdown with predictions */}
+        {showDropdown && predictions.length > 0 && (
+          <div
+            ref={dropdownRef}
+            className={
+              variant === "profile"
+                ? "absolute z-[9999] w-full mt-1 max-h-60 overflow-auto rounded-xl border border-white/20 bg-slate-800 shadow-lg"
+                : "absolute z-[9999] w-full mt-1 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white dark:bg-zinc-800 shadow-lg"
+            }
+            style={{ position: 'absolute' }}
+          >
+            {predictions.map((prediction, index) => (
+              <div
+                key={prediction.placeId}
+                className={`px-4 py-3 cursor-pointer ${
+                  index === selectedIndex
+                    ? variant === "profile"
+                      ? "bg-slate-700"
+                      : "bg-gray-100 dark:bg-zinc-700"
+                    : variant === "profile"
+                    ? "hover:bg-slate-700"
+                    : "hover:bg-gray-50 dark:hover:bg-zinc-700"
+                } ${
+                  variant === "profile"
+                    ? "text-slate-100"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+                onClick={() => handlePlaceSelect(prediction)}
+                onMouseEnter={() => setSelectedIndex(index)}
+              >
+                <div className="font-medium">{prediction.mainText?.text}</div>
+                <div
+                  className={
+                    variant === "profile"
+                      ? "text-sm text-slate-400"
+                      : "text-sm text-gray-500 dark:text-gray-400"
+                  }
+                >
+                  {prediction.secondaryText?.text}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
         {errors.address && (
           <p className={styles.error}>{errors.address}</p>
         )}
@@ -321,7 +429,7 @@ export default function AddressAutocomplete({
           <Input
             label="Code postal"
             type="text"
-            placeholder={country === "CA" ? "A1B 2C3" : "12345"}
+            placeholder="A1B 2C3"
             value={zipCode}
             onChange={(e) => {
               const newZipCode = e.target.value;
@@ -335,7 +443,7 @@ export default function AddressAutocomplete({
               });
             }}
             pattern="^[A-Za-z0-9\s-]+$"
-            title={country === "CA" ? "Format canadien: A1B 2C3" : "Lettres, chiffres, espaces ou tirets"}
+            title="Format canadien: A1B 2C3"
             required
             disabled={disabled}
             className={styles.inputClass}
@@ -346,77 +454,41 @@ export default function AddressAutocomplete({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="province"
-            className={styles.label}
-          >
-            Province / État
-          </label>
-          <select
-            id="province"
-            value={province}
-            onChange={(e) => {
-              const newProvince = e.target.value;
-              setProvince(newProvince);
-              onAddressSelect({
-                address,
-                city,
-                province: newProvince,
-                zipCode,
-                country,
-              });
-            }}
-            required
-            disabled={disabled}
-            className={styles.select}
-          >
-            <option value="">Sélectionner</option>
-            {provinces.map((p) => (
-              <option key={p.code} value={p.code}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-          {errors.province && (
-            <p className={styles.error}>{errors.province}</p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="country"
-            className={styles.label}
-          >
-            Pays
-          </label>
-          <select
-            id="country"
-            value={country}
-            onChange={(e) => {
-              const newCountry = e.target.value;
-              setCountry(newCountry);
-              setProvince(""); // Reset province when country changes
-              onAddressSelect({
-                address,
-                city,
-                province: "",
-                zipCode,
-                country: newCountry,
-              });
-            }}
-            required
-            disabled={disabled}
-            className={styles.select}
-          >
-            <option value="CA">Canada</option>
-            <option value="US">États-Unis</option>
-          </select>
-          {errors.country && (
-            <p className={styles.error}>{errors.country}</p>
-          )}
-        </div>
+      <div>
+        <label
+          htmlFor={provinceId}
+          className={styles.label}
+        >
+          Province
+        </label>
+        <select
+          id={provinceId}
+          value={province}
+          onChange={(e) => {
+            const newProvince = e.target.value;
+            setProvince(newProvince);
+            onAddressSelect({
+              address,
+              city,
+              province: newProvince,
+              zipCode,
+              country,
+            });
+          }}
+          required
+          disabled={disabled}
+          className={styles.select}
+        >
+          <option value="">Sélectionner</option>
+          {provinces.map((p) => (
+            <option key={p.code} value={p.code}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        {errors.province && (
+          <p className={styles.error}>{errors.province}</p>
+        )}
       </div>
     </div>
   );
