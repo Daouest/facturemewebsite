@@ -84,13 +84,6 @@ export default function Form({ customers, businesses, objects }: Props) {
     }
   }, [state.errors, state.formData]);
 
-  // Auto-select business if there's only one and invoice type is 'company'
-  useEffect(() => {
-    if (form.invoiceType === "company" && businesses.length === 1 && !form.businessId) {
-      updateField("businessId", String(businesses[0].id));
-    }
-  }, [businesses, form.businessId, form.invoiceType]);
-
   // Clear businessId when switching to personal invoice type
   useEffect(() => {
     if (form.invoiceType === "personal" && form.businessId) {
