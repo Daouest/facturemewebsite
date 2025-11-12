@@ -76,9 +76,20 @@ export default function Previsualisation() {
           });
 
           if (!setRes.ok) {
-            console.error("Failed to set facture in session");
+            const errorData = await setRes.json().catch(() => ({ error: 'Unknown error' }));
+            console.error("Failed to set facture in session:", setRes.status, errorData.error);
             setLoading(false);
-            setError("Impossible de définir la facture dans la session.");
+            
+            // Generic error message based on status code
+            if (setRes.status === 401) {
+              setError("Veuillez vous connecter pour accéder à cette facture.");
+            } else if (setRes.status === 403) {
+              setError("Vous n'avez pas accès à cette facture.");
+            } else if (setRes.status === 404) {
+              setError("Facture introuvable.");
+            } else {
+              setError("Impossible d'accéder à la facture. Veuillez réessayer.");
+            }
             return;
           }
           setFactureId(parseInt(factureIdFromUrl)); // conserve l’intention de l’état
@@ -92,7 +103,19 @@ export default function Previsualisation() {
           const data = await res.json();
           if (data) setFacture(data);
         } else {
-          throw new Error("Échec du chargement des données de la facture.");
+          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          console.error("Previsualisation error:", res.status, errorData.error);
+          
+          // Generic error message based on status code
+          if (res.status === 401) {
+            throw new Error("Veuillez vous connecter pour accéder à cette facture.");
+          } else if (res.status === 403) {
+            throw new Error("Vous n'avez pas accès à cette facture.");
+          } else if (res.status === 404) {
+            throw new Error("Facture introuvable.");
+          } else {
+            throw new Error("Échec du chargement des données de la facture.");
+          }
         }
       } catch (err: any) {
         console.error("Erreur", err);
@@ -337,16 +360,10 @@ function invoiceComponent(infoArray: any) {
               <span className="text-slate-300/80 mr-2">Numero de facture:</span>{" "}
               {infoArray["factureNumber"]}
             </p>
-            <div className="flex flex-row gap-4 mb-2">
-              <p className="mb-2">
-                <span className="text-slate-300/80 mr-2">Date:</span>{" "}
-                {infoArray["date"]}
-              </p>
-              <p className="mb-2">
-                <span className="text-slate-300/80 mr-2">Heure:</span>{" "}
-                {infoArray["time"]}
-              </p>
-            </div>
+            <p className="mb-2">
+              <span className="text-slate-300/80 mr-2">Date:</span>{" "}
+              {infoArray["date"]}
+            </p>
           </div>
 
           <div>

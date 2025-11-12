@@ -1,9 +1,14 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import PDFInvoice from "@/app/ui/invoices/pdf-invoice";
+import { useLangageContext } from "@/app/context/langageContext";
+import { use } from "react";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
     const factureId = parseInt(params.id, 10);
+    const { langage } = useLangageContext();
 
     // Validate the invoice ID
     if (isNaN(factureId)) {
@@ -13,7 +18,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     // Render the PDF invoice component with the API data
     return (
         <main>
-            <PDFInvoice invoiceId={factureId} />
+            <PDFInvoice invoiceId={factureId} language={langage} />
         </main>
     );
 }
