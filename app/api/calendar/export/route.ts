@@ -9,7 +9,7 @@ import crypto from "crypto";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_CLEANUP_THRESHOLD = 100; // Clean up after 100 entries
 const CACHE_MAX_AGE_SECONDS = 3600; // 1 hour
-const ENABLE_RATE_LIMITING = false; // Set to true in production
+const ENABLE_RATE_LIMITING = true; // Set to true in production
 
 // Rate limiting: Track last access time per token
 const rateLimitMap = new Map<string, number>();
