@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Form from "@/app/ui/invoices/InvoiceCreationForm";
+import { useUser } from "@/app/context/UserContext";
+import type {
+  CustomerField,
+  BusinessField,
+  ItemFieldWithPrice,
+} from "@/app/lib/definitions";
+
+export default function NewInvoicePage() {
+  const router = useRouter();
+  const { user, ready } = useUser();
+  const [customers, setCustomers] = useState<CustomerField[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessField[]>([]);
+  const [objects, setObjects] = useState<ItemFieldWithPrice[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Check authentication
+  useEffect(() => {
+    if (ready && !user) {
+      router.push("/login");
+    }
+  }, [user, ready, router]);
+
+  useEffect(() => {
+    // Don't fetch data if not authenticated
+    if (!ready || !user) {
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const [customersRes, businessesRes, productsRes, hourlyRatesRes] =
+          await Promise.all([
+            fetch("/api/clients-catalogue", { credentials: "include" }),
+            fetch("/api/profile/business", { credentials: "include" }),
+            fetch("/api/item-catalogue", { credentials: "include" }),
+            fetch("/api/hourlyRates", { credentials: "include" }),
+          ]);
+
+        const customersData = await customersRes.json();
+        const businessesData = await businessesRes.json();
+        const productsData = await productsRes.json();
+        const hourlyRatesData = await hourlyRatesRes.json();
+
+        const transformedCustomers = (customersData.clients || []).map(
+          (client: any) => ({
+            id: client.idClient,
+            name: client.nomClient,
+          })
+        );
+
+        // Transform business data - API returns single object, not array
+        const transformedBusinesses = businessesData.idBusiness
+          ? [
+              {
+                id: businessesData.idBusiness,
+                name: businessesData.name,
+                businessNumber: businessesData.businessNumber,
+                address: businessesData.address,
+                city: businessesData.city,
+                zipCode: businessesData.zipCode,
+                province: businessesData.province,
+                country: businessesData.country,
+                logo: businessesData.logo,
+                TVP: businessesData.TVP,
+                TVQ: businessesData.TVQ,
+                TVH: businessesData.TVH,
+                TVS: businessesData.TVS,
+              },
+            ]
+          : [];
+
+        // Transform products
+        const transformedProducts = (productsData || []).map((item: any) => ({
+          id: item.idObjet,
+          name: item.productName || "Unknown Product",
+          type: "product" as const,
+          price: item.price || 0,
+        }));
+
+        // Transform hourly rates
+        const transformedHourlyRates = (hourlyRatesData || []).map(
+          (rate: any) => ({
+            id: rate.idObjet,
+            name: rate.workPosition || "Unknown Position",
+            type: "hourly" as const,
+            hourlyRate: rate.hourlyRate || 0,
+          })
+        );
+
+        // Combine both arrays
+        const allObjects = [...transformedProducts, ...transformedHourlyRates];
+
+        setCustomers(transformedCustomers);
+        setBusinesses(transformedBusinesses);
+        setObjects(allObjects);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user, ready]);
+
+  // Show loading while checking authentication or fetching data
+  if (!ready || loading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-slate-300">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <Form
+        customers={customers}
+        businesses={businesses}
+        objects={objects}
+      />
+    </div>
+  );
+}

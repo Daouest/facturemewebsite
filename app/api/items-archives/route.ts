@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     //  Vérification du cache côté client
     const clientEtag = req.headers.get("if-none-match");
 
-    const hasChangedForAccueil = isLastFacturesRequested 
+    const hasChangedForAccueil = isLastFacturesRequested;
     const isCacheValid =
       clientEtag === lastFactureDate &&
       filterByPaid == null &&

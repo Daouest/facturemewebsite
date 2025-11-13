@@ -6,11 +6,9 @@ import { AppUser, UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session/session-node";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SidebarProvider } from "@/app/context/SidebarContext";
 
 import "./globals.css";
-import HourlyRates from "./hourlyRates/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +21,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FactureMe - Gestion de Factures | Invoice Management",
-  description: "Gestion des factures professionnelle et simplifiée. Créez, gérez et suivez vos factures facilement. | Professional and simplified invoice management. Create, manage and track your invoices easily.",
+  title: "FactureMe",
+  description: "Invoice Management System",
   icons: {
     icon: "/favicon.ico",
   },
 };
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -49,7 +48,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-blue-900 to-indigo-950 flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserProvider initialUser={user}>
           <LangageProvider>
@@ -65,21 +64,4 @@ export default async function RootLayout({
       </body>
     </html>
   );
-
-  /*
-ReactQueryDevtoolsPanel:
-This will add a floating Devtools panel to your app, allowing you to inspect queries, cache states, and more.
-
-Debugging Features
-
-The Devtools provide a visual interface to:
-
-Monitor active queries and their states (e.g., fetching, error, success).
-
-View cached data and query keys.
-
-Retry or refetch queries manually.
-
-Identify stale or inactive queries.
-*/
 }

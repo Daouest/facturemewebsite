@@ -211,7 +211,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
         });
 
-        router.replace("/homePage");
+        // Redirect to new dashboard structure
+        router.replace("/fr/dashboard");
         router.refresh();
       } catch {
         setErrors({ form: "Erreur du serveur au login" });
@@ -279,7 +280,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       }
 
       // success → go to check-email page
-      router.replace("/auth/email/check-email");
+      router.replace("/(auth)/email/check-email");
     } catch {
       setErrors({ form: "Erreur du serveur au AuthForm" });
     } finally {

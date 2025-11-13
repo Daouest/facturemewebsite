@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
   TableItemType,
@@ -48,6 +48,8 @@ export function Table<
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
   const router = useRouter();
+  const params = useParams();
+  const lang = (params?.lang as string) || "fr";
   const [modalIsOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const etagRef = useRef<string | null>(null);
@@ -70,7 +72,7 @@ export function Table<
       });
 
       if (res.ok) {
-        router.push("/previsualisation");
+        router.push(`/${lang}/preview`);
       } else {
         console.error("Failed to set session");
       }
@@ -253,7 +255,7 @@ export function Table<
               <tr
                 key={row.idObjet}
                 onClick={() =>
-                  router.push(`/item/detail/${btoa(String(row.idObjet))}`)
+                  router.push(`/${lang}/products/${btoa(String(row.idObjet))}`)
                 }
                 className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
               >
@@ -317,7 +319,7 @@ export function Table<
               <tr
                 key={row.idObjet}
                 onClick={() =>
-                  router.push(`/hourlyRates/details/${row.idObjet}`)
+                  router.push(`/${lang}/rates/${row.idObjet}`)
                 } //onclick --> voir les details
                 className="cursor-pointer bg-white/0 hover:bg-white/5 transition-colors"
               >

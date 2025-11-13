@@ -5,7 +5,7 @@ import { AiOutlineAlert } from "react-icons/ai";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useFormData } from "@/app/context/HourlyRateFormContext";
 import { useUser } from "../context/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { createTranslator } from "@/app/lib/utils";
 import { useLangageContext } from "@/app/context/langageContext";
 
@@ -13,6 +13,8 @@ export default function FormCreationHourlyRate() {
     // Traduction
     const { langage } = useLangageContext();
     const t = createTranslator(langage);
+    const params = useParams();
+    const lang = (params?.lang as string) || "fr";
 
     // Form
     const { formData, setFormData } = useFormData();
@@ -88,8 +90,8 @@ export default function FormCreationHourlyRate() {
 
             await reponse.json();
 
-            // On success, redirect to item-catalogue
-            router.push("/hourlyRates");
+            // On success, redirect to rates
+            router.push(`/${lang}/rates`);
         } catch (err) {
             console.error("Erreur dans l'envoi des données [hourlyRates/create]", err);
             setErrorMessage({

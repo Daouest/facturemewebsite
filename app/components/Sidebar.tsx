@@ -8,6 +8,7 @@ import { createTranslator } from "@/app/lib/utils";
 import TextType from "./TextType";
 import { Button } from "@/components/ui/button";
 import { useSidebarContext } from "@/app/context/SidebarContext";
+import { useLocale } from "@/app/_lib/useLocale";
 
 import {
   FileText,
@@ -29,6 +30,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const { user } = useUser();
   const t = createTranslator(langage);
   const { setShowPage } = useSidebarContext();
+  const lang = useLocale();
 
   return (
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] lg:self-start lg:sticky lg:top-20">
@@ -62,7 +64,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
       <nav className="w-full flex flex-col gap-2">
         <Link
-          href="/homePage"
+          href={`/${lang}/dashboard`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Home className="w-4 h-4 flex-shrink-0" />
@@ -70,7 +72,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/item/items-archives"
+          href={`/${lang}/invoices`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
@@ -78,7 +80,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/item/item-catalogue"
+          href={`/${lang}/products`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Package className="w-4 h-4 flex-shrink-0" />
@@ -86,7 +88,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/hourlyRates"
+          href={`/${lang}/rates`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Package className="w-4 h-4 flex-shrink-0" />
@@ -94,7 +96,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/clients-catalogue"
+          href={`/${lang}/clients`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Users className="w-4 h-4 flex-shrink-0" />
@@ -102,7 +104,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/calendar"
+          href={`/${lang}/calendar`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <Calendar className="w-4 h-4 flex-shrink-0" />
@@ -110,7 +112,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         </Link>
 
         <Link
-          href="/profile"
+          href={`/${lang}/profile`}
           className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
         >
           <UserCircle className="w-4 h-4 flex-shrink-0" />
@@ -121,7 +123,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
           <>
             {!showPageInAdmin && (
               <Link
-                href="/admin"
+                href={`/${lang}/admin`}
                 className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
               >
                 {t("admin_section")}

@@ -5,13 +5,15 @@ import { AiOutlineAlert } from "react-icons/ai";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "../context/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function FormCreationItem() {
   const { formData, setFormData } = useFormData();
   const { user } = useUser();
   const router = useRouter();
+  const params = useParams();
+  const lang = (params?.lang as string) || "fr";
   const queryClient = useQueryClient();
   const [price, setPrice] = useState<string>("");
 
@@ -106,8 +108,8 @@ export default function FormCreationItem() {
       // Invalidate the items cache to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ["items"] });
 
-      // On success, redirect to item-catalogue
-      router.push("/item/item-catalogue");
+      // On success, redirect to products
+      router.push(`/${lang}/products`);
     } catch (err) {
       console.error("Erreur dans l'envoi des données [creation-item]", err);
       setErrorMessage({

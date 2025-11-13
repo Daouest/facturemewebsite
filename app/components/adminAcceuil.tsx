@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Client, UserData } from "@/app/lib/definitions";
 import { useUser } from "@/app/context/UserContext";
@@ -10,6 +10,8 @@ export default function AdminAcceuil() {
   const countRef = useRef<string | null>(null);
 
   const router = useRouter();
+  const params = useParams();
+  const lang = (params?.lang as string) || "fr";
   const [searche, setSearche] = useState("");
   const [showData, setShowData] = useState({ clients: true, users: false });
   const [dataOutput, setDataOutput] = useState<Client[] | UserData[]>([]);
@@ -94,7 +96,7 @@ export default function AdminAcceuil() {
         <div
           key={index}
           className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur user-card"
-          onClick={() => router.push("/clients-catalogue")}
+          onClick={() => router.push(`/${lang}/clients`)}
         >
           <div className="user-avatar">{u?.firstName?.charAt(0) ?? ""}</div>
           <div className="user-info">
@@ -111,7 +113,7 @@ export default function AdminAcceuil() {
       <div
         key={index}
         className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur user-card user-card"
-        onClick={() => router.push("/clients-catalogue")}
+        onClick={() => router.push(`/${lang}/clients`)}
       >
         <div className="user-avatar">{u?.nomClient?.charAt(0) ?? ""}</div>
         <div className="user-info">
