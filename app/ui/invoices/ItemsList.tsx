@@ -2,7 +2,6 @@
 
 import { ItemFieldWithPrice, InvoiceFormItem } from "@/app/lib/definitions";
 import { createItemKey, calculateWorkedHours } from "@/app/lib/utils";
-import ImageFromBd from "@/components/ui/images";
 
 // Currency formatter
 const fmt = new Intl.NumberFormat("fr-CA", {
@@ -133,27 +132,10 @@ export default function ItemsList({
                     <div>
                       <h3 className="font-semibold text-slate-100 flex items-center gap-3">
                         <span>{obj.name}</span>
-                        <span className="flex-shrink-0">
-                          {obj.photo ? (
-                            <img
-                              src={obj.photo}
-                              alt={`Image ${obj.name}`}
-                              width={40}
-                              height={40}
-                              style={{
-                                width: 40,
-                                height: 40,
-                                objectFit: "cover",
-                              }}
-                              className="rounded-md"
-                            />
-                          ) : (
-                            <ImageFromBd
-                              id={obj.id}
-                              name={`thumb-${obj.id}`}
-                              size={40}
-                            />
-                          )}
+                        <span className="text-xs text-slate-300/70 font-normal">
+                          {obj.shortDescription
+                            ? ` - ${obj.shortDescription}`
+                            : ""}
                         </span>
                       </h3>
                       <p className="text-xs text-slate-300/70">📦 Produit</p>

@@ -79,12 +79,13 @@ export default function Page() {
           : [];
 
         // Transform products
+        // on get en même temps les 10 premiers chars du string description
         const transformedProducts = (productsData || []).map((item: any) => ({
           id: item.idObjet,
           name: item.productName || "Unknown Product",
           type: "product" as const,
           price: item.price || 0,
-          photo: item.productPhoto || null,
+          shortDescription: (item.description || "").slice(0, 10),
         }));
 
         // Transform hourly rates

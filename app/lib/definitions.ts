@@ -139,8 +139,8 @@ export type ItemField = {
     id: number;
     name: string;
     type: 'product' | 'hourly';
-    // optional inline photo (base64 data URL or path) to avoid extra fetches
-    photo?: string | null;
+    // optional short description snippet (first ~10 chars) used in lists
+    shortDescription?: string | null;
 };
 
 // Extended type with pricing information for invoice calculations

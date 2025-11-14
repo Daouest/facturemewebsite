@@ -1,6 +1,5 @@
 import { ItemFieldWithPrice, InvoiceForm } from "@/app/lib/definitions";
 import ItemsList from "@/app/ui/invoices/ItemsList";
-import ImageFromBd from "@/components/ui/images";
 import { createTranslator } from "@/app/lib/utils";
 import { useLangageContext } from "@/app/context/langageContext";
 
@@ -51,40 +50,12 @@ export default function ProductsSection({
 
       <div className="flex gap-3 mb-4">
         <div className="relative flex-1">
-          {/* Thumbnail preview for selected product */}
-          {selectedProduct !== -1 &&
-            (() => {
-              const selectedObj = productObjects.find(
-                (o) => o.id === selectedProduct
-              );
-              return (
-                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 rounded-md overflow-hidden">
-                  {selectedObj?.photo ? (
-                    <img
-                      src={selectedObj.photo}
-                      alt={`Image ${selectedObj.name}`}
-                      width={40}
-                      height={40}
-                      style={{ width: 40, height: 40, objectFit: "cover" }}
-                      className="rounded-md"
-                    />
-                  ) : (
-                    <ImageFromBd
-                      id={selectedProduct}
-                      name={"preview"}
-                      size={40}
-                    />
-                  )}
-                </div>
-              );
-            })()}
+          {/* No thumbnail preview — description snippets are shown in the list */}
 
           <select
             value={selectedProduct === -1 ? "" : String(selectedProduct)}
             onChange={(e) =>
-              setSelectedProduct(
-                e.target.value === "" ? -1 : Number(e.target.value)
-              )
+              setSelectedProduct(e.target.value === "" ? -1 : Number(e.target.value))
             }
             className={`w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 ${
               selectedProduct !== -1 ? "pl-16" : "pl-12"
@@ -94,9 +65,7 @@ export default function ProductsSection({
             {productObjects
               .filter(
                 (obj) =>
-                  !form.items.some(
-                    (item) => item.id === obj.id && item.type === "product"
-                  )
+                  !form.items.some((item) => item.id === obj.id && item.type === "product")
               )
               .map((obj) => (
                 <option key={obj.id} value={obj.id}>
