@@ -19,8 +19,8 @@ export default function BusinessSelect({
   const errorId = "business-error";
 
   return (
-    <div>
-      <div className="relative">
+    <div className="flex gap-3">
+      <div className="relative flex-1">
         <select
           id="business"
           name="businessId"

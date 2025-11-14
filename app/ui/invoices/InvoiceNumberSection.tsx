@@ -1,4 +1,7 @@
+"use client";
+
 import { InvoiceForm } from "@/app/lib/definitions";
+import { Hash } from "lucide-react";
 import { createTranslator } from "@/app/lib/utils";
 import { useLangageContext } from "@/app/context/langageContext";
 
@@ -8,7 +11,7 @@ type Props = {
     field: K,
     value: InvoiceForm[K]
   ) => void;
-  numberGroupId: string;
+  numberGroupId?: string;
   errors?: {
     customerId?: string[];
     number?: string[];
@@ -51,35 +54,41 @@ export default function InvoiceNumberSection({
         </h2>
       </div>
 
-      <div
-        id={numberGroupId}
-        className="flex flex-wrap gap-3 mb-4"
-        role="radiogroup"
-        aria-label="Invoice number type"
-      >
-        <label className="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          <input
-            type="radio"
-            name="numberType"
-            value="auto"
-            checked={form.numberType === "auto"}
-            onChange={() => updateField("numberType", "auto")}
-            className="h-4 w-4 text-sky-400"
-          />
-          <span className="text-sm text-slate-200">{t("automatic")}</span>
+      <div className="flex gap-3 mb-4">
+        <label htmlFor="numberType" className="sr-only">
+          {t("chooseInvoiceNumber")}
         </label>
+        <div className="relative flex-1">
+          <Hash className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <select
+            id="numberType"
+            name="numberType"
+            value={form.numberType}
+            onChange={(e) =>
+              updateField("numberType", e.target.value as "auto" | "custom")
+            }
+            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none appearance-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
+          >
+            <option value="auto">{t("automatic")}</option>
+            <option value="custom">{t("custom")}</option>
+          </select>
 
-        <label className="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          <input
-            type="radio"
-            name="numberType"
-            value="custom"
-            checked={form.numberType === "custom"}
-            onChange={() => updateField("numberType", "custom")}
-            className="h-4 w-4 text-sky-400"
-          />
-          <span className="text-sm text-slate-200">{t("custom")}</span>
-        </label>
+          <svg
+            className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            />
+          </svg>
+        </div>
       </div>
 
       {form.numberType === "custom" && (
@@ -89,8 +98,11 @@ export default function InvoiceNumberSection({
             className="mb-2 block text-sm font-medium text-slate-200"
           >
             {t("chooseInvoiceNumber")}
-            <span className="ml-1 text-rose-300">*</span>
+            <span aria-hidden="true" className="text-rose-300 ml-1">
+              *
+            </span>
           </label>
+
           <div className="relative">
             <input
               id="number"
@@ -104,6 +116,7 @@ export default function InvoiceNumberSection({
               required
               inputMode="numeric"
             />
+
             <svg
               className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
               xmlns="http://www.w3.org/2000/svg"
@@ -120,8 +133,9 @@ export default function InvoiceNumberSection({
               />
             </svg>
           </div>
+
           {errors?.number && (
-            <div className="mt-2">
+            <div className="mt-2 space-y-1">
               {errors.number.map((error: string) => (
                 <p className="text-sm text-rose-400" key={error}>
                   {error}

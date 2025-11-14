@@ -79,13 +79,11 @@ export default function Page() {
           : [];
 
         // Transform products
-        // on get en même temps les 10 premiers chars du string description
         const transformedProducts = (productsData || []).map((item: any) => ({
           id: item.idObjet,
           name: item.productName || "Unknown Product",
           type: "product" as const,
           price: item.price || 0,
-          shortDescription: (item.description || "").slice(0, 10),
         }));
 
         // Transform hourly rates
@@ -132,7 +130,7 @@ export default function Page() {
         <Header />
 
         <main className="flex-1 pt-20">
-          <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
             {/* Sidebar */}
             <MobileSidebarWrapper>
               <Sidebar />

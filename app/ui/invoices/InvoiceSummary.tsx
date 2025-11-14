@@ -38,7 +38,7 @@ export default function InvoiceSummary({
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "—";
     // Parse the date string as local date (YYYY-MM-DD format)
-    const [year, month, day] = dateStr.split('-').map(Number);
+    const [year, month, day] = dateStr.split("-").map(Number);
     const date = new Date(year, month - 1, day);
     return date.toLocaleDateString(langage === "fr" ? "fr-FR" : "en-US", {
       year: "numeric",
@@ -47,19 +47,20 @@ export default function InvoiceSummary({
     });
   };
 
-  const displayDate = dateType === "future" && invoiceDate
-    ? formatDate(invoiceDate)
-    : new Date().toLocaleDateString(langage === "fr" ? "fr-FR" : "en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+  const displayDate =
+    dateType === "future" && invoiceDate
+      ? formatDate(invoiceDate)
+      : new Date().toLocaleDateString(langage === "fr" ? "fr-FR" : "en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
 
   return (
     <aside className="lg:col-span-4">
-      <div className="sticky top-[96px] space-y-6">
+      <div className="lg:sticky lg:top-[96px] space-y-6">
         {/* Summary Card */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 sm:p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
           <h3 className="text-sm font-semibold text-slate-200">
             {t("invoiceSummary")}
           </h3>
@@ -94,9 +95,7 @@ export default function InvoiceSummary({
             </div>
             <div className="pt-2 border-t border-white/10 flex justify-between">
               <span className="text-slate-300/80">{t("invoiceDate")}</span>
-              <span className="font-medium">
-                {displayDate}
-              </span>
+              <span className="font-medium">{displayDate}</span>
             </div>
             <div className="pt-2 border-t border-white/10 flex justify-between">
               <span className="text-slate-300/80">{t("numbering")}</span>

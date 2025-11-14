@@ -19,8 +19,8 @@ export default function CustomerSelect({
   const errorId = "customer-error";
 
   return (
-    <div>
-      <div className="relative">
+    <div className="flex gap-3">
+      <div className="relative flex-1">
         <select
           id="customer"
           name="customerId"

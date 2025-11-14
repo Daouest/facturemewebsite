@@ -8,10 +8,9 @@ const imageCache = new Map<string | number, string | null>();
 type ImageFromBdProps = {
   name: string;
   id: string | number;
-  size?: number; // square size in pixels
 };
 
-export default function ImageFromBd({ name, id, size = 80 }: ImageFromBdProps) {
+export default function ImageFromBd({ name, id }: ImageFromBdProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,16 +55,13 @@ export default function ImageFromBd({ name, id, size = 80 }: ImageFromBdProps) {
   const src =
     imageUrl || (loading ? "/image_loading.gif" : "/default_image.jpg");
 
-  // `size` comes from props (default 80px)
-
   return (
     <Image
       src={src}
       alt={imageUrl ? `Image ${id}` : `image_loading ${id}`}
-      width={size}
-      height={size}
-      style={{ width: size, height: size }}
-      className="object-cover rounded-md"
+      width={80}
+      height={80}
+      className="object-cover w-20 h-20"
       unoptimized
     />
   );

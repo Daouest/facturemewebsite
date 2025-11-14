@@ -44,28 +44,30 @@ export default function ProductsSection({
         </span>
         <h2 className="text-sm font-semibold text-slate-200">
           {t("products")}
-          <span className="ml-1 text-rose-300">*</span>
+          <span aria-hidden="true" className="text-rose-300 ml-1">
+            *
+          </span>
         </h2>
       </div>
 
       <div className="flex gap-3 mb-4">
         <div className="relative flex-1">
-          {/* No thumbnail preview — description snippets are shown in the list */}
-
           <select
             value={selectedProduct === -1 ? "" : String(selectedProduct)}
             onChange={(e) =>
-              setSelectedProduct(e.target.value === "" ? -1 : Number(e.target.value))
+              setSelectedProduct(
+                e.target.value === "" ? -1 : Number(e.target.value)
+              )
             }
-            className={`w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 ${
-              selectedProduct !== -1 ? "pl-16" : "pl-12"
-            } pr-10 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none`}
+            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none"
           >
             <option value="">{t("selectProduct")}</option>
             {productObjects
               .filter(
                 (obj) =>
-                  !form.items.some((item) => item.id === obj.id && item.type === "product")
+                  !form.items.some(
+                    (item) => item.id === obj.id && item.type === "product"
+                  )
               )
               .map((obj) => (
                 <option key={obj.id} value={obj.id}>
@@ -75,9 +77,7 @@ export default function ProductsSection({
           </select>
 
           <svg
-            className={`pointer-events-none absolute ${
-              selectedProduct !== -1 ? "left-14" : "left-4"
-            } top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400`}
+            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

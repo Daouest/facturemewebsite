@@ -2,6 +2,7 @@
 
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import { Briefcase } from "lucide-react";
 
 interface InvoiceTypeSelectorProps {
   value: "company" | "personal";
@@ -45,56 +46,40 @@ export default function InvoiceTypeSelector({
         </h2>
       </div>
 
-      <div
-        id={groupId}
-        className="flex flex-wrap gap-3"
-        role="radiogroup"
-        aria-label={t("invoiceType")}
-        aria-invalid={hasError}
-      >
-        <label
-          className={`flex items-center gap-3 cursor-pointer rounded-lg px-4 py-2 border transition ${
-            disabled ? "opacity-50 cursor-not-allowed" : ""
-          } ${
-            value === "company"
-              ? "border-violet-400/60 bg-violet-500/20 ring-1 ring-violet-400/30"
-              : "border-white/10 bg-white/5 hover:bg-white/10"
-          }`}
-        >
-          <input
-            type="radio"
+      <div className="flex gap-3">
+        <label htmlFor="invoiceType" className="sr-only">
+          {t("invoiceType")}
+        </label>
+        <div className="relative flex-1">
+          <Briefcase className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <select
+            id="invoiceType"
             name="invoiceType"
-            value="company"
-            checked={value === "company"}
+            value={value}
             onChange={(e) => onChange(e.target.value as "company" | "personal")}
             disabled={disabled}
-            className="h-4 w-4 text-violet-400"
-          />
-          <span className="text-sm text-slate-200">{t("withCompany")}</span>
-        </label>
-
-        <label
-          className={`flex items-center gap-3 cursor-pointer rounded-lg px-4 py-2 border transition ${
-            disabled ? "opacity-50 cursor-not-allowed" : ""
-          } ${
-            value === "personal"
-              ? "border-violet-400/60 bg-violet-500/20 ring-1 ring-violet-400/30"
-              : "border-white/10 bg-white/5 hover:bg-white/10"
-          }`}
-        >
-          <input
-            type="radio"
-            name="invoiceType"
-            value="personal"
-            checked={value === "personal"}
-            onChange={(e) => onChange(e.target.value as "company" | "personal")}
-            disabled={disabled}
-            className="h-4 w-4 text-violet-400"
-          />
-          <span className="text-sm text-slate-200">
-            {t("withPersonalAddress")}
-          </span>
-        </label>
+            aria-invalid={hasError}
+            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none appearance-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
+          >
+            <option value="company">{t("withCompany")}</option>
+            <option value="personal">{t("withPersonalAddress")}</option>
+          </select>
+          <svg
+            className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            />
+          </svg>
+        </div>
       </div>
 
       {hasError && (

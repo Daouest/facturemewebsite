@@ -128,46 +128,46 @@ export default function ItemsList({
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {item.type === "product" ? (
-                    <div>
-                      <h3 className="font-semibold text-slate-100 flex items-center gap-3">
-                        <span>{obj.name}</span>
-                        <span className="text-xs text-slate-300/70 font-normal">
-                          {obj.shortDescription
-                            ? ` - ${obj.shortDescription}`
-                            : ""}
-                        </span>
-                      </h3>
-                      <p className="text-xs text-slate-300/70">📦 Produit</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex-shrink-0 w-8 h-8 rounded-md bg-white/10 ring-1 ring-white/15 flex items-center justify-center">
-                        <svg
-                          className="h-4 w-4 text-indigo-300"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                          />
-                        </svg>
-                      </div>
+                  <div className="flex-shrink-0 w-8 h-8 rounded-md bg-white/10 ring-1 ring-white/15 flex items-center justify-center">
+                    {item.type === "product" ? (
+                      <svg
+                        className="h-4 w-4 text-sky-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="h-4 w-4 text-indigo-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
+                    )}
+                  </div>
 
-                      <div>
-                        <h3 className="font-semibold text-slate-100">
-                          {obj.name}
-                        </h3>
-                        <p className="text-xs text-slate-300/70">
-                          ⏱️ Taux horaire
-                        </p>
-                      </div>
-                    </>
-                  )}
+                  <div>
+                    <h3 className="font-semibold text-slate-100">{obj.name}</h3>
+                    <p className="text-xs text-slate-300/70">
+                      {item.type === "product"
+                        ? "📦 Produit"
+                        : "⏱️ Taux horaire"}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Show line total in header for product */}

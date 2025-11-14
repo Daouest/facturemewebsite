@@ -60,7 +60,7 @@ export default function HourlyRatesSection({
                 e.target.value === "" ? -1 : Number(e.target.value)
               )
             }
-            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20 appearance-none"
+            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none"
           >
             <option value="">{t("selectHourlyRate")}</option>
             {hourlyObjects

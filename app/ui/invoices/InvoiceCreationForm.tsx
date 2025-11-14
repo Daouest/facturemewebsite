@@ -274,12 +274,13 @@ export default function Form({ customers, businesses, objects }: Props) {
     <div className="pb-14">
       {/* Hero header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-100">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-100">
           {t("createNewInvoice")}
         </h1>
       </div>
+
       {/* Required fields hint */}
-      <div className="mb-4">
+      <div className="text-center">
         <HintMessage>{t("requiredFieldsAsterisk")}</HintMessage>
       </div>
 
@@ -287,7 +288,7 @@ export default function Form({ customers, businesses, objects }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main form column */}
         <div className="lg:col-span-8">
-          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 sm:p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
             <form
               onSubmit={handleSubmit}
               aria-label="Create Invoice"
@@ -314,7 +315,9 @@ export default function Form({ customers, businesses, objects }: Props) {
                     </span>
                     <h2 className="text-sm font-semibold text-slate-200">
                       {t("client")}
-                      <span className="ml-1 text-rose-300">*</span>
+                      <span aria-hidden="true" className="text-rose-300 ml-1">
+                        *
+                      </span>
                     </h2>
                   </div>
                   <CustomerSelect
@@ -356,7 +359,9 @@ export default function Form({ customers, businesses, objects }: Props) {
                       </span>
                       <h2 className="text-sm font-semibold text-slate-200">
                         {t("business")}
-                        <span className="ml-1 text-rose-300">*</span>
+                        <span aria-hidden="true" className="text-rose-300 ml-1">
+                          *
+                        </span>
                       </h2>
                     </div>
                     <BusinessSelect
