@@ -7,6 +7,8 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import Comments from "../components/comments";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import { data } from "@/app/lib/constante";
 
 export default function PublicitePage() {
@@ -37,67 +39,87 @@ export default function PublicitePage() {
   console.log("commentaires", commentaires);
   return (
     <>
-      <Header />
-      <div className="text-white flex flex-col items-center justify-center mt-20">
-        {/* --- Section vidéo --- */}
-        <section className="w-full max-w-5xl mt-10 px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
-            Découvrez notre application en action
-          </h1>
-          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg">
-            <video
-              src="/facture_video.mp4"
-              controls
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </section>
+      <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+        <Header />
 
-        {/* --- Carrousel --- */}
-        <section className=" fle w-full mt-20 px-6">
-          <h2 className="flex x flex-col justify-center items-center text-2xl font-semibold text-center mb-8">
-            Quelques aperçus de l’application
-          </h2>
-          <div className="flex w-full self-start items-start overflow-hidden rounded-2xl">
-            <Comments />
-          </div>
-        </section>
+        {/* Decorative gradient glows */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/4 -left-64 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+        </div>
 
-        {/* --- Section commentaires --- */}
-        <section className="w-full  max-w-4xl mt-16 px-6 mb-10">
-          <h2 className="text-2xl font-semibold text-center mb-8">
-            Ce que disent nos utilisateurs
-          </h2>
-          <div className="flex flex-row">
-            <AiOutlineArrowLeft
-              onClick={prev}
-              className=" mr-10 cursoir cursor-pointer"
-              color="white"
-              size={50}
-            />
+        <main className="flex-1 pt-20 pb-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
+            {/* Mobile Sidebar with Toggle */}
+            <MobileSidebarWrapper>
+              <Sidebar />
+            </MobileSidebarWrapper>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {commentaires.map((c, i) => (
-                <div
-                  key={i}
-                  className="bg-white text-[#0a1a3c] rounded-2xl p-6 shadow-md transition-transform hover:scale-105"
-                >
-                  <p className="italic mb-4">“{c.texte}”</p>
-                  <p className="font-bold text-right">— {c.nom}</p>
+            {/* Main Content */}
+            <section className="flex-1 flex flex-col items-center">
+              {/* --- Section vidéo --- */}
+              <div className="w-full max-w-5xl mt-10 px-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-center text-slate-100 mb-6">
+                  Découvrez notre application en action
+                </h1>
+                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg border border-white/10">
+                  <video
+                    src="/facture_video.mp4"
+                    controls
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
 
-            <AiOutlineArrowRight
-              onClick={next}
-              className=" ml-10 cursoir cursor-pointer"
-              color="white"
-              size={50}
-            />
+              {/* --- Carrousel --- */}
+              <div className="w-full mt-20 px-6">
+                <h2 className="text-2xl font-semibold text-center text-slate-100 mb-8">
+                  Quelques aperçus de l'application
+                </h2>
+                <div className="flex w-full self-start items-start overflow-hidden rounded-2xl">
+                  <Comments />
+                </div>
+              </div>
+
+              {/* --- Section commentaires --- */}
+              <div className="w-full max-w-4xl mt-16 px-6 mb-10">
+                <h2 className="text-2xl font-semibold text-center text-slate-100 mb-8">
+                  Ce que disent nos utilisateurs
+                </h2>
+                <div className="flex flex-row items-center">
+                  <AiOutlineArrowLeft
+                    onClick={prev}
+                    className="mr-10 cursor-pointer hover:text-sky-300 transition-colors"
+                    color="white"
+                    size={50}
+                  />
+
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {commentaires.map((c, i) => (
+                      <div
+                        key={i}
+                        className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] transition-all hover:bg-white/10"
+                      >
+                        <p className="italic mb-4 text-slate-300">"{c.texte}"</p>
+                        <p className="font-bold text-right text-sky-300">— {c.nom}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <AiOutlineArrowRight
+                    onClick={next}
+                    className="ml-10 cursor-pointer hover:text-sky-300 transition-colors"
+                    color="white"
+                    size={50}
+                  />
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </main>
+
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }

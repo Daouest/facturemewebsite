@@ -145,6 +145,7 @@ export default function ItemCatalogue() {
                           <Link
                             href={"/clients-catalogue/create"}
                             className="mt-4 inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sky-200 hover:bg-sky-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/30"
+                            title={t("createClientTitle")}
                           >
                             <FaPersonCirclePlus size={18} className="mr-2" />
                             {t("newClientLabel")}

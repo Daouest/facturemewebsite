@@ -34,7 +34,9 @@ function CreatorCard({
       className={clsx(
         "creator-card rounded-2xl border border-white/10 bg-white/5 backdrop-blur shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]",
         "p-6 sm:p-8 text-center transition-all hover:bg-white/10",
-        extraMargin && "mt-24"
+        // apply the extra top offset only on large screens so small/medium
+        // layouts keep the grid aligned and don't show a gap between cards
+        extraMargin && "lg:mt-24"
       )}
     >
       <div className="flex justify-center mb-4">
