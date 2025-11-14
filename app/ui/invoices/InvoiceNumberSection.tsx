@@ -89,6 +89,7 @@ export default function InvoiceNumberSection({
             className="mb-2 block text-sm font-medium text-slate-200"
           >
             {t("chooseInvoiceNumber")}
+            <span className="ml-1 text-rose-300">*</span>
           </label>
           <div className="relative">
             <input

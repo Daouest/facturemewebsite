@@ -12,6 +12,7 @@ import { ClientAffichage } from "@/app/lib/definitions";
 import { FaPersonCirclePlus } from "react-icons/fa6";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import HintMessage from "@/app/components/HintMessage";
 
 export default function ItemCatalogue() {
   const [clients, setClients] = useState<ClientAffichage[]>([]);
@@ -75,13 +76,13 @@ export default function ItemCatalogue() {
                     <div className="grid grid-cols-3 items-center">
                       <div className="col-span-1" />
                       <h1 className="col-span-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-100 text-center">
-                        Vos clients
+                        {t("clientsTitle")}
                       </h1>
                       <div className="col-span-1 flex items-center justify-end">
                         <Link
                           href={"/clients-catalogue/create"}
                           className="inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-3 py-2 text-sky-200 hover:bg-sky-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/30"
-                          title="Créer un client"
+                          title={t("createClientTitle")}
                         >
                           <FaPersonCirclePlus size={25} className="mr-2" />
                         </Link>
@@ -91,12 +92,14 @@ export default function ItemCatalogue() {
                     {/* Divider under title */}
                     <div className="my-4 border-t border-white/10" />
 
+                    <HintMessage>{t("clientsImmutableHint")}</HintMessage>
+
                     {/* Content */}
                     {loading ? (
                       <div className="flex justify-center items-center py-10">
                         <Image
                           src="/Loading_Paperplane.gif"
-                          alt="loading"
+                          alt={t("loading")}
                           width={300}
                           height={300}
                           className="object-contain max-w-full h-auto opacity-90"
@@ -134,17 +137,17 @@ export default function ItemCatalogue() {
                             <FaPersonCirclePlus className="h-6 w-6 text-sky-300" />
                           </div>
                           <p className="text-slate-200 font-semibold">
-                            Aucun client trouvé
+                            {t("noClientFound")}
                           </p>
                           <p className="text-slate-300/80 text-sm mt-1">
-                            Créez votre premier client pour commencer.
+                            {t("createFirstClient")}
                           </p>
                           <Link
                             href={"/clients-catalogue/create"}
                             className="mt-4 inline-flex items-center rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sky-200 hover:bg-sky-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/30"
                           >
                             <FaPersonCirclePlus size={18} className="mr-2" />
-                            Nouveau client
+                            {t("newClientLabel")}
                           </Link>
                         </div>
                       </div>

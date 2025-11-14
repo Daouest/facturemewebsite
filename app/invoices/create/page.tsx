@@ -84,6 +84,7 @@ export default function Page() {
           name: item.productName || "Unknown Product",
           type: "product" as const,
           price: item.price || 0,
+          photo: item.productPhoto || null,
         }));
 
         // Transform hourly rates

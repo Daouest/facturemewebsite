@@ -1,5 +1,6 @@
 import { ItemFieldWithPrice, InvoiceForm } from "@/app/lib/definitions";
 import ItemsList from "@/app/ui/invoices/ItemsList";
+import ImageFromBd from "@/components/ui/images";
 import { createTranslator } from "@/app/lib/utils";
 import { useLangageContext } from "@/app/context/langageContext";
 
@@ -44,11 +45,40 @@ export default function ProductsSection({
         </span>
         <h2 className="text-sm font-semibold text-slate-200">
           {t("products")}
+          <span className="ml-1 text-rose-300">*</span>
         </h2>
       </div>
 
       <div className="flex gap-3 mb-4">
         <div className="relative flex-1">
+          {/* Thumbnail preview for selected product */}
+          {selectedProduct !== -1 &&
+            (() => {
+              const selectedObj = productObjects.find(
+                (o) => o.id === selectedProduct
+              );
+              return (
+                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 rounded-md overflow-hidden">
+                  {selectedObj?.photo ? (
+                    <img
+                      src={selectedObj.photo}
+                      alt={`Image ${selectedObj.name}`}
+                      width={40}
+                      height={40}
+                      style={{ width: 40, height: 40, objectFit: "cover" }}
+                      className="rounded-md"
+                    />
+                  ) : (
+                    <ImageFromBd
+                      id={selectedProduct}
+                      name={"preview"}
+                      size={40}
+                    />
+                  )}
+                </div>
+              );
+            })()}
+
           <select
             value={selectedProduct === -1 ? "" : String(selectedProduct)}
             onChange={(e) =>
@@ -56,7 +86,9 @@ export default function ProductsSection({
                 e.target.value === "" ? -1 : Number(e.target.value)
               )
             }
-            className="w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 pl-12 pr-10 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none"
+            className={`w-full rounded-xl border border-white/10 bg-white/5 text-slate-100 py-3 ${
+              selectedProduct !== -1 ? "pl-16" : "pl-12"
+            } pr-10 text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none`}
           >
             <option value="">{t("selectProduct")}</option>
             {productObjects
@@ -74,7 +106,9 @@ export default function ProductsSection({
           </select>
 
           <svg
-            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+            className={`pointer-events-none absolute ${
+              selectedProduct !== -1 ? "left-14" : "left-4"
+            } top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

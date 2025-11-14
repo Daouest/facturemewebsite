@@ -89,7 +89,7 @@ const fr = {
   downloadingCalendar: "Téléchargement...",
   calendarExportSuccess: "Calendrier téléchargé avec succès",
   calendarExportError: "Erreur lors du téléchargement du calendrier",
-  
+
   // Calendar Subscription
   calendarSubscription: "Abonnement au calendrier",
   calendarSubscriptionDescription: "Copiez ce lien et ajoutez-le à votre application de calendrier pour synchroniser automatiquement vos factures.",
@@ -174,6 +174,15 @@ const fr = {
   fillRequiredFields: "Veuillez remplir tous les champs requis.",
   clientAddedSuccess: "Client ajouté avec succès !",
 
+  // Clients catalogue / listing
+  clientsTitle: "Vos clients",
+  createClientTitle: "Créer un client",
+  noClientFound: "Aucun client trouvé",
+  createFirstClient: "Créez votre premier client pour commencer.",
+  newClientLabel: "Nouveau client",
+  clientsImmutableHint: "Pour des raisons de sécurité, les informations d’un client ne peuvent pas être modifiées.",
+  requiredFieldsAsterisk: "Tous les champs marqués d'un * sont obligatoires.",
+
   // Item Detail Page
   details: "Détails",
   loadingText: "Chargement...",
@@ -202,14 +211,14 @@ const fr = {
   custom: "Personnalisé",
   chooseInvoiceNumber: "Choisir un numéro de facture",
   enterInvoiceNumber: "Entrer un numéro de facture",
-  
+
   // Invoice Date Section
   invoiceDate: "Date de facture",
   currentDate: "Date actuelle",
   futureDate: "Date future",
   selectInvoiceDate: "Sélectionner une date de facture",
   dateMustBeTodayOrLater: "La date doit être aujourd'hui ou dans le futur",
-  
+
   products: "Produits",
   selectProduct: "Sélectionner un produit",
   add: "Ajouter",
@@ -232,7 +241,7 @@ const fr = {
   chooseClient: "Choisir un client",
   selectBusinessLabel: "Sélectionner une entreprise",
   chooseBusiness: "Choisir une entreprise",
-  
+
   // Invoice Type Selection
   invoiceType: "Type de facturation",
   withCompany: "Avec une entreprise",
@@ -431,6 +440,15 @@ const en = {
   fillRequiredFields: "Please fill in all required fields.",
   clientAddedSuccess: "Client added successfully!",
 
+  // Clients catalogue / listing
+  clientsTitle: "Your clients",
+  createClientTitle: "Create a client",
+  noClientFound: "No client found",
+  createFirstClient: "Create your first client to get started.",
+  newClientLabel: "New client",
+  clientsImmutableHint: "For security reasons, a client's information cannot be modified.",
+  requiredFieldsAsterisk: "All fields marked with * are required.",
+
   // Item Detail Page
   details: "Details",
   loadingText: "Loading...",
@@ -459,14 +477,14 @@ const en = {
   custom: "Custom",
   chooseInvoiceNumber: "Choose an invoice number",
   enterInvoiceNumber: "Enter an invoice number",
-  
+
   // Invoice Date Section
   invoiceDate: "Invoice Date",
   currentDate: "Current Date",
   futureDate: "Future Date",
   selectInvoiceDate: "Select an invoice date",
   dateMustBeTodayOrLater: "Date must be today or in the future",
-  
+
   products: "Products",
   selectProduct: "Select a product",
   add: "Add",
@@ -489,7 +507,7 @@ const en = {
   chooseClient: "Choose a client",
   selectBusinessLabel: "Select a business",
   chooseBusiness: "Choose a business",
-  
+
   // Invoice Type Selection
   invoiceType: "Invoice Type",
   withCompany: "With a company",

@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect, startTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ClientForm, Address } from "@/app/lib/definitions";
 import { createClient } from "@/app/lib/actions/clients-actions";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
-import AddressAutocomplete, { type AddressData } from "@/app/components/AddressAutocomplete";
+import AddressAutocomplete, {
+  type AddressData,
+} from "@/app/components/AddressAutocomplete";
 
 export default function Form() {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
+  const router = useRouter();
   const [isPending, setisPending] = useState(false);
   const [address, setAddress] = useState<Address>({
     idAddress: -1,
@@ -57,16 +61,21 @@ export default function Form() {
     setisPending(true);
     setMessage({ text: "", type: "" }); // Clear any previous message
 
-    // Simulate a delay
-    setTimeout(() => {
-      setisPending(false);
-      setMessage({ text: t("clientAddedSuccess"), type: "success" });
-
-      // action
-      createClient(formData);
-
-      // maybe reset form or navigate away
-    }, 1000);
+    // call server action and navigate when done
+    startTransition(async () => {
+      try {
+        await createClient(formData);
+        // push to clients catalogue so the page remounts and fetches fresh data
+        router.push("/clients-catalogue");
+      } catch (err) {
+        // If the server action throws a redirect or other error, still show success message
+        // and allow manual navigation by the user
+        console.error("Error creating client:", err);
+        setMessage({ text: t("clientAddedSuccess"), type: "success" });
+      } finally {
+        setisPending(false);
+      }
+    });
   };
 
   const isFormValid = () => {

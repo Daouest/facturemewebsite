@@ -7,6 +7,7 @@ import Sidebar from "@/app/components/Sidebar";
 import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import HintMessage from "@/app/components/HintMessage";
 
 export default function Page() {
   const { langage } = useLangageContext();
@@ -38,6 +39,8 @@ export default function Page() {
 
                 {/* Thin divider matching other pages */}
                 <div className="my-4 border-t border-white/10" />
+
+                <HintMessage>{t("clientsImmutableHint")}</HintMessage>
 
                 <Form />
               </div>

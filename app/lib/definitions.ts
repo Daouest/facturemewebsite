@@ -93,7 +93,7 @@ export type Client = {
     idUser: number,
     nomClient: string,
     idAddress: number,
-    isOnline?:boolean,
+    isOnline?: boolean,
 }
 
 export type ClientAffichage = {
@@ -104,10 +104,10 @@ export type ClientAffichage = {
 export type Ticket = {
     idClient: number;
     message: string;
-    isCompleted:string;
-    nomClient:string;
+    isCompleted: string;
+    nomClient: string;
     date: Date;
-    idTicket:number,
+    idTicket: number,
 };
 export type TableItemType = {
     idObjet: number,
@@ -139,6 +139,8 @@ export type ItemField = {
     id: number;
     name: string;
     type: 'product' | 'hourly';
+    // optional inline photo (base64 data URL or path) to avoid extra fetches
+    photo?: string | null;
 };
 
 // Extended type with pricing information for invoice calculations

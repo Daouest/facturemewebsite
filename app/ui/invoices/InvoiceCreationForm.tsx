@@ -24,10 +24,10 @@ import InvoiceTypeSelector from "@/app/ui/invoices/InvoiceTypeSelector";
 import { useLangageContext } from "@/app/context/langageContext";
 import InvoiceNumberSection from "@/app/ui/invoices/InvoiceNumberSection";
 import InvoiceDateSelector from "@/app/ui/invoices/InvoiceDateSelector";
-import ValidationWarning from "@/app/ui/invoices/ValidationWarning";
 import InvoiceSummary from "@/app/ui/invoices/InvoiceSummary";
 import ProductsSection from "@/app/ui/invoices/ProductsSection";
 import HourlyRatesSection from "@/app/ui/invoices/HourlyRatesSection";
+import HintMessage from "@/app/components/HintMessage";
 
 type Props = {
   customers: CustomerField[];
@@ -278,6 +278,10 @@ export default function Form({ customers, businesses, objects }: Props) {
           {t("createNewInvoice")}
         </h1>
       </div>
+      {/* Required fields hint */}
+      <div className="mb-4">
+        <HintMessage>{t("requiredFieldsAsterisk")}</HintMessage>
+      </div>
 
       {/* Card shell */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -310,6 +314,7 @@ export default function Form({ customers, businesses, objects }: Props) {
                     </span>
                     <h2 className="text-sm font-semibold text-slate-200">
                       {t("client")}
+                      <span className="ml-1 text-rose-300">*</span>
                     </h2>
                   </div>
                   <CustomerSelect
@@ -342,24 +347,25 @@ export default function Form({ customers, businesses, objects }: Props) {
                           stroke="currentColor"
                         >
                           <path
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 21h18M4.5 21V8.25A2.25 2.25 0 0 1 6.75 6h10.5A2.25 2.25 0 0 1 19.5 8.25V21M9 21V12h6v9"
-                        />
-                      </svg>
-                    </span>
-                    <h2 className="text-sm font-semibold text-slate-200">
-                      {t("business")}
-                    </h2>
-                  </div>
-                  <BusinessSelect
-                    businesses={businesses}
-                    value={form.businessId}
-                    onChange={(val) => updateField("businessId", val)}
-                    error={state.errors?.businessId}
-                  />
-                </section>
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 21h18M4.5 21V8.25A2.25 2.25 0 0 1 6.75 6h10.5A2.25 2.25 0 0 1 19.5 8.25V21M9 21V12h6v9"
+                          />
+                        </svg>
+                      </span>
+                      <h2 className="text-sm font-semibold text-slate-200">
+                        {t("business")}
+                        <span className="ml-1 text-rose-300">*</span>
+                      </h2>
+                    </div>
+                    <BusinessSelect
+                      businesses={businesses}
+                      value={form.businessId}
+                      onChange={(val) => updateField("businessId", val)}
+                      error={state.errors?.businessId}
+                    />
+                  </section>
                 )}
 
                 {/* Invoice Number Type */}
@@ -375,7 +381,9 @@ export default function Form({ customers, businesses, objects }: Props) {
                   dateType={form.dateType}
                   invoiceDate={form.invoiceDate}
                   onDateTypeChange={(value) => updateField("dateType", value)}
-                  onInvoiceDateChange={(value) => updateField("invoiceDate", value)}
+                  onInvoiceDateChange={(value) =>
+                    updateField("invoiceDate", value)
+                  }
                   errors={state.errors?.invoiceDate}
                 />
 
@@ -430,15 +438,17 @@ export default function Form({ customers, businesses, objects }: Props) {
                 )}
               </div>
 
-              {/* Validation Warning */}
-              <ValidationWarning
+              {/* Validation (show validation warning when form incomplete, otherwise show security hint) */}
+              <HintMessage
                 canSubmit={canSubmit}
                 customerId={form.customerId}
                 businessId={form.businessId}
                 invoiceType={form.invoiceType}
                 itemsCount={form.items.length}
                 t={t}
-              />
+              >
+                {t("clientsImmutableHint")}
+              </HintMessage>
 
               {/* Actions */}
               <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
