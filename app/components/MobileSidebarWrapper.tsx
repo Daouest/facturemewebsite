@@ -37,7 +37,7 @@ export default function MobileSidebarWrapper({
       {/* Sidebar */}
       <aside
         className={`
-          fixed lg:relative top-20 lg:top-0 left-0 
+          fixed lg:sticky top-20 lg:top-[96px] left-0 
           h-[calc(100vh-5rem)] lg:h-auto
           w-full lg:w-auto
           transform transition-transform duration-300 ease-in-out
@@ -48,7 +48,7 @@ export default function MobileSidebarWrapper({
           }
           z-50 lg:z-auto
           lg:flex-shrink-0
-          overflow-y-auto
+          overflow-y-auto lg:overflow-visible
         `}
       >
         {children}

@@ -367,19 +367,14 @@ export function Table<
               "hover:bg-white/10 hover:border-white/20 transition-colors",
               "focus:outline-none focus:ring-2 focus:ring-sky-400/30",
             ].join(" ")}
-            aria-label={`${t("invoice")} #${row.factureNumber} - ${
-              row.nomClient
-            }`}
+            aria-label={`${t("invoice")} #${row.factureNumber}`}
           >
             <div className="flex items-center justify-between gap-4">
-              {/* Left: client + invoice number */}
+              {/* Left: invoice number */}
               <div className="min-w-0">
                 <h4 className="text-base font-semibold text-slate-100 truncate">
-                  {t("clientName")}: {row.nomClient}
-                </h4>
-                <p className="text-xs text-slate-300/80">
                   {t("invoice")} #{row.factureNumber}
-                </p>
+                </h4>
               </div>
 
               {/* Right: meta */}

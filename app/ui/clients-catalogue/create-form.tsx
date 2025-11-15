@@ -65,14 +65,22 @@ export default function Form() {
     startTransition(async () => {
       try {
         await createClient(formData);
-        // push to clients catalogue so the page remounts and fetches fresh data
+        // The server action will redirect, but if it doesn't, we push manually
         router.push("/clients-catalogue");
-      } catch (err) {
-        // If the server action throws a redirect or other error, still show success message
-        // and allow manual navigation by the user
+      } catch (err: any) {
+        // Re-throw redirect errors (Next.js uses NEXT_REDIRECT)
+        if (err?.digest?.startsWith("NEXT_REDIRECT")) {
+          throw err;
+        }
+        // For other errors, show error message
         console.error("Error creating client:", err);
-        setMessage({ text: t("clientAddedSuccess"), type: "success" });
-      } finally {
+        setMessage({
+          text:
+            langage === "fr"
+              ? "Erreur lors de la création du client"
+              : "Error creating client",
+          type: "error",
+        });
         setisPending(false);
       }
     });

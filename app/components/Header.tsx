@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { LogOut, LogIn } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLangageContext } from "@/app/context/langageContext";
 
 export default function Header() {
   const { user, setUser } = useUser();
@@ -15,9 +16,14 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const { langage, setLangage } = useLangageContext();
 
   const isLoggedIn = !!(user?.id || user?.username || user?.email);
   const onAboutPage = pathname === "/about";
+
+  const changeLang = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLangage(e.target.value as "fr" | "en");
+  };
 
   const handleLogout = async () => {
     try {
@@ -53,7 +59,7 @@ export default function Header() {
           </div>
         </a>
 
-        <nav className="flex items-center gap-6 text-sm font-medium">
+        <nav className="flex items-center gap-3 sm:gap-6 text-sm font-medium">
           {/* Username (when logged in) */}
           {isLoggedIn && (
             <Link
@@ -63,6 +69,37 @@ export default function Header() {
               {user?.username?.toUpperCase() ?? ""}
             </Link>
           )}
+
+          {/* Language selector */}
+          <div className="relative">
+            <select
+              value={langage}
+              onChange={changeLang}
+              className="border border-white/20 bg-white/5 text-white rounded-md px-2 py-1 text-xs sm:text-sm outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 appearance-none pr-7"
+              aria-label="Choose language"
+            >
+              <option value="fr" className="bg-slate-900">
+                FR
+              </option>
+              <option value="en" className="bg-slate-900">
+                EN
+              </option>
+            </select>
+            <svg
+              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </div>
 
           {/* When NOT logged in:
               - if on About page, show "Connexion"
