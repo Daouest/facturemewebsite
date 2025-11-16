@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
 import { useLangageContext } from "../context/langageContext";
-import { createTranslator, getDateNow } from "@/app/lib/utils";
+import { createTranslator, getDateNow, setCacheImage, getCacheImage } from "@/app/lib/utils";
 import TextType from "./TextType";
 import { Button } from "@/components/ui/button";
 import { useSidebarContext } from "@/app/context/SidebarContext";
@@ -24,7 +24,7 @@ import {
 type SidebarProps = {
   showPageInAdmin?: boolean;
 };
-
+const urlImage = ["/default_user.png"];
 export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const { langage } = useLangageContext();
   const { user } = useUser();
@@ -32,12 +32,14 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   const { setShowPage } = useSidebarContext();
   const pathname = usePathname();
   const [businessLogo, setBusinessLogo] = useState<string | null>(null);
+  const [srcImage, setSrcImage] = useState<string>();
 
   const isActive = (path: string) => {
     return pathname === path || pathname?.startsWith(path + "/");
   };
 
   useEffect(() => {
+
     const fetchBusinessLogo = async () => {
       try {
         const response = await fetch("/api/profile/business");
@@ -51,17 +53,27 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
         console.error("Error fetching business logo:", error);
       }
     };
-
+   const getImageCached = async () => {
+      let cachedImage = await getCacheImage("userProfileImage");
+      if (!cachedImage) {
+          setCacheImage("userProfileImage", urlImage[0]);
+          cachedImage = await getCacheImage("userProfileImage");
+      }
+      setSrcImage(cachedImage ?? urlImage[0]);
+    }
     if (user) {
       fetchBusinessLogo();
+       getImageCached();
     }
+
+ 
   }, [user]);
 
   return (
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
       <div className="flex flex-col items-center">
         <Image
-          src={businessLogo || "/default_user.png"}
+          src={businessLogo || businessLogo ||srcImage ||urlImage[0]}
           alt="profile"
           width={96}
           height={96}
@@ -73,7 +85,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
             text={[
               user?.firstName
                 ? user.firstName.charAt(0).toUpperCase() +
-                  user.firstName.slice(1, 10)
+                user.firstName.slice(1, 10)
                 : "",
             ]}
             className="font-semibold text-slate-100"
@@ -94,11 +106,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
       <nav className="w-full flex flex-col gap-2">
         <Link
           href="/homePage"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/homePage")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/homePage")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <Home className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("home")}</span>
@@ -106,11 +117,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/item/items-archives"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/item/items-archives") || isActive("/invoices")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/item/items-archives") || isActive("/invoices")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("invoices")}</span>
@@ -118,13 +128,12 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/item/item-catalogue"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/item/item-catalogue") ||
-            isActive("/item/creation-item") ||
-            isActive("/item/detail")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/item/item-catalogue") ||
+              isActive("/item/creation-item") ||
+              isActive("/item/detail")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <Package className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("catalogue")}</span>
@@ -132,11 +141,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/hourlyRates"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/hourlyRates")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/hourlyRates")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <Package className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("hourlyRatePage")}</span>
@@ -144,11 +152,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/clients-catalogue"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/clients-catalogue")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/clients-catalogue")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <Users className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("myClients")}</span>
@@ -156,11 +163,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/calendar"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/calendar")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/calendar")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <Calendar className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("calendar")}</span>
@@ -168,11 +174,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
 
         <Link
           href="/profile"
-          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-            isActive("/profile")
+          className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/profile")
               ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
               : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-          }`}
+            }`}
         >
           <UserCircle className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{t("profile")}</span>
@@ -183,11 +188,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
             {!showPageInAdmin && (
               <Link
                 href="/admin"
-                className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
-                  isActive("/admin")
+                className={`flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${isActive("/admin")
                     ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
                     : "text-slate-200 bg-white/0 hover:bg-white/10 border-transparent hover:border-white/10"
-                }`}
+                  }`}
               >
                 {t("admin_section")}
               </Link>

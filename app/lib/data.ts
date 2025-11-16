@@ -936,3 +936,42 @@ export async function getAllUsers() {
         return null;
     }
 }
+
+
+export async function updateFactureUser(idFacture: number, status:boolean,isPaid:boolean) {
+  try {
+    // console.log("status", status);
+
+    await connectToDatabase();
+
+    const existingFacture = await DbFacture.findOne({ idFacture: idFacture });
+    if (!existingFacture) {
+      console.error("Facture non trouvé ou vous n'avez pas la permission de le modifier");
+      return { success: false };
+    }
+
+    const facture = await getFactureData(idFacture);
+    if (!facture) {
+      console.error("Facture non trouvé");
+      return { success: false };
+    }
+
+    const updateData = await DbTicket.findOneAndUpdate(
+      { idFacture },
+      {
+        $set: {
+          isActive: status,
+          isPaid: isPaid
+        },
+      },
+      { new: true } // renvoie le ticket mis à jour
+    );
+
+    console.log("Facture modifiée", updateData);
+    return { success: true, facture: updateData };
+
+  } catch (err) {
+    console.error("Erreur dans le controller updateFactureUser:", err);
+    return { success: false };
+  }
+}

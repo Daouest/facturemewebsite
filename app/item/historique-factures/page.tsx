@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -23,12 +23,22 @@ export default function HistoricInvoices() {
   const [sorterByFactureNumber, setSorterByFactureNumber] = useState(false);
   const [sorterByDate, setSorterByDate] = useState(false);
   const [sortByPaidInvoice, setSortByPaidInvoice] = useState(false);
+  const etagRef = useRef<string |null>(null);
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
 
   const fetchData = async () => {
-    const res = await fetch(`/api/histories-invoices`);
+    const res = await fetch(`/api/histories-invoices`, {
+      cache: "no-cache",
+      headers: {
+        "if-None-Match": etagRef.current ?? "",
+      },
+    });
     const data = await res.json();
+    const newEtag = res.headers.get("Etag");
+
+    if (newEtag) etagRef.current = newEtag;
+
     const tableRows: Facture[] = data.map((facture: any) => ({
       idFacture: facture.idFacture,
       idUser: facture.idUser,
@@ -39,7 +49,11 @@ export default function HistoricInvoices() {
       idClient: facture.clientInfo?.idClient,
       nomClient: facture.clientInfo?.nomClient,
     }));
-    return tableRows ?? [];
+
+     if (res.status === 304) {
+      throw new Error("Pas modifié");
+    }
+      return tableRows ?? [];
   };
 
   const {

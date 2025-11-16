@@ -348,3 +348,15 @@ export function showLongText(message: string) {
     return udpdateMessage;
 }
 
+
+export function setCacheImage(key:string,url:string){
+    try{
+        localStorage.setItem(key,url);
+    }catch(err){
+        console.error("Erreur in settin the cache for image",err)
+    }
+}
+
+export async function getCacheImage(key:string){
+    return  localStorage.getItem(key) ?? null;
+}

@@ -117,7 +117,27 @@ export function Table<
     return res.json();
   };
 
-  const mutation = useMutation({
+  
+  const handleUpdateFacture = async ({
+    idFacture,
+    status,
+    isPaid,
+  }: {
+    idFacture: number;
+    status: boolean;
+    isPaid: boolean;
+  }) => {
+    const res = await fetch("/api/items-archives", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idFacture, status, isPaid }),
+    });
+    if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+    return res.json();
+  };
+
+
+  const mutationTicket = useMutation({
     mutationFn: handleChangeStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
@@ -127,8 +147,22 @@ export function Table<
     },
   });
 
-  const update = (idClient: number, idTicket: number, status: boolean) => {
-    mutation.mutate({ idClient, idTicket, status });
+  const mutationFacture = useMutation({
+    mutationFn: handleUpdateFacture,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["archivedFactures"] });
+    },
+    onError: (error) => {
+      console.error("Erreur de la modification d'une Facture :", error);
+    },
+  });
+
+  const updateTicket =(idClient: number, idTicket: number, status: boolean) => {
+    mutationTicket.mutate({ idClient, idTicket, status });
+  };
+  
+  const updateFactutre =(idFacture: number, status: boolean,isPaid:boolean) => {
+    mutationFacture.mutate({ idFacture, status,isPaid });
   };
 
   if (!rows || rows.length === 0) return null;
@@ -190,8 +224,8 @@ export function Table<
               ? "Créez votre premier produit pour commencer."
               : "Create your first product to get started."
             : langage === "fr"
-            ? "Ajoutez des éléments pour les voir apparaître ici."
-            : "Add items to see them here."}
+              ? "Ajoutez des éléments pour les voir apparaître ici."
+              : "Add items to see them here."}
         </p>
         {type === "items" && (
           <Link
@@ -387,20 +421,22 @@ export function Table<
                 <div className="text-xs text-slate-300/80 whitespace-nowrap">
                   {dateToSting(row.dateFacture)}
                 </div>
-                <div
+                <Button
                   className={[
                     "text-sm font-semibold whitespace-nowrap",
                     row.isPaid ? "text-emerald-300" : "text-rose-300",
                   ].join(" ")}
+
+                  onClick={()=>{updateFactutre(row.idFacture,!row.isActive,!row.isPaid)}}// change the status and put them directly to invoice history
                 >
                   {row.isPaid
                     ? langage === "fr"
                       ? "PAYÉE"
                       : "PAID"
                     : langage === "fr"
-                    ? "NON PAYÉE"
-                    : "UNPAID"}
-                </div>
+                      ? "NON PAYÉE"
+                      : "UNPAID"}
+                </Button>
               </div>
             </div>
           </button>
@@ -462,7 +498,7 @@ export function Table<
                       ...isClick,
                       ticketStatus: !isClick.ticketStatus,
                     });
-                    update(row.idClient, row.idTicket, !isClick.ticketStatus);
+                    updateTicket(row.idClient, row.idTicket, !isClick.ticketStatus);
                   }}
                 >
                   {row.isCompleted ? (

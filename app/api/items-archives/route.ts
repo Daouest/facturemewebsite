@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
   getAllFacturesUsers,
-  getLastFacture
+  getLastFacture,
+  updateFactureUser,
 } from "@/app/lib/data";
 import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
 
@@ -37,12 +38,12 @@ export async function GET(req: NextRequest) {
     //  Vérification du cache côté client
     const clientEtag = req.headers.get("if-none-match");
 
-    const hasChangedForAccueil = isLastFacturesRequested 
     const isCacheValid =
       clientEtag === lastFactureDate &&
       filterByPaid == null &&
-      !hasChangedForAccueil &&
+      isLastFacturesRequested &&
       (!sortBy || sortBy === "false");
+    // console.log("isCacheValid",isCacheValid)
 
     if (isCacheValid) {
       return new NextResponse(null, { status: 304 });
@@ -55,6 +56,37 @@ export async function GET(req: NextRequest) {
     return response;
   } catch (error) {
     console.error("Erreur API getAllFacturesUsers:", error);
+    return NextResponse.json(
+      { success: false, message: "Erreur serveur" },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function PUT(request: NextRequest) {
+  try {
+
+    const body = await request.json();
+    const idFacture = parseInt(body.idFacture);
+    const isPaid =  body.isPaid;
+    const status = body.status;
+
+
+    const result = await updateFactureUser(idFacture,status,isPaid);
+
+    if (!result.success) {
+      return NextResponse.json(result, { status: 500 });
+    }
+
+
+    console.log("facture", result.facture);
+
+    return NextResponse.json(result.facture ?? [], { status: 200 });
+
+
+  } catch (error) {
+    console.error("Erreur API PUT for updateFactureUser :", error);
     return NextResponse.json(
       { success: false, message: "Erreur serveur" },
       { status: 500 }
