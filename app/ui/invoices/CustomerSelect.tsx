@@ -1,4 +1,6 @@
 import { CustomerField } from "@/app/lib/definitions";
+import { createTranslator } from "@/app/lib/utils";
+import { useLangageContext } from "@/app/context/langageContext";
 
 export default function CustomerSelect({
   customers,
@@ -11,12 +13,14 @@ export default function CustomerSelect({
   onChange: (val: string) => void;
   error?: string[];
 }) {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
   const hasError = !!error && error.length > 0;
   const errorId = "customer-error";
 
   return (
-    <div>
-      <div className="relative">
+    <div className="flex gap-3">
+      <div className="relative flex-1">
         <select
           id="customer"
           name="customerId"
@@ -35,7 +39,7 @@ export default function CustomerSelect({
           ].join(" ")}
         >
           <option value="" disabled>
-            Sélectionner un client
+            {t("selectClientLabel")}
           </option>
           {customers.map((customer) => (
             <option key={customer.id} value={customer.id}>

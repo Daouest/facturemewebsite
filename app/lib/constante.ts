@@ -1,11 +1,14 @@
 
 const fr = {
-        ticket:"Tickets",
+  ticket: "Tickets",
   hello: "Bonjour",
   home: "Accueil",
   info: "FAQs",
   users: "Utilisateurs",
-  admin_section:"Séction admin",
+  admin_section: "Séction admin",
+  aboutUs: "À propos",
+  faq: "FAQ",
+  tagline: "Vite fait bien fait!",
   historicInvoices: " Historique des factures",
   sortByDate: "Date",
   sortByPaidInvoice: "Non payée",
@@ -68,7 +71,41 @@ const fr = {
   clientManagement: "Mes clients",
   calendar: "Calendrier",
 
+  // PDF
+  invoiceGeneratedBy: "Facture générée par FactureMe",
+  invoiceTitle: "FACTURE",
+  from: "De",
+  to: "À",
+  hourlyServices: "Services horaires",
+  position: "Position",
+  ratePerHour: "Taux/h",
+  hours: "Heures",
+  productsServices: "Produits/Services",
+  product: "Produit",
+  quantity: "Qté",
+  unitPrice: "Prix unit.",
+  subtotal: "Sous-total",
+
   today: "Aujourd'hui",
+  downloadCalendar: "Télécharger le calendrier",
+  exportToCalendar: "Exporter vers calendrier",
+  downloadingCalendar: "Téléchargement...",
+  calendarExportSuccess: "Calendrier téléchargé avec succès",
+  calendarExportError: "Erreur lors du téléchargement du calendrier",
+
+  // Calendar Subscription
+  calendarSubscription: "Abonnement au calendrier",
+  calendarSubscriptionDescription: "Copiez ce lien et ajoutez-le à votre application de calendrier pour synchroniser automatiquement vos factures.",
+  tokenExpiresIn: "Ce lien expire dans 30 jours",
+  copied: "Copié",
+  copyLink: "Copier le lien",
+  howToSubscribe: "Comment s'abonner :",
+  subscriptionInstructionsCopy: "Copiez le lien ci-dessus",
+  subscriptionInstructionsCalendarApp: "Ajoutez-le comme calendrier par URL dans votre application (Outlook, Google Calendar, Apple Calendar, etc.)",
+  subscriptionInstructionsAutoUpdate: "Votre calendrier se mettra à jour automatiquement avec vos factures",
+  loadingSubscription: "Génération du lien d'abonnement...",
+  subscriptionGenerationError: "Erreur lors de la génération du lien d'abonnement",
+  retry: "Réessayer",
 
   //LANGAGE
   chooseLanguage: "choisir une langue",
@@ -138,18 +175,107 @@ const fr = {
   addingClient: "Ajout...",
   addClientButton: "Ajouter le client",
   fillRequiredFields: "Veuillez remplir tous les champs requis.",
-  clientAddedSuccess: "Client ajouté avec succès !"
+  clientAddedSuccess: "Client ajouté avec succès !",
+
+  // Clients catalogue / listing
+  clientsTitle: "Vos clients",
+  createClientTitle: "Créer un client",
+  noClientFound: "Aucun client trouvé",
+  createFirstClient: "Créez votre premier client pour commencer.",
+  newClientLabel: "Nouveau client",
+  clientsImmutableHint: "Pour des raisons de sécurité, les informations d’un client ne peuvent pas être modifiées.",
+  requiredFieldsAsterisk: "Tous les champs marqués d'un * sont obligatoires.",
+
+  // Item Detail Page
+  details: "Détails",
+  loadingText: "Chargement...",
+  errorLoadingItem: "Erreur dans le chargement de l'item",
+  message: "Message",
+  noFieldsModified: "Erreur dans le formulaire: aucun champs modifié",
+  itemName: "Nom de l'item",
+  modifyImage: "Modifier l'image",
+  change: "Changer",
+  modify: "Modifier",
+  return: "Retour",
+  deleteItem: "Supprimer",
+
+  // Invoice Creation Validation
+  pleaseCompleteFields: "Veuillez compléter les champs suivants :",
+  selectClient: "Sélectionner un client",
+  selectBusiness: "Sélectionner une entreprise",
+  addAtLeastOneItem: "Ajouter au moins un produit ou taux horaire",
+
+  // Invoice Creation Form
+  createNewInvoice: "Créer une nouvelle facture",
+  client: "Client",
+  business: "Entreprise",
+  invoiceNumber: "Numéro de facture",
+  automatic: "Automatique",
+  custom: "Personnalisé",
+  chooseInvoiceNumber: "Choisir un numéro de facture",
+  enterInvoiceNumber: "Entrer un numéro de facture",
+
+  // Invoice Date Section
+  invoiceDate: "Date de facture",
+  currentDate: "Date actuelle",
+  futureDate: "Date future",
+  selectInvoiceDate: "Sélectionner une date de facture",
+  dateMustBeTodayOrLater: "La date doit être aujourd'hui ou dans le futur",
+
+  products: "Produits",
+  selectProduct: "Sélectionner un produit",
+  add: "Ajouter",
+  hourlyRate: "Taux horaire",
+  selectHourlyRate: "Sélectionner un taux",
+  cancel: "Annuler",
+  createInvoice: "Créer la facture",
+  creating: "Création...",
+  missing: "Manquant",
+
+  // Invoice Summary
+  invoiceSummary: "Résumé facture",
+  items: "Articles",
+  numbering: "Numérotation",
+  total: "Total",
+
+  // Customer Business Section
+  clientAndBusiness: "Client et Entreprise",
+  selectClientLabel: "Sélectionner un client",
+  chooseClient: "Choisir un client",
+  selectBusinessLabel: "Sélectionner une entreprise",
+  chooseBusiness: "Choisir une entreprise",
+
+  // Invoice Type Selection
+  invoiceType: "Type de facturation",
+  withCompany: "Avec une entreprise",
+  withPersonalAddress: "Avec mon adresse personnelle",
+  companyInvoice: "Facture d'entreprise",
+  personalInvoice: "Facture personnelle",
+
+  // Address autocomplete
+  addressRequired: "L'adresse est requise",
+  cityRequired: "La ville est requise",
+  provinceRequired: "La province est requise",
+  postalCodeRequired: "Le code postal est requis",
+  countryRequired: "Le pays est requis",
+
+  // Address management
+  addressInformation: "Informations d'adresse",
+  saveAddress: "Enregistrer l'adresse"
 } as const;
 
 
 const en = {
-        ticket:"Tickets",
+  ticket: "Tickets",
   users: "Users",
 
   hello: "Hi",
   home: "Home",
   info: "FAQs",
-  admin_section:"Admin section",
+  admin_section: "Admin section",
+  aboutUs: "About us",
+  faq: "FAQ",
+  tagline: "Quick and well done!",
   historicInvoices: "Invoice histories",
   sortByDate: "Sort by date",
   sortByNumber: "Sort by facture number",
@@ -213,7 +339,41 @@ const en = {
   clientManagement: "My clients",
   calendar: "Calendar",
 
+  // PDF
+  invoiceGeneratedBy: "Invoice generated by FactureMe",
+  invoiceTitle: "INVOICE",
+  from: "From",
+  to: "To",
+  hourlyServices: "Hourly Services",
+  position: "Position",
+  ratePerHour: "Rate/h",
+  hours: "Hours",
+  productsServices: "Products/Services",
+  product: "Product",
+  quantity: "Qty",
+  unitPrice: "Unit Price",
+  subtotal: "Subtotal",
+
   today: "Today",
+  downloadCalendar: "Download Calendar",
+  exportToCalendar: "Export to Calendar",
+  downloadingCalendar: "Downloading...",
+  calendarExportSuccess: "Calendar downloaded successfully",
+  calendarExportError: "Error downloading calendar",
+
+  // Calendar Subscription
+  calendarSubscription: "Calendar Subscription",
+  calendarSubscriptionDescription: "Copy this link and add it to your calendar application to automatically sync your invoices.",
+  tokenExpiresIn: "This link expires in 30 days",
+  copied: "Copied",
+  copyLink: "Copy Link",
+  howToSubscribe: "How to subscribe:",
+  subscriptionInstructionsCopy: "Copy the link above",
+  subscriptionInstructionsCalendarApp: "Add it as a calendar by URL in your application (Outlook, Google Calendar, Apple Calendar, etc.)",
+  subscriptionInstructionsAutoUpdate: "Your calendar will automatically update with your invoices",
+  loadingSubscription: "Generating subscription link...",
+  subscriptionGenerationError: "Error generating subscription link",
+  retry: "Retry",
 
   invoice: "Invoice",
   //langage
@@ -284,7 +444,93 @@ const en = {
   addingClient: "Adding...",
   addClientButton: "Add Client",
   fillRequiredFields: "Please fill in all required fields.",
-  clientAddedSuccess: "Client added successfully!"
+  clientAddedSuccess: "Client added successfully!",
+
+  // Clients catalogue / listing
+  clientsTitle: "Your clients",
+  createClientTitle: "Create a client",
+  noClientFound: "No client found",
+  createFirstClient: "Create your first client to get started.",
+  newClientLabel: "New client",
+  clientsImmutableHint: "For security reasons, a client's information cannot be modified.",
+  requiredFieldsAsterisk: "All fields marked with * are required.",
+
+  // Item Detail Page
+  details: "Details",
+  loadingText: "Loading...",
+  errorLoadingItem: "Error loading item",
+  message: "Message",
+  noFieldsModified: "Form error: no fields modified",
+  itemName: "Item name",
+  modifyImage: "Modify image",
+  change: "Change",
+  modify: "Modify",
+  return: "Return",
+  deleteItem: "Delete",
+
+  // Invoice Creation Validation
+  pleaseCompleteFields: "Please complete the following fields:",
+  selectClient: "Select a client",
+  selectBusiness: "Select a business",
+  addAtLeastOneItem: "Add at least one product or hourly rate",
+
+  // Invoice Creation Form
+  createNewInvoice: "Create a new invoice",
+  client: "Client",
+  business: "Business",
+  invoiceNumber: "Invoice Number",
+  automatic: "Automatic",
+  custom: "Custom",
+  chooseInvoiceNumber: "Choose an invoice number",
+  enterInvoiceNumber: "Enter an invoice number",
+
+  // Invoice Date Section
+  invoiceDate: "Invoice Date",
+  currentDate: "Current Date",
+  futureDate: "Future Date",
+  selectInvoiceDate: "Select an invoice date",
+  dateMustBeTodayOrLater: "Date must be today or in the future",
+
+  products: "Products",
+  selectProduct: "Select a product",
+  add: "Add",
+  hourlyRate: "Hourly Rate",
+  selectHourlyRate: "Select a rate",
+  cancel: "Cancel",
+  createInvoice: "Create Invoice",
+  creating: "Creating...",
+  missing: "Missing",
+
+  // Invoice Summary
+  invoiceSummary: "Invoice Summary",
+  items: "Items",
+  numbering: "Numbering",
+  total: "Total",
+
+  // Customer Business Section
+  clientAndBusiness: "Client and Business",
+  selectClientLabel: "Select a client",
+  chooseClient: "Choose a client",
+  selectBusinessLabel: "Select a business",
+  chooseBusiness: "Choose a business",
+
+  // Invoice Type Selection
+  invoiceType: "Invoice Type",
+  withCompany: "With a company",
+  withPersonalAddress: "With my personal address",
+  companyInvoice: "Company invoice",
+  personalInvoice: "Personal invoice",
+
+  // Address autocomplete
+  addressRequired: "Address is required",
+  cityRequired: "City is required",
+  provinceRequired: "Province is required",
+  postalCodeRequired: "Postal code is required",
+  countryRequired: "Country is required",
+
+  // Address management
+  addressInformation: "Address Information",
+  saveAddress: "Save Address"
 }
 
 type TranslationKey = keyof typeof fr;

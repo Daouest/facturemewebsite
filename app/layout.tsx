@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { FormDataProvider } from "@/app/context/FormContext";
-import {HourlyFormDataProvider} from "@/app/context/HourlyRateFormContext";
+import { HourlyFormDataProvider } from "@/app/context/HourlyRateFormContext";
 import { AppUser, UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
 import { getUserFromCookies } from "./lib/session/session-node";
@@ -42,22 +42,23 @@ export default async function RootLayout({
         email: raw.email,
         firstName: raw.firstName,
         lastName: raw.lastName,
+        isAdmin: raw.isAdmin ?? false,
       }
     : undefined;
 
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-blue-900 to-indigo-950`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-blue-900 to-indigo-950 flex flex-col`}
       >
         <UserProvider initialUser={user}>
           <LangageProvider>
             <SidebarProvider>
-            <FormDataProvider>
-              <HourlyFormDataProvider>
-              <ReactQueryWrapper>{children}</ReactQueryWrapper>
-              </HourlyFormDataProvider>
-            </FormDataProvider>
+              <FormDataProvider>
+                <HourlyFormDataProvider>
+                  <ReactQueryWrapper>{children}</ReactQueryWrapper>
+                </HourlyFormDataProvider>
+              </FormDataProvider>
             </SidebarProvider>
           </LangageProvider>
         </UserProvider>

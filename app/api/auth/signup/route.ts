@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/app/lib/db/mongodb";
 import bcrypt from "bcryptjs";
-import { DbUsers } from "@/app/lib/models";
+import { DbUsers, DbAddress } from "@/app/lib/models";
 import { SignupSchema } from "@/app/lib/schemas/auth";
 import { APP_URL } from "@/app/lib/schemas/env";
 import { getNextSeq } from "@/app/lib/db/getNextSeq";
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         }
 
         //check
-        const { username, firstName, lastName, email, password } = parsed.data;
+        const { username, firstName, lastName, email, password, address } = parsed.data;
 
         const userExists = await DbUsers.findOne({ $or: [{ email }, { username }] });
 
@@ -64,6 +64,18 @@ export async function POST(req: Request) {
         const db = mongoose.connection.db as unknown as Db;
         const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
 
+        // Create address first
+        const idAddress = await getNextSeq(counters, "addresses");
+        const addressDoc = await DbAddress.create({
+            idAddress,
+            address: address.address,
+            city: address.city,
+            province: address.province,
+            zipCode: address.zipCode,
+            country: address.country,
+        });
+
+        // Then create user with address reference
         const idUser = await getNextSeq(counters, "users");
         const hash = await bcrypt.hash(password, 12);
 
@@ -74,14 +86,11 @@ export async function POST(req: Request) {
             lastName,
             email,
             password: hash,
-            // idAddress,
-            // idBusiness: null,
-            // isActive: true,
-            // isAdmin: false,
-            // paidAcces: false,
+            idAddress: idAddress,
         });
 
         console.log("[SIGNUP] User created successfully:", user._id.toString());
+        console.log("[SIGNUP] Address created successfully:", addressDoc._id.toString());
 
         // Send confirmation email
         try {

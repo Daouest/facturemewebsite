@@ -1,16 +1,21 @@
 "use client";
 
 import { useState, useEffect, startTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ClientForm, Address } from "@/app/lib/definitions";
 import { createClient } from "@/app/lib/actions/clients-actions";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
+import AddressAutocomplete, {
+  type AddressData,
+} from "@/app/components/AddressAutocomplete";
 
 export default function Form() {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
+  const router = useRouter();
   const [isPending, setisPending] = useState(false);
   const [address, setAddress] = useState<Address>({
     idAddress: -1,
@@ -56,16 +61,29 @@ export default function Form() {
     setisPending(true);
     setMessage({ text: "", type: "" }); // Clear any previous message
 
-    // Simulate a delay
-    setTimeout(() => {
-      setisPending(false);
-      setMessage({ text: t("clientAddedSuccess"), type: "success" });
-
-      // action
-      createClient(formData);
-
-      // maybe reset form or navigate away
-    }, 1000);
+    // call server action and navigate when done
+    startTransition(async () => {
+      try {
+        await createClient(formData);
+        // The server action will redirect, but if it doesn't, we push manually
+        router.push("/clients-catalogue");
+      } catch (err: any) {
+        // Re-throw redirect errors (Next.js uses NEXT_REDIRECT)
+        if (err?.digest?.startsWith("NEXT_REDIRECT")) {
+          throw err;
+        }
+        // For other errors, show error message
+        console.error("Error creating client:", err);
+        setMessage({
+          text:
+            langage === "fr"
+              ? "Erreur lors de la création du client"
+              : "Error creating client",
+          type: "error",
+        });
+        setisPending(false);
+      }
+    });
   };
 
   const isFormValid = () => {
@@ -137,66 +155,26 @@ export default function Form() {
               {t("clientAddressLabel")}
             </p>
 
-            {/*Premier ligne: addresse, ville*/}
-            <div className="flex flex-col md:flex-row w-full gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("addressLabel")}
-                </label>
-                <input
-                  required
-                  placeholder={t("addressPlaceholder")}
-                  onChange={(e) =>
-                    setAddress({ ...address, address: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("cityLabel")}
-                </label>
-                <input
-                  required
-                  pattern="^[^\d]+$"
-                  placeholder={t("cityPlaceholder")}
-                  onChange={(e) =>
-                    setAddress({ ...address, city: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-            </div>
-
-            {/*Seconde ligne: code postal, province*/}
-            <div className="flex flex-col md:flex-row w-full gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("postalCodeLabel")}
-                </label>
-                <input
-                  required
-                  placeholder={t("postalCodePlaceholder")}
-                  value={address.zipCode}
-                  minLength={6}
-                  maxLength={7}
-                  pattern="^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$"
-                  onChange={(e) =>
-                    setAddress({ ...address, zipCode: e.target.value })
-                  }
-                  className="w-full bg-white/10 backdrop-blur rounded-xl border border-white/20 py-3 pl-5 text-sm text-slate-100 placeholder:text-slate-400 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-2">
-                <label className="text-sm font-semibold text-slate-300 sm:w-28 sm:mr-3 whitespace-nowrap">
-                  {t("provinceLabel")}
-                </label>
-                <Provinces
-                  value={address.province}
-                  onChange={(province) => setAddress({ ...address, province })}
-                />
-              </div>
-            </div>
+            <AddressAutocomplete
+              onAddressSelect={(addressData: AddressData) => {
+                setAddress({
+                  ...address,
+                  address: addressData.address,
+                  city: addressData.city,
+                  province: addressData.province,
+                  zipCode: addressData.zipCode,
+                  country: addressData.country,
+                });
+              }}
+              initialAddress={{
+                address: address.address,
+                city: address.city,
+                province: address.province,
+                zipCode: address.zipCode,
+                country: address.country,
+              }}
+              variant="profile"
+            />
           </div>
 
           {/*Boutons de soumission*/}

@@ -14,6 +14,9 @@ export type InvoiceCreationFormState = {
         customerId?: string[];
         number?: string[];
         businessId?: string[];
+        invoiceType?: string[];
+        dateType?: string[];
+        invoiceDate?: string[];
         items?: { [itemIndex: number]: { [field: string]: string[] } };
         general?: string[];
     };
@@ -87,8 +90,17 @@ export async function createInvoice(prevState: InvoiceCreationFormState, formDat
 
     // Prepare invoice data
     const idFacture = nextId;
-    const dateFacture = new Date();
+    
+    // Determine date based on dateType
+    const dateFacture = invoiceForm.dateType === 'future' && invoiceForm.invoiceDate
+        ? new Date(invoiceForm.invoiceDate)
+        : new Date();
+    
     const idClient = Number(invoiceForm.customerId);
+    const idBusiness = invoiceForm.invoiceType === 'company' && invoiceForm.businessId 
+        ? Number(invoiceForm.businessId) 
+        : undefined;
+    const isBusinessInvoice = invoiceForm.invoiceType === 'company';
 
     // Determine typeFacture based on item types
     const hasProducts = productIds.length > 0;
@@ -131,8 +143,9 @@ export async function createInvoice(prevState: InvoiceCreationFormState, formDat
                 includesTaxes: false,
                 isActive: true,
                 isPaid: false,
-                isBusinessInvoice: false,
-                idClient
+                isBusinessInvoice: isBusinessInvoice,
+                idClient,
+                ...(idBusiness !== undefined && { idBusiness })
             });
 
             await facture.save({ session });

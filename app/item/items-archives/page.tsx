@@ -9,6 +9,7 @@ import ActionsCard from "@/app/components/ActionsCard";
 import { Table } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import { Facture } from "@/app/lib/definitions";
 import {
   createTranslator,
@@ -24,6 +25,9 @@ export default function ItemCatalogue() {
   const [sorterByFactureNumber, setSorterByFactureNumber] = useState(false);
   const [sorterByDate, setSorterByDate] = useState(false);
   const [sortByPaidInvoice, setSortByPaidInvoice] = useState(false);
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(
+    new Set()
+  );
 
   const etagRef = useRef<string | null>(null);
   const countRef = useRef<string | null>(null);
@@ -100,7 +104,43 @@ export default function ItemCatalogue() {
       return getFacturesUsersByDate(archivedFactures ?? []);
     }
     return archivedFactures;
-  }, [archivedFactures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
+  }, [
+    archivedFactures,
+    sorterByFactureNumber,
+    sortByPaidInvoice,
+    sorterByDate,
+  ]);
+
+  // Group invoices by client
+  const groupedByClient = useMemo(() => {
+    if (!sortedFactures || sortedFactures.length === 0) return {};
+
+    const groups: { [key: string]: Facture[] } = {};
+
+    sortedFactures.forEach((facture) => {
+      const clientName =
+        facture.nomClient ||
+        (langage === "fr" ? "Client inconnu" : "Unknown client");
+      if (!groups[clientName]) {
+        groups[clientName] = [];
+      }
+      groups[clientName].push(facture);
+    });
+
+    return groups;
+  }, [sortedFactures, langage]);
+
+  const toggleClient = (clientName: string) => {
+    setExpandedClients((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(clientName)) {
+        newSet.delete(clientName);
+      } else {
+        newSet.add(clientName);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <>
@@ -138,8 +178,44 @@ export default function ItemCatalogue() {
                         />
                       </div>
                     ) : (
-                      <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar">
-                        <Table rows={sortedFactures ?? []} />
+                      <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar space-y-6">
+                        {Object.keys(groupedByClient).length === 0 ? (
+                          <p className="text-slate-400 text-center py-4">
+                            {langage === "fr"
+                              ? "Aucune facture trouvée"
+                              : "No invoices found"}
+                          </p>
+                        ) : (
+                          Object.entries(groupedByClient)
+                            .sort(([clientA], [clientB]) =>
+                              clientA.localeCompare(clientB)
+                            )
+                            .map(([clientName, invoices]) => {
+                              const isExpanded =
+                                expandedClients.has(clientName);
+                              return (
+                                <div key={clientName} className="space-y-2">
+                                  <button
+                                    onClick={() => toggleClient(clientName)}
+                                    className="w-full text-left text-lg font-semibold text-sky-300 px-4 py-3 sticky top-0 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur rounded-lg border border-white/10 hover:border-sky-400/40 hover:bg-sky-500/5 transition-all duration-200 flex items-center justify-between group"
+                                  >
+                                    <span className="truncate">
+                                      {clientName.length > 20
+                                        ? clientName.substring(0, 20) + "..."
+                                        : clientName}{" "}
+                                      ({invoices.length})
+                                    </span>
+                                    <ChevronDown
+                                      className={`w-5 h-5 transition-transform duration-200 text-sky-400 group-hover:text-sky-300 flex-shrink-0 ${
+                                        isExpanded ? "rotate-180" : ""
+                                      }`}
+                                    />
+                                  </button>
+                                  {isExpanded && <Table rows={invoices} />}
+                                </div>
+                              );
+                            })
+                        )}
                       </div>
                     )}
                   </div>
@@ -211,7 +287,9 @@ export default function ItemCatalogue() {
               {/* Mobile switches - below the table */}
               <div
                 className={`${
-                  archivedFactures && archivedFactures?.length > 0 ? "flex" : "hidden"
+                  archivedFactures && archivedFactures?.length > 0
+                    ? "flex"
+                    : "hidden"
                 } md:hidden flex-col gap-4 mt-6 px-6`}
               >
                 <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 backdrop-blur px-4 py-3">

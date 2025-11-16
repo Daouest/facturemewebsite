@@ -1,4 +1,6 @@
 import { BusinessField } from "@/app/lib/definitions";
+import { createTranslator } from "@/app/lib/utils";
+import { useLangageContext } from "@/app/context/langageContext";
 
 export default function BusinessSelect({
   businesses,
@@ -11,12 +13,14 @@ export default function BusinessSelect({
   onChange: (val: string) => void;
   error?: string[];
 }) {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
   const hasError = !!error && error.length > 0;
   const errorId = "business-error";
 
   return (
-    <div>
-      <div className="relative">
+    <div className="flex gap-3">
+      <div className="relative flex-1">
         <select
           id="business"
           name="businessId"
@@ -35,7 +39,7 @@ export default function BusinessSelect({
           ].join(" ")}
         >
           <option value="" disabled>
-            Sélectionner une entreprise
+            {t("selectBusinessLabel")}
           </option>
           {businesses.map((business) => (
             <option key={business.id} value={business.id}>

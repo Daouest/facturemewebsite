@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Form from "@/app/ui/invoices/create-form";
+import Form from "@/app/ui/invoices/InvoiceCreationForm";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
@@ -40,7 +40,7 @@ export default function Page() {
         const [customersRes, businessesRes, productsRes, hourlyRatesRes] =
           await Promise.all([
             fetch("/api/clients-catalogue", { credentials: "include" }),
-            fetch("/api/profile", { credentials: "include" }),
+            fetch("/api/profile/business", { credentials: "include" }),
             fetch("/api/item-catalogue", { credentials: "include" }),
             fetch("/api/hourlyRates", { credentials: "include" }),
           ]);
@@ -56,6 +56,27 @@ export default function Page() {
             name: client.nomClient,
           })
         );
+
+        // Transform business data - API returns single object, not array
+        const transformedBusinesses = businessesData.idBusiness
+          ? [
+              {
+                id: businessesData.idBusiness,
+                name: businessesData.name,
+                businessNumber: businessesData.businessNumber,
+                address: businessesData.address,
+                city: businessesData.city,
+                zipCode: businessesData.zipCode,
+                province: businessesData.province,
+                country: businessesData.country,
+                logo: businessesData.logo,
+                TVP: businessesData.TVP,
+                TVQ: businessesData.TVQ,
+                TVH: businessesData.TVH,
+                TVS: businessesData.TVS,
+              },
+            ]
+          : [];
 
         // Transform products
         const transformedProducts = (productsData || []).map((item: any) => ({
@@ -79,7 +100,7 @@ export default function Page() {
         const allObjects = [...transformedProducts, ...transformedHourlyRates];
 
         setCustomers(transformedCustomers);
-        setBusinesses(businessesData.businesses || []);
+        setBusinesses(transformedBusinesses);
         setObjects(allObjects);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -109,7 +130,7 @@ export default function Page() {
         <Header />
 
         <main className="flex-1 pt-20">
-          <div className="max-w-7xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
             {/* Sidebar */}
             <MobileSidebarWrapper>
               <Sidebar />

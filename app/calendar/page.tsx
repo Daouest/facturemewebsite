@@ -7,8 +7,8 @@ import Sidebar from "../components/Sidebar";
 import MobileSidebarWrapper from "../components/MobileSidebarWrapper";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useLangageContext } from "../context/langageContext";
+import { useUser } from "../context/UserContext";
 import { createTranslator } from "../lib/utils";
 
 type InvoiceSummary = {
@@ -27,6 +27,7 @@ function formatLocalDateKey(d: Date) {
 
 export default function CalendarPage() {
   const { langage } = useLangageContext();
+  const { user } = useUser();
   const t = createTranslator(langage);
   const router = useRouter();
 
@@ -34,10 +35,18 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<"month" | "week" | "day">("month");
   const [invoices, setInvoices] = useState<Record<string, InvoiceSummary[]>>(
     {}
   );
   const [loading, setLoading] = useState(false);
+
+  const [subscriptionUrl, setSubscriptionUrl] = useState<string>("");
+  const [copiedSubscription, setCopiedSubscription] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string>("");
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
+  const [showSubscription, setShowSubscription] = useState(false);
 
   const year = currentMonth.getFullYear();
   const monthIndex = currentMonth.getMonth();
@@ -45,6 +54,43 @@ export default function CalendarPage() {
   const monthStartKey = `${year}-${pad(monthIndex + 1)}-01`;
   const monthEnd = new Date(year, monthIndex + 1, 0).getDate();
   const monthEndKey = `${year}-${pad(monthIndex + 1)}-${pad(monthEnd)}`;
+
+  // Generate subscription URL when user is available
+  useEffect(() => {
+    if (user?.id) {
+      const generateSubscriptionUrl = async () => {
+        setLoadingSubscription(true);
+        setSubscriptionError("");
+
+        try {
+          const response = await fetch("/api/calendar/token", {
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to generate subscription token");
+          }
+
+          const { token } = await response.json();
+          const baseUrl = window.location.origin;
+          // No longer need userId in URL - it's encoded in the token
+          const url = `${baseUrl}/api/calendar/export?token=${token}`;
+          setSubscriptionUrl(url);
+        } catch (error) {
+          console.error("Error generating subscription URL:", error);
+          setSubscriptionError(
+            langage === "fr"
+              ? "Erreur lors de la génération du lien d'abonnement"
+              : "Error generating subscription link"
+          );
+        } finally {
+          setLoadingSubscription(false);
+        }
+      };
+
+      generateSubscriptionUrl();
+    }
+  }, [user?.id, langage]); // Remove 't' from dependencies, use langage instead
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -54,10 +100,12 @@ export default function CalendarPage() {
           `/api/histories-invoices?start=${monthStartKey}&end=${monthEndKey}`,
           { credentials: "include" }
         );
+
         if (!res.ok) {
           setInvoices({});
           return;
         }
+
         const data = await res.json();
 
         const map: Record<string, InvoiceSummary[]> = {};
@@ -85,6 +133,25 @@ export default function CalendarPage() {
   }, [monthStartKey, monthEndKey, monthIndex, year]);
 
   const daysGrid = useMemo(() => {
+    if (viewMode === "day") {
+      return [{ date: currentDate }];
+    }
+
+    if (viewMode === "week") {
+      const cells: Array<{ date: Date | null }> = [];
+      const startOfWeek = new Date(currentDate);
+      const day = startOfWeek.getDay();
+      startOfWeek.setDate(startOfWeek.getDate() - day);
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(startOfWeek);
+        d.setDate(d.getDate() + i);
+        cells.push({ date: d });
+      }
+      return cells;
+    }
+
+    // Month view
     const firstDayIndex = new Date(year, monthIndex, 1).getDay(); // 0=Sun
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
     const totalCells = Math.ceil((firstDayIndex + daysInMonth) / 7) * 7;
@@ -98,12 +165,58 @@ export default function CalendarPage() {
       );
     }
     return cells;
-  }, [year, monthIndex]);
+  }, [year, monthIndex, viewMode, currentDate]);
 
-  const goPrev = () => setCurrentMonth(new Date(year, monthIndex - 1, 1));
-  const goNext = () => setCurrentMonth(new Date(year, monthIndex + 1, 1));
-  const goToday = () =>
-    setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+  const goPrev = () => {
+    if (viewMode === "month") {
+      setCurrentMonth(new Date(year, monthIndex - 1, 1));
+    } else if (viewMode === "week") {
+      const newDate = new Date(currentDate);
+      newDate.setDate(newDate.getDate() - 7);
+      setCurrentDate(newDate);
+      setCurrentMonth(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
+    } else {
+      const newDate = new Date(currentDate);
+      newDate.setDate(newDate.getDate() - 1);
+      setCurrentDate(newDate);
+      setCurrentMonth(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
+    }
+  };
+
+  const goNext = () => {
+    if (viewMode === "month") {
+      setCurrentMonth(new Date(year, monthIndex + 1, 1));
+    } else if (viewMode === "week") {
+      const newDate = new Date(currentDate);
+      newDate.setDate(newDate.getDate() + 7);
+      setCurrentDate(newDate);
+      setCurrentMonth(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
+    } else {
+      const newDate = new Date(currentDate);
+      newDate.setDate(newDate.getDate() + 1);
+      setCurrentDate(newDate);
+      setCurrentMonth(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
+    }
+  };
+
+  const goToday = () => {
+    const now = new Date();
+    setCurrentMonth(new Date(now.getFullYear(), now.getMonth(), 1));
+    setCurrentDate(now);
+    setViewMode("week");
+  };
+
+  const handleCopySubscriptionUrl = async () => {
+    if (subscriptionUrl) {
+      try {
+        await navigator.clipboard.writeText(subscriptionUrl);
+        setCopiedSubscription(true);
+        setTimeout(() => setCopiedSubscription(false), 2000);
+      } catch (error) {
+        console.error("Error copying to clipboard:", error);
+      }
+    }
+  };
 
   // Localized weekday labels, Sunday -> Saturday
   const weekDays = useMemo(() => {
@@ -117,10 +230,40 @@ export default function CalendarPage() {
     return names;
   }, [langage]);
 
-  const monthLabel = currentMonth.toLocaleString(
-    langage === "fr" ? "fr-FR" : "en-US",
-    { month: "long", year: "numeric" }
-  );
+  const viewLabel = useMemo(() => {
+    const locale = langage === "fr" ? "fr-FR" : "en-US";
+
+    if (viewMode === "day") {
+      return currentDate.toLocaleString(locale, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+
+    if (viewMode === "week") {
+      const startOfWeek = new Date(currentDate);
+      const day = startOfWeek.getDay();
+      startOfWeek.setDate(startOfWeek.getDate() - day);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+      return `${startOfWeek.toLocaleString(locale, {
+        month: "short",
+        day: "numeric",
+      })} - ${endOfWeek.toLocaleString(locale, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })}`;
+    }
+
+    return currentMonth.toLocaleString(locale, {
+      month: "long",
+      year: "numeric",
+    });
+  }, [viewMode, currentDate, currentMonth, langage]);
 
   return (
     <>
@@ -143,12 +286,90 @@ export default function CalendarPage() {
             {/* Main Content */}
             <section className="flex-1">
               {/* Toolbar - Stack on mobile, single row on desktop */}
-              <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-100 capitalize text-center sm:text-left">
-                  {monthLabel}
-                </h2>
+              <div className="mb-4 flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-100 capitalize text-center sm:text-left">
+                    {viewLabel}
+                  </h2>
 
-                <div className="flex items-center justify-center gap-2">
+                  {/* View Mode Selector */}
+                  <div className="flex items-center justify-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+                    <button
+                      onClick={() => setViewMode("month")}
+                      className={[
+                        "px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all",
+                        viewMode === "month"
+                          ? "bg-sky-500/20 text-sky-200 ring-1 ring-sky-400/40"
+                          : "text-slate-300 hover:text-slate-100 hover:bg-white/5",
+                      ].join(" ")}
+                    >
+                      {langage === "fr" ? "Mois" : "Month"}
+                    </button>
+                    <button
+                      onClick={() => setViewMode("week")}
+                      className={[
+                        "px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all",
+                        viewMode === "week"
+                          ? "bg-sky-500/20 text-sky-200 ring-1 ring-sky-400/40"
+                          : "text-slate-300 hover:text-slate-100 hover:bg-white/5",
+                      ].join(" ")}
+                    >
+                      {langage === "fr" ? "Semaine" : "Week"}
+                    </button>
+                    <button
+                      onClick={() => setViewMode("day")}
+                      className={[
+                        "px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all",
+                        viewMode === "day"
+                          ? "bg-sky-500/20 text-sky-200 ring-1 ring-sky-400/40"
+                          : "text-slate-300 hover:text-slate-100 hover:bg-white/5",
+                      ].join(" ")}
+                    >
+                      {langage === "fr" ? "Jour" : "Day"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  {/* Calendar Subscription Toggle Button */}
+                  <button
+                    onClick={() => setShowSubscription(!showSubscription)}
+                    className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-3 sm:px-4 py-2 text-violet-200 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm sm:text-base flex items-center gap-2"
+                    title={t("calendarSubscription")}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">
+                      {t("calendarSubscription")}
+                    </span>
+                    <svg
+                      className={`w-3 h-3 transition-transform duration-200 ${
+                        showSubscription ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+
                   <button
                     onClick={goPrev}
                     className="rounded-xl border border-white/10 bg-white/5 backdrop-blur px-3 sm:px-4 py-2 text-slate-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors"
@@ -172,30 +393,191 @@ export default function CalendarPage() {
                 </div>
               </div>
 
+              {/* Collapsible Subscription Section */}
+              {showSubscription && (
+                <div className="mb-4 rounded-xl border border-violet-400/20 bg-violet-500/5 backdrop-blur p-4 sm:p-5 animate-in slide-in-from-top-2 duration-200">
+                  {loadingSubscription && (
+                    <div className="flex items-center justify-center gap-3 text-violet-200 py-4">
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <span className="text-sm">
+                        {t("loadingSubscription")}
+                      </span>
+                    </div>
+                  )}
+
+                  {subscriptionError && (
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-400/20">
+                      <svg
+                        className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <div className="flex-1">
+                        <p className="text-red-200 text-sm">
+                          {subscriptionError}
+                        </p>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="mt-2 text-xs text-red-300 hover:text-red-100 underline"
+                        >
+                          {t("retry")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {subscriptionUrl &&
+                    !loadingSubscription &&
+                    !subscriptionError && (
+                      <>
+                        <p className="text-sm text-slate-300 mb-3">
+                          {t("calendarSubscriptionDescription")}
+                        </p>
+
+                        {/* Expiration notice */}
+                        <div className="flex items-center gap-2 text-xs text-violet-300/70 mb-3">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {t("tokenExpiresIn")}
+                        </div>
+
+                        {/* Single Subscription URL for all platforms */}
+                        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                          <input
+                            type="text"
+                            value={subscriptionUrl}
+                            readOnly
+                            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <button
+                            onClick={handleCopySubscriptionUrl}
+                            className="px-4 py-2 rounded-lg border border-violet-400/40 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-colors text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                          >
+                            {copiedSubscription ? (
+                              <>
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                {t("copied")}
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                {t("copyLink")}
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Instructions */}
+                        <div className="text-xs text-slate-400 bg-white/5 rounded-lg p-3">
+                          <p className="font-semibold text-slate-300 mb-2">
+                            {t("howToSubscribe")}
+                          </p>
+                          <ul className="space-y-1 list-disc list-inside">
+                            <li>{t("subscriptionInstructionsCopy")}</li>
+                            <li>{t("subscriptionInstructionsCalendarApp")}</li>
+                            <li>{t("subscriptionInstructionsAutoUpdate")}</li>
+                          </ul>
+                        </div>
+                      </>
+                    )}
+                </div>
+              )}
+
               {/* Calendar frame */}
               <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 sm:p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
-                {/* Weekday header (weekends highlighted) */}
-                <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-sm font-semibold pb-3 border-b border-white/10">
-                  {weekDays.map((d, i) => {
-                    const isWeekend = i === 0 || i === 6; // Sun or Sat
-                    return (
-                      <div
-                        key={i}
-                        className={[
-                          "rounded-lg px-1 sm:px-2 py-1",
-                          isWeekend
-                            ? "text-rose-200 bg-rose-500/10 ring-1 ring-rose-400/20"
-                            : "text-slate-300/90",
-                        ].join(" ")}
-                      >
-                        {d}
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* Weekday header (weekends highlighted) - Hide in day view */}
+                {viewMode !== "day" && (
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-sm font-semibold pb-3 border-b border-white/10">
+                    {weekDays.map((d, i) => {
+                      const isWeekend = i === 0 || i === 6; // Sun or Sat
+                      return (
+                        <div
+                          key={i}
+                          className={[
+                            "rounded-lg px-1 sm:px-2 py-1",
+                            isWeekend
+                              ? "text-rose-200 bg-rose-500/10 ring-1 ring-rose-400/20"
+                              : "text-slate-300/90",
+                          ].join(" ")}
+                        >
+                          {d}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Days grid (weekend cells tinted) */}
-                <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-2">
+                <div
+                  className={[
+                    "mt-3 gap-1 sm:gap-2",
+                    viewMode === "day"
+                      ? "grid grid-cols-1"
+                      : "grid grid-cols-7",
+                  ].join(" ")}
+                >
                   {daysGrid.map((cell, idx) => {
                     if (!cell.date)
                       return <div key={idx} className="h-20 sm:h-24 md:h-28" />;
@@ -204,29 +586,79 @@ export default function CalendarPage() {
                     const dateKey = formatLocalDateKey(d);
                     const dayInvoices = invoices[dateKey] || [];
                     const isToday = dateKey === formatLocalDateKey(today);
+                    const isPast = d < today && !isToday;
+                    const hasInvoices = dayInvoices.length > 0;
+                    const isClickable = !isPast || hasInvoices;
                     const dayOfWeek = d.getDay(); // 0=Sun,6=Sat
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
                     return (
                       <div
                         key={idx}
+                        onClick={() => {
+                          if (viewMode !== "day" && isClickable) {
+                            setCurrentDate(d);
+                            setViewMode("day");
+                          }
+                        }}
                         className={[
-                          "h-20 sm:h-24 md:h-28 p-1 sm:p-2 rounded-lg sm:rounded-xl border flex flex-col",
+                          viewMode === "day"
+                            ? "min-h-[400px] p-4"
+                            : viewMode === "week"
+                            ? `h-48 sm:h-56 md:h-64 p-2 sm:p-3 ${
+                                isClickable
+                                  ? "cursor-pointer"
+                                  : "cursor-not-allowed"
+                              }`
+                            : `h-20 sm:h-24 md:h-28 p-1 sm:p-2 ${
+                                isClickable
+                                  ? "cursor-pointer"
+                                  : "cursor-not-allowed"
+                              }`,
+                          "rounded-lg sm:rounded-xl border flex flex-col",
                           "transition-colors",
-                          isWeekend
-                            ? "bg-rose-500/5 border-rose-400/20 hover:bg-rose-500/10"
-                            : "bg-white/5 border-white/10 hover:bg-white/10",
+                          isPast && !hasInvoices
+                            ? "bg-slate-900/30 border-slate-700/30 opacity-50"
+                            : isWeekend
+                            ? `bg-rose-500/5 border-rose-400/20 ${
+                                isClickable ? "hover:bg-rose-500/10" : ""
+                              }`
+                            : `bg-white/5 border-white/10 ${
+                                isClickable ? "hover:bg-white/10" : ""
+                              }`,
                           isToday ? "ring-2 ring-sky-400/40" : "",
                         ].join(" ")}
                       >
                         <div className="flex items-start justify-between">
-                          <div className="text-[10px] sm:text-xs md:text-sm font-medium text-slate-100">
-                            {d.getDate()}
+                          <div
+                            className={[
+                              "font-medium",
+                              isPast && !hasInvoices
+                                ? "text-slate-500"
+                                : "text-slate-100",
+                              viewMode === "day"
+                                ? "text-lg sm:text-xl"
+                                : "text-[10px] sm:text-xs md:text-sm",
+                            ].join(" ")}
+                          >
+                            {viewMode === "day"
+                              ? d.toLocaleString(
+                                  langage === "fr" ? "fr-FR" : "en-US",
+                                  {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                  }
+                                )
+                              : d.getDate()}
                           </div>
                           {dayInvoices.length > 0 && (
                             <div
                               className={[
-                                "text-[8px] sm:text-[10px] md:text-xs text-white rounded-full px-1 sm:px-2 py-0.5",
+                                "text-white rounded-full px-1 sm:px-2 py-0.5",
+                                viewMode === "day"
+                                  ? "text-sm"
+                                  : "text-[8px] sm:text-[10px] md:text-xs",
                                 isWeekend ? "bg-rose-500/90" : "bg-sky-500/90",
                               ].join(" ")}
                             >
@@ -235,22 +667,69 @@ export default function CalendarPage() {
                           )}
                         </div>
 
-                        <div className="mt-0.5 sm:mt-1 flex-1 overflow-auto">
+                        <div className="mt-0.5 sm:mt-1 flex-1 overflow-auto calendar-scroll">
                           {loading ? (
-                            <div className="text-[9px] sm:text-[11px] md:text-xs text-slate-400">
+                            <div
+                              className={[
+                                "text-slate-400",
+                                viewMode === "day"
+                                  ? "text-base"
+                                  : viewMode === "week"
+                                  ? "text-sm"
+                                  : "text-[9px] sm:text-[11px] md:text-xs",
+                              ].join(" ")}
+                            >
                               {t("loading")}
                             </div>
                           ) : dayInvoices.length === 0 ? (
-                            <div className="text-[9px] sm:text-[11px] md:text-xs text-transparent select-none">
-                              .
-                            </div>
+                            viewMode === "day" ? (
+                              <div className="mt-4 flex flex-col items-center justify-center gap-3">
+                                <p className="text-sm text-slate-400 text-center">
+                                  {langage === "fr"
+                                    ? "Aucune facture pour cette journée"
+                                    : "No invoices for this day"}
+                                </p>
+                                {!isPast && (
+                                  <Link
+                                    href="/invoices/create"
+                                    className="inline-flex items-center gap-2 rounded-xl border border-sky-400/40 bg-sky-500/10 px-4 py-2.5 text-sky-200 hover:bg-sky-500/20 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-all"
+                                  >
+                                    <svg
+                                      className="w-5 h-5"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                      />
+                                    </svg>
+                                    {langage === "fr"
+                                      ? "Créer une facture"
+                                      : "Create Invoice"}
+                                  </Link>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="text-[9px] sm:text-[11px] md:text-xs text-transparent select-none">
+                                .
+                              </div>
+                            )
                           ) : (
                             dayInvoices.map((inv) => (
                               <Link
                                 key={inv.idFacture}
                                 href={`/previsualisation?factureId=${inv.idFacture}`}
                                 className={[
-                                  "block text-[9px] sm:text-[11px] md:text-xs truncate underline-offset-2 hover:underline",
+                                  "block truncate underline-offset-2 hover:underline transition-all",
+                                  viewMode === "day"
+                                    ? "text-base sm:text-lg py-2 px-3 mb-2 rounded-lg border border-white/10 hover:bg-white/5"
+                                    : viewMode === "week"
+                                    ? "text-xs sm:text-sm py-1.5 px-2 mb-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+                                    : "text-[9px] sm:text-[11px] md:text-xs",
                                   isWeekend
                                     ? "text-rose-200 hover:text-rose-100"
                                     : "text-sky-200 hover:text-sky-100",
@@ -259,12 +738,35 @@ export default function CalendarPage() {
                                   inv.nomClient ?? ""
                                 }`}
                               >
-                                <span className="hidden sm:inline">
-                                  {inv.factureNumber} • {inv.nomClient ?? ""}
-                                </span>
-                                <span className="sm:hidden">
-                                  {inv.factureNumber}
-                                </span>
+                                {viewMode === "day" || viewMode === "week" ? (
+                                  <>
+                                    <div className="font-semibold">
+                                      {inv.factureNumber}
+                                    </div>
+                                    {inv.nomClient && (
+                                      <div
+                                        className={[
+                                          "truncate",
+                                          viewMode === "day"
+                                            ? "text-sm sm:text-base opacity-80"
+                                            : "text-xs opacity-80",
+                                        ].join(" ")}
+                                      >
+                                        {inv.nomClient}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="hidden sm:inline">
+                                      {inv.factureNumber} •{" "}
+                                      {inv.nomClient ?? ""}
+                                    </span>
+                                    <span className="sm:hidden">
+                                      {inv.factureNumber}
+                                    </span>
+                                  </>
+                                )}
                               </Link>
                             ))
                           )}

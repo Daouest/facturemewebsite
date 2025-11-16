@@ -93,6 +93,7 @@ const factureSchema = new Schema({
     isPaid: { type: Boolean, required: [true, "Paid status is required"] },
     isBusinessInvoice: { type: Boolean, required: [true, "Business invoice status is required"] },
     idClient: { type: Number, required: [true, "Client ID is required"] },
+    idBusiness: { type: Number },
 
 }, { collection: 'factures_users' });
 
@@ -173,7 +174,7 @@ const UserSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     password: { type: String, required: true },
-    idAddress: { type: String, default: null },
+    idAddress: { type: Number, default: null },
     idBusiness: { type: Number, default: null },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },

@@ -14,10 +14,17 @@ export function validateFormData(formData: FormData): {
 } {
     const customerIdRaw = formData.get('customerId');
     const businessIdRaw = formData.get('businessId');
+    const invoiceTypeRaw = formData.get('invoiceType');
+    const dateTypeRaw = formData.get('dateType');
+    const invoiceDateRaw = formData.get('invoiceDate');
     const numberTypeRaw = formData.get('numberType');
     const customNumber = formData.get('number');
     const numberType: 'auto' | 'custom' | undefined =
         numberTypeRaw === 'auto' || numberTypeRaw === 'custom' ? numberTypeRaw : undefined;
+    const invoiceType: 'company' | 'personal' =
+        invoiceTypeRaw === 'company' || invoiceTypeRaw === 'personal' ? invoiceTypeRaw : 'company';
+    const dateType: 'current' | 'future' =
+        dateTypeRaw === 'current' || dateTypeRaw === 'future' ? dateTypeRaw : 'current';
 
     // Parse items
     const { items, itemErrors } = parseItems(formData);
@@ -25,6 +32,9 @@ export function validateFormData(formData: FormData): {
     const invoiceForm: InvoiceForm = {
         customerId: customerIdRaw ? String(customerIdRaw) : '',
         businessId: businessIdRaw ? String(businessIdRaw) : '',
+        invoiceType: invoiceType,
+        dateType: dateType,
+        invoiceDate: invoiceDateRaw ? String(invoiceDateRaw) : '',
         numberType: numberType || 'auto',
         number: customNumber ? String(customNumber) : '',
         items: items
@@ -40,8 +50,12 @@ export function validateFormData(formData: FormData): {
     if (customerId === null || isNaN(customerId) || customerId < 0) {
         errors.customerId = ["Le client est requis"];
     }
-    if (businessId === null || isNaN(businessId) || businessId < 0) {
-        errors.businessId = ["L'entreprise est requise"];
+    
+    // Only validate businessId if invoice type is 'company'
+    if (invoiceType === 'company') {
+        if (businessId === null || isNaN(businessId) || businessId < 0) {
+            errors.businessId = ["L'entreprise est requise"];
+        }
     }
 
     // Item validation
@@ -56,6 +70,21 @@ export function validateFormData(formData: FormData): {
         const factureNumber = Number(customNumber);
         if (customNumber === null || customNumber === undefined || customNumber === '' || isNaN(factureNumber) || factureNumber < 0) {
             errors.number = ["Un numéro de facture valide est requis"];
+        }
+    }
+
+    // Date validation
+    if (dateType === "future") {
+        if (!invoiceDateRaw || invoiceDateRaw === '') {
+            errors.invoiceDate = ["Une date est requise"];
+        } else {
+            const selectedDate = new Date(String(invoiceDateRaw));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                errors.invoiceDate = ["La date doit être aujourd'hui ou dans le futur"];
+            }
         }
     }
 

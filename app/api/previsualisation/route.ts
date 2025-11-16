@@ -6,6 +6,12 @@ export async function GET(request: Request) {
 
     const session = await getSession();
     const factureId = session?.factureId;
+    const userId = session?.idUser; // Use idUser, not userId
+
+    // Check if user is authenticated
+    if (!userId) {
+        return new Response(JSON.stringify({ error: 'Unauthorized - No session' }), { status: 401 });
+    }
 
     if (typeof factureId !== "number" || isNaN(factureId)) {
         return new Response(JSON.stringify({ error: 'Invalid or missing factureId parameter' }), { status: 400 });
@@ -14,6 +20,16 @@ export async function GET(request: Request) {
     try {
         //chercher les données de la facture
         const factureData = await getFactureData(factureId);
+
+        // SECURITY: Verify ownership before processing
+        if (!factureData.success || !factureData.facture) {
+            return new Response(JSON.stringify({ error: 'Invoice not found' }), { status: 404 });
+        }
+
+        if (factureData.facture.idUser !== userId) {
+            console.warn(`Authorization failed in previsualisation: User ${userId} tried to access invoice ${factureId} owned by ${factureData.facture.idUser}`);
+            return new Response(JSON.stringify({ error: 'Unauthorized - You do not own this invoice' }), { status: 403 });
+        }
 
         //modification des données pour l'affichage
         let facture;
@@ -56,7 +72,8 @@ export async function GET(request: Request) {
                                 "address": addressInfo.address,
                                 "city": addressInfo.city,
                                 "province": addressInfo.province,
-                                "zipCode": addressInfo.zipCode
+                                "zipCode": addressInfo.zipCode,
+                                "logo": businessInfo.businessLogo || undefined
                             }
                         }
                     }
@@ -65,7 +82,7 @@ export async function GET(request: Request) {
                 }
 
             } else {
-                //1.2    fetch l'addresse user
+                //1.2    fetch l'addresse user (personal invoice)
                 if (userInfo && userInfo.idAddress != null) {
 
                     const addressMsg = await getAddressInfo(userInfo.idAddress);
@@ -80,6 +97,9 @@ export async function GET(request: Request) {
                             "zipCode": address.zipCode
                         }
                     }
+                } else {
+                    console.error('Personal invoice error: User does not have a personal address set in their profile.');
+                    console.error('User needs to go to Profile page and set their personal address.');
                 }
 
             }
@@ -161,7 +181,6 @@ export async function GET(request: Request) {
 
                 invoiceInfos = {
                     "date": new Date(factureData.facture.dateFacture).toLocaleDateString(),
-                    "time": new Date(factureData.facture.dateFacture).toLocaleTimeString(),
                     "factureNumber": factureData.facture.factureNumber,
                     "colonnesHoraire": colHoraire,
                     "colonnesUnitaires": colUnitaires,
@@ -179,6 +198,33 @@ export async function GET(request: Request) {
                 client: clientInfos,
                 facture: invoiceInfos,
             }
+
+            console.log('=== Preview Data Debug ===');
+            console.log('userInfos:', userInfos);
+            console.log('clientInfos:', clientInfos);
+            console.log('invoiceInfos:', invoiceInfos);
+            console.log('facture object:', facture);
+        }
+
+        // Check if all required data is present
+        if (!facture || !facture.user || !facture.client || !facture.facture) {
+            console.error('Missing required data:', {
+                hasFacture: !!facture,
+                hasUser: !!facture?.user,
+                hasClient: !!facture?.client,
+                hasInvoice: !!facture?.facture
+            });
+            return new Response(
+                JSON.stringify({ 
+                    error: 'Incomplete invoice data',
+                    details: {
+                        hasUser: !!facture?.user,
+                        hasClient: !!facture?.client,
+                        hasInvoice: !!facture?.facture
+                    }
+                }), 
+                { status: 500 }
+            );
         }
 
         //ceci represente un schema de donnees sur lequel se baser pour creer les tableaux

@@ -1,15 +1,39 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AuthForm from "@/app/components/AuthForm";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { useUser } from "./context/UserContext";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, ready } = useUser();
+
+  useEffect(() => {
+    // Wait for user context to be ready
+    if (ready && user) {
+      // Redirect to homePage if user is logged in
+      router.push("/homePage");
+    }
+  }, [user, ready, router]);
+
+  // Show loading or nothing while checking auth status
+  if (!ready) {
+    return null;
+  }
+
+  // If user exists, don't render the page (will redirect)
+  if (user) {
+    return null;
+  }
+
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
+      <main className="relative grid flex-1 grid-cols-1 lg:grid-cols-2">
         {/* Right: centered content - shows first on mobile */}
         <div className="relative flex items-center justify-center px-6 py-12 pt-24 lg:py-20 order-1 lg:order-2">
           <div className="w-full max-w-md">
@@ -46,6 +70,6 @@ export default function Home() {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

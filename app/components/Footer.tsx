@@ -1,11 +1,16 @@
 "use client";
 import Link from "next/link";
 import { HelpCircle, Mail } from "lucide-react";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Footer() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   return (
     <footer
-      className="w-full bg-slate-800/90 backdrop-blur border-t border-white/10 md:fixed md:bottom-0 md:left-0 md:right-0 md:z-50"
+      className="w-full bg-slate-800/90 backdrop-blur border-t border-white/10 mt-auto"
       aria-label="Footer"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
@@ -13,7 +18,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col">
             <h2 className="text-xl font-bold text-slate-100">FactureMe</h2>
-            <p className="text-sm text-slate-400">Vite fait bien fait!</p>
+            <p className="text-sm text-slate-400">{t("tagline")}</p>
           </div>
 
           {/* Navigation */}
@@ -25,14 +30,14 @@ export default function Footer() {
               href="/about"
               className="text-sm text-slate-300 hover:text-sky-400 transition-colors"
             >
-              About us
+              {t("aboutUs")}
             </Link>
             <Link
               href="/pub"
               className="flex items-center gap-2 text-sm text-slate-300 hover:text-sky-400 transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
-              <span>FAQ</span>
+              <span>{t("faq")}</span>
             </Link>
           </nav>
 
