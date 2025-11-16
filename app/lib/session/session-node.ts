@@ -13,7 +13,7 @@ export async function getSession(): Promise<SessionPayload | null> {
 export async function createUserSession(opts: {
     idUser: number;
     factureId?: number;
-        blockUser?: boolean
+    blockUser?: boolean
 
 }) {
     return encrypt({ idUser: opts.idUser, factureId: opts.factureId })
@@ -50,6 +50,7 @@ export async function getUserFromCookies() {
         firstName: userFromDb.firstName,
         lastName: userFromDb.lastName,
         email: userFromDb.email,
+        isAdmin: userFromDb.isAdmin,
         __v: userFromDb.__v
     }
 }
@@ -66,9 +67,13 @@ export async function setFacture(factureId: number) {
     return setSessionCookieOnResponse(res, newToken, ACCESS_TTL_MS)
 }
 
-export  async function setCookieBlock(blockUser:boolean){
-    const ttlMs  = 60000;// 1 min
-    const newToken = await encrypt({blockUser},ttlMs);
+export async function setCookieBlock(blockUser: boolean) {
+     const session = await getSession()
+    const idUser = session?.idUser
+    const ttlMs = 60000;// 1 min
+    if (typeof idUser !== "number" || !Number.isFinite(idUser)) return null;
+
+    const newToken = await encrypt({ idUser ,blockUser }, ttlMs);
 
     const res = NextResponse.json({ success: true });
     setSessionCookieOnResponse(res, newToken, ttlMs);
