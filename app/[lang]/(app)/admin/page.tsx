@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useLangageContext } from "@/app/context/langageContext";
-import { getDateNow, createTranslator } from "@/app/lib/utils";
+import { getDateNow, createTranslator } from "@/app/_lib/utils/format";
 import Link from "next/link";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import AdminAcceuil from "@/app/components/adminAcceuil";
@@ -50,19 +50,31 @@ export default function AdminPage() {
 
           <div className="flex flex-col w-full h-full">
             {showPage.tickePage && (
-              <Suspense fallback={<div className="self-center animate-pulse text-white"> Loading...</div>}>
+              <Suspense
+                fallback={
+                  <div className="self-center animate-pulse text-white">
+                    {" "}
+                    Loading...
+                  </div>
+                }
+              >
                 <TickePage />
               </Suspense>
             )}
 
             {showPage.stats && (
-              <Suspense fallback={<div className="self-center animate-pulse text-white"> Loading...</div>}>
+              <Suspense
+                fallback={
+                  <div className="self-center animate-pulse text-white">
+                    {" "}
+                    Loading...
+                  </div>
+                }
+              >
                 <StatsFactureMe />
               </Suspense>
             )}
-            {!showPage.stats && !showPage.tickePage && (
-              <AdminAcceuil />
-            )}
+            {!showPage.stats && !showPage.tickePage && <AdminAcceuil />}
           </div>
         </div>
       </div>

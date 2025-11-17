@@ -79,7 +79,7 @@ export default function FormCreationItem() {
 
     try {
       const numereicPrice = parseFloat(
-        price.replace(/\s/g, "").replace(",", ".")
+        price.replace(/\s/g, "").replace(",", "."),
       );
       const dataToSend = { ...formData, prix: numereicPrice };
 

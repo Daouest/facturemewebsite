@@ -1,8 +1,8 @@
 "use client";
 
-import Form from "@/app/ui/clients-catalogue/create-form";
+import Form from "@/app/_components/clients/create-form";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { useParams } from "next/navigation";
 
 export default function CreateClientPage() {

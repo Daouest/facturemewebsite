@@ -4,11 +4,11 @@ import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { refreshSeconds } from "@/app/lib/constante";
-import { HourlyRateType } from "@/app/lib/definitions";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
+import { HourlyRateType } from "@/app/_lib/types/definitions";
 import { Table } from "@/components/ui/table";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { useParams } from "next/navigation";
 
 export default function RatesPage() {
@@ -32,7 +32,7 @@ export default function RatesPage() {
       idObjet: row.idObjet,
       clientName: row.clientName ?? "",
       workPosition: row.workPosition ?? "",
-      hourlyRate: row.hourlyRate ?? 0
+      hourlyRate: row.hourlyRate ?? 0,
     }));
 
     const newCount = res.headers.get("Count");

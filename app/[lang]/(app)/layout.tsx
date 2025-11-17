@@ -10,14 +10,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
-  
+
   if (lang === "fr") {
     return {
       title: "FactureMe - Tableau de bord",
       description: "Gérez vos factures, clients et produits",
     };
   }
-  
+
   return {
     title: "FactureMe - Dashboard",
     description: "Manage your invoices, clients and products",
@@ -41,12 +41,12 @@ export default async function AppLayout({ children, params }: Props) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <Header />
-        
+
         {/* Mobile Sidebar */}
         <MobileSidebarWrapper>
           <Sidebar />
         </MobileSidebarWrapper>
-        
+
         <main className="flex-1 p-6 bg-gradient-to-br from-blue-900 to-indigo-950">
           {children}
         </main>

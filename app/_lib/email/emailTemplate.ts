@@ -1,0 +1,3 @@
+export function confirmEmailHtml(verifyUrl: string, expiresAt: number = 30) {
+  return `    <div style="">        <h2 style="margin:0 0 7px;">Confirmez votre courriel</h2>        <p style="margin:0 0 12px;">Cliquez le lien en sous pour confirmer votre email</p>            <a href="${verifyUrl}" style="display:inline-block; padding:12px 18px; border-radius:8px; background:#57B9FF; color:#fff;">                Cliquez moi!            </a>        </p>        <p style="margin:0 0 12px;">            Si le bouton ne marche pas, utilisez directement ce lien :            <br>${verifyUrl}        </p>         <p style="margin:16px 0 0; font-size:12px;">Ce lien est seulement valide pour ${expiresAt} minutes. Faites vite!</p>    </div>`;
+}

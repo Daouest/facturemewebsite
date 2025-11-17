@@ -4,7 +4,7 @@ import { FormDataProvider } from "@/app/context/FormContext";
 import { HourlyFormDataProvider } from "@/app/context/HourlyRateFormContext";
 import { AppUser, UserProvider } from "@/app/context/UserContext";
 import { LangageProvider } from "@/app/context/langageContext";
-import { getUserFromCookies } from "./lib/session/session-node";
+import { getUserFromCookies } from "./_lib/session/session-node";
 import ReactQueryWrapper from "@/app/context/ReactQueryWrapper";
 import { SidebarProvider } from "@/app/context/SidebarContext";
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
+import { COOKIE_NAME, decrypt } from "@/app/_lib/session/session-crypto";
 import { generateCalendarToken } from "@/app/lib/calendar-token";
 
 export async function GET(req: NextRequest) {
@@ -18,10 +18,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ token: calendarToken });
   } catch (error) {
-    console.error('Error generating calendar token:', error);
+    console.error("Error generating calendar token:", error);
     return NextResponse.json(
-      { success: false, message: 'Error generating token' },
-      { status: 500 }
+      { success: false, message: "Error generating token" },
+      { status: 500 },
     );
   }
 }

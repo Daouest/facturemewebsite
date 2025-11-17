@@ -7,7 +7,7 @@ import EditProfileForm from "./EditProfileForm";
 import EditBusinessForm from "./EditBusinessForm";
 import EditAddressForm from "./EditAddressForm";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 
 export default function ProfilePage() {
   const { langage } = useLangageContext();

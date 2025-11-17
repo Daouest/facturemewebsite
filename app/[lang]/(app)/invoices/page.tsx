@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import ActionsCard from "@/app/components/ActionsCard";
 import { Table } from "@/components/ui/table";
 import Image from "next/image";
-import { Facture } from "@/app/lib/definitions";
+import { Facture } from "@/app/_lib/types/definitions";
 import {
   createTranslator,
   getFacturesUsersByDate,
   getFacturesUsersByFactureNumber,
   getFacturesUsersPaidInvoice,
-} from "@/app/lib/utils";
+} from "@/app/_lib/utils/format";
 import { Switch } from "@/components/ui/switch";
-import { refreshSeconds } from "@/app/lib/constante";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
 import { useLangageContext } from "@/app/context/langageContext";
 import { useParams } from "next/navigation";
 
@@ -96,7 +96,12 @@ export default function InvoicesPage() {
       return getFacturesUsersByDate(archivedFactures ?? []);
     }
     return archivedFactures;
-  }, [archivedFactures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
+  }, [
+    archivedFactures,
+    sorterByFactureNumber,
+    sortByPaidInvoice,
+    sorterByDate,
+  ]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -150,9 +155,7 @@ export default function InvoicesPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-300">
-                    {t("sortByNumber")}
-                  </p>
+                  <p className="text-sm text-slate-300">{t("sortByNumber")}</p>
                   <Switch
                     className="data-[state=checked]:bg-sky-400 transition-colors cursor-pointer"
                     checked={sorterByFactureNumber}
@@ -160,9 +163,7 @@ export default function InvoicesPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-300">
-                    {t("sortByDate")}
-                  </p>
+                  <p className="text-sm text-slate-300">{t("sortByDate")}</p>
                   <Switch
                     className="data-[state=checked]:bg-sky-400 transition-colors cursor-pointer"
                     checked={sorterByDate}

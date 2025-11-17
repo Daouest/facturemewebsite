@@ -8,10 +8,10 @@ import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import ActionsCard from "@/app/components/ActionsCard";
 import Link from "next/link";
 import Image from "next/image";
-import { ClientAffichage } from "@/app/lib/definitions";
+import { ClientAffichage } from "@/app/_lib/types/definitions";
 import { FaPersonCirclePlus } from "react-icons/fa6";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 
 export default function ItemCatalogue() {
   const [clients, setClients] = useState<ClientAffichage[]>([]);
@@ -36,7 +36,7 @@ export default function ItemCatalogue() {
             idClient: client.idClient,
             nomClient: client.nomClient ?? "N/A",
             address: client.address ?? "N/A",
-          })
+          }),
         );
         setClients(clientsTable);
       } else {

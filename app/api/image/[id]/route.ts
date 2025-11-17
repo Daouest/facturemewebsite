@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { getImageItem } from "@/app/lib/data";
+import { getImageItem } from "@/app/_lib/database/queries";
 
-export async function GET( req: Request, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params; 
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
   const productPhoto = await getImageItem(parseInt(id, 10));
 
   if (!productPhoto) {
@@ -11,4 +14,3 @@ export async function GET( req: Request, context: { params: Promise<{ id: string
 
   return NextResponse.json({ image: productPhoto });
 }
-

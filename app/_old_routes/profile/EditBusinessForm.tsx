@@ -6,8 +6,10 @@ import { BusinessSchema, BusinessInput } from "../lib/schemas/profile";
 import Input from "../components/Input";
 import Image from "next/image";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
-import AddressAutocomplete, { type AddressData } from "../components/AddressAutocomplete";
+import { createTranslator } from "@/app/_lib/utils/format";
+import AddressAutocomplete, {
+  type AddressData,
+} from "../components/AddressAutocomplete";
 
 export default function EditBusinessForm() {
   const { user, setUser } = useUser();
@@ -109,7 +111,10 @@ export default function EditBusinessForm() {
     if (normalized.idBusiness === undefined) delete normalized.idBusiness;
     if (normalized.idAddress === undefined) delete normalized.idAddress;
 
-    console.log("2. After removing undefined IDs:", JSON.stringify(normalized, null, 2));
+    console.log(
+      "2. After removing undefined IDs:",
+      JSON.stringify(normalized, null, 2),
+    );
 
     // Handle optional string fields
     const optionalFields = ["TVP", "TVQ", "TVH", "TVS", "logo"] as const;
@@ -125,18 +130,27 @@ export default function EditBusinessForm() {
     //Formatting zip code
     normalized.zipCode = normalized.zipCode.replace(/\s/g, "");
 
-    console.log("3. After normalizing optional fields:", JSON.stringify(normalized, null, 2));
+    console.log(
+      "3. After normalizing optional fields:",
+      JSON.stringify(normalized, null, 2),
+    );
 
     const parsed = BusinessSchema.safeParse(normalized);
     if (!parsed.success) {
       console.error("❌ VALIDATION ERROR:");
-      console.error("Validation errors:", JSON.stringify(parsed.error.format(), null, 2));
+      console.error(
+        "Validation errors:",
+        JSON.stringify(parsed.error.format(), null, 2),
+      );
       console.error("Failed data:", JSON.stringify(normalized, null, 2));
       setSaved("err");
       return;
     }
 
-    console.log("✅ Validation passed! Parsed data:", JSON.stringify(parsed.data, null, 2));
+    console.log(
+      "✅ Validation passed! Parsed data:",
+      JSON.stringify(parsed.data, null, 2),
+    );
 
     setSaving(true);
     try {

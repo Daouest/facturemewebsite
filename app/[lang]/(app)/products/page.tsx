@@ -4,11 +4,11 @@ import { useRef, useState, useMemo } from "react";
 import ActionsCard from "@/app/components/ActionsCard";
 import { Table } from "@/components/ui/table";
 import Image from "next/image";
-import { TableItemType } from "@/app/lib/definitions";
+import { TableItemType } from "@/app/_lib/types/definitions";
 import { useQuery } from "@tanstack/react-query";
-import { refreshSeconds } from "@/app/lib/constante";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { Search, X } from "lucide-react";
 import { useParams } from "next/navigation";
 
@@ -89,7 +89,7 @@ export default function ProductsPage() {
     return items.filter(
       (item) =>
         item.productName.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+        item.description.toLowerCase().includes(query),
     );
   }, [items, searchQuery]);
 

@@ -1,10 +1,10 @@
 "use client";
 
-import EditProfileForm from "@/app/profile/EditProfileForm";
-import EditBusinessForm from "@/app/profile/EditBusinessForm";
-import EditAddressForm from "@/app/profile/EditAddressForm";
-import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import EditProfileForm from "@/app/_components/forms/EditProfileForm";
+import EditBusinessForm from "@/app/_components/forms/EditBusinessForm";
+import EditAddressForm from "@/app/_components/forms/EditAddressForm";
+import { useLangageContext } from "@/app/_context/language-provider";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { useParams } from "next/navigation";
 
 export default function ProfilePage() {

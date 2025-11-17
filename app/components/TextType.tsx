@@ -66,7 +66,7 @@ const TextType: React.FC<TextTypeProps> = ({
 
   const textArray = useMemo(
     () => (Array.isArray(text) ? text : [text]),
-    [text]
+    [text],
   );
 
   const getRandomSpeed = useCallback(() => {
@@ -92,7 +92,7 @@ const TextType: React.FC<TextTypeProps> = ({
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(containerRef.current);
@@ -132,7 +132,7 @@ const TextType: React.FC<TextTypeProps> = ({
 
           onSentenceComplete?.(
             textArray[currentTextIndex] ?? "",
-            currentTextIndex
+            currentTextIndex,
           );
           if (currentTextIndex === textArray.length - 1 && !loop) {
             return;
@@ -151,11 +151,11 @@ const TextType: React.FC<TextTypeProps> = ({
           setT(
             () => {
               setDisplayedText(
-                (prev) => prev + processedText[currentCharIndex]
+                (prev) => prev + processedText[currentCharIndex],
               );
               setCurrentCharIndex((prev) => prev + 1);
             },
-            variableSpeed ? getRandomSpeed() : typingSpeed
+            variableSpeed ? getRandomSpeed() : typingSpeed,
           );
         } else if (textArray.length > 1) {
           setT(() => {
@@ -219,7 +219,7 @@ const TextType: React.FC<TextTypeProps> = ({
       >
         {cursorCharacter}
       </span>
-    )
+    ),
   );
 };
 

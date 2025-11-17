@@ -52,13 +52,13 @@ export default function AddressAutocomplete({
   const [zipCode, setZipCode] = useState(initialAddress.zipCode || "");
   const [country, setCountry] = useState(initialAddress.country || "CA");
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  
+
   // Autocomplete state
   const [inputValue, setInputValue] = useState("");
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  
+
   const sessionTokenRef = useRef<any>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -75,26 +75,42 @@ export default function AddressAutocomplete({
       setInputValue(initialAddress.address); // Also set the input value
     }
     if (initialAddress.city !== undefined) setCity(initialAddress.city);
-    if (initialAddress.province !== undefined) setProvince(initialAddress.province);
-    if (initialAddress.zipCode !== undefined) setZipCode(initialAddress.zipCode);
-    if (initialAddress.country !== undefined) setCountry(initialAddress.country);
-  }, [initialAddress.address, initialAddress.city, initialAddress.province, initialAddress.zipCode, initialAddress.country]);
+    if (initialAddress.province !== undefined)
+      setProvince(initialAddress.province);
+    if (initialAddress.zipCode !== undefined)
+      setZipCode(initialAddress.zipCode);
+    if (initialAddress.country !== undefined)
+      setCountry(initialAddress.country);
+  }, [
+    initialAddress.address,
+    initialAddress.city,
+    initialAddress.province,
+    initialAddress.zipCode,
+    initialAddress.country,
+  ]);
 
   // Style configurations based on variant
   const styles = {
-    label: variant === "profile" 
-      ? "block text-sm font-medium text-slate-300 mb-1"
-      : "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1",
-    input: variant === "profile"
-      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
-      : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
-    select: variant === "profile"
-      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
-      : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
-    error: variant === "profile" ? "mt-1 text-xs text-red-400" : "mt-1 text-xs text-red-600",
-    inputClass: variant === "profile"
-      ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
-      : "", // empty string means use Input component's default styling
+    label:
+      variant === "profile"
+        ? "block text-sm font-medium text-slate-300 mb-1"
+        : "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1",
+    input:
+      variant === "profile"
+        ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
+        : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
+    select:
+      variant === "profile"
+        ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
+        : "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-900 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
+    error:
+      variant === "profile"
+        ? "mt-1 text-xs text-red-400"
+        : "mt-1 text-xs text-red-600",
+    inputClass:
+      variant === "profile"
+        ? "w-full h-11 rounded-xl border border-white/20 bg-white/10 backdrop-blur px-3 py-2 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 focus:border-sky-400/60"
+        : "", // empty string means use Input component's default styling
   };
 
   // Load Google Places API script
@@ -107,7 +123,7 @@ export default function AddressAutocomplete({
     }
 
     const existingScript = document.querySelector(
-      'script[src*="maps.googleapis.com"]'
+      'script[src*="maps.googleapis.com"]',
     );
     if (existingScript) {
       const checkLoaded = setInterval(() => {
@@ -141,7 +157,8 @@ export default function AddressAutocomplete({
   useEffect(() => {
     if (isScriptLoaded && !sessionTokenRef.current) {
       const google = (window as any).google;
-      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+      sessionTokenRef.current =
+        new google.maps.places.AutocompleteSessionToken();
     }
   }, [isScriptLoaded]);
 
@@ -161,12 +178,15 @@ export default function AddressAutocomplete({
         sessionToken: sessionTokenRef.current,
       };
 
-      const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-      
+      const { suggestions } =
+        await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(
+          request,
+        );
+
       const placePredictions = suggestions
         .filter((s: any) => s.placePrediction)
         .map((s: any) => s.placePrediction);
-      
+
       setPredictions(placePredictions);
       setShowDropdown(placePredictions.length > 0);
     } catch (error) {
@@ -181,7 +201,7 @@ export default function AddressAutocomplete({
     try {
       const google = (window as any).google;
       const place = prediction.toPlace();
-      
+
       await place.fetchFields({
         fields: ["addressComponents"],
       });
@@ -218,7 +238,10 @@ export default function AddressAutocomplete({
         });
       }
 
-      const fullAddress = [streetNumber, route].filter(Boolean).join(" ").trim();
+      const fullAddress = [streetNumber, route]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
 
       setAddress(fullAddress);
       setInputValue(fullAddress);
@@ -231,7 +254,8 @@ export default function AddressAutocomplete({
       setSelectedIndex(-1);
 
       // Create new session token for next search
-      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+      sessionTokenRef.current =
+        new google.maps.places.AutocompleteSessionToken();
 
       onAddressSelect({
         address: fullAddress,
@@ -269,8 +293,8 @@ export default function AddressAutocomplete({
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex((prev) => 
-          prev < predictions.length - 1 ? prev + 1 : prev
+        setSelectedIndex((prev) =>
+          prev < predictions.length - 1 ? prev + 1 : prev,
         );
         break;
       case "ArrowUp":
@@ -346,7 +370,7 @@ export default function AddressAutocomplete({
           disabled={disabled}
           className={styles.input}
         />
-        
+
         {/* Dropdown with predictions */}
         {showDropdown && predictions.length > 0 && (
           <div
@@ -356,7 +380,7 @@ export default function AddressAutocomplete({
                 ? "absolute z-[9999] w-full mt-1 max-h-60 overflow-auto rounded-xl border border-white/20 bg-slate-800 shadow-lg"
                 : "absolute z-[9999] w-full mt-1 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white dark:bg-zinc-800 shadow-lg"
             }
-            style={{ position: 'absolute' }}
+            style={{ position: "absolute" }}
           >
             {predictions.map((prediction, index) => (
               <div
@@ -367,8 +391,8 @@ export default function AddressAutocomplete({
                       ? "bg-slate-700"
                       : "bg-gray-100 dark:bg-zinc-700"
                     : variant === "profile"
-                    ? "hover:bg-slate-700"
-                    : "hover:bg-gray-50 dark:hover:bg-zinc-700"
+                      ? "hover:bg-slate-700"
+                      : "hover:bg-gray-50 dark:hover:bg-zinc-700"
                 } ${
                   variant === "profile"
                     ? "text-slate-100"
@@ -391,10 +415,8 @@ export default function AddressAutocomplete({
             ))}
           </div>
         )}
-        
-        {errors.address && (
-          <p className={styles.error}>{errors.address}</p>
-        )}
+
+        {errors.address && <p className={styles.error}>{errors.address}</p>}
       </div>
 
       {/* Manual fields */}
@@ -420,9 +442,7 @@ export default function AddressAutocomplete({
             disabled={disabled}
             className={styles.inputClass}
           />
-          {errors.city && (
-            <p className={styles.error}>{errors.city}</p>
-          )}
+          {errors.city && <p className={styles.error}>{errors.city}</p>}
         </div>
 
         <div>
@@ -448,17 +468,12 @@ export default function AddressAutocomplete({
             disabled={disabled}
             className={styles.inputClass}
           />
-          {errors.zipCode && (
-            <p className={styles.error}>{errors.zipCode}</p>
-          )}
+          {errors.zipCode && <p className={styles.error}>{errors.zipCode}</p>}
         </div>
       </div>
 
       <div>
-        <label
-          htmlFor={provinceId}
-          className={styles.label}
-        >
+        <label htmlFor={provinceId} className={styles.label}>
           Province
         </label>
         <select
@@ -486,9 +501,7 @@ export default function AddressAutocomplete({
             </option>
           ))}
         </select>
-        {errors.province && (
-          <p className={styles.error}>{errors.province}</p>
-        )}
+        {errors.province && <p className={styles.error}>{errors.province}</p>}
       </div>
     </div>
   );

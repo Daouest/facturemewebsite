@@ -1,12 +1,12 @@
 "use client";
 
-import Form from "@/app/ui/clients-catalogue/create-form";
+import Form from "@/app/_components/clients/create-form";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
 import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 
 export default function Page() {
   const { langage } = useLangageContext();

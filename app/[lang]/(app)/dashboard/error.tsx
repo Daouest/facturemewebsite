@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 
 export default function DashboardError({
   error,
@@ -20,7 +20,9 @@ export default function DashboardError({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px]">
-      <h2 className="text-xl font-semibold text-white mb-4">{t("errorLoading")}</h2>
+      <h2 className="text-xl font-semibold text-white mb-4">
+        {t("errorLoading")}
+      </h2>
       <p className="text-slate-300 mb-6">{t("errorOccurred")}</p>
       <button
         onClick={reset}

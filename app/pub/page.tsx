@@ -7,7 +7,7 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import Comments from "../components/comments";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { data } from "@/app/lib/constante";
+import { data } from "@/app/_lib/utils/constants";
 
 export default function PublicitePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -16,7 +16,7 @@ export default function PublicitePage() {
     console.log("next:", currentIndex);
 
     setCurrentIndex((prev) =>
-      prev + maxImage >= data.length ? 0 : prev + maxImage
+      prev + maxImage >= data.length ? 0 : prev + maxImage,
     );
   };
   const prev = () => {
@@ -25,7 +25,7 @@ export default function PublicitePage() {
     setCurrentIndex((prev) =>
       prev - maxImage < 0
         ? Math.max(0, data.length - 1 - maxImage)
-        : prev - maxImage
+        : prev - maxImage,
     );
   };
 

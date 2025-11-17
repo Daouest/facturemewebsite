@@ -1,6 +1,6 @@
 "use client";
-import { dateToSting, createTranslator } from "@/app/lib/utils";
-import { TableFactureType } from "@/app/lib/definitions";
+import { dateToSting, createTranslator } from "@/app/_lib/utils/format";
+import { TableFactureType } from "@/app/_lib/types/definitions";
 import { useLangageContext } from "../context/langageContext";
 import Link from "next/link";
 import { FileText, User, Calendar, ChevronRight } from "lucide-react";

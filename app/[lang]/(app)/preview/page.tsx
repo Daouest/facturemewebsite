@@ -56,19 +56,39 @@ export default function PreviewPage() {
           });
 
           if (!setRes.ok) {
-            const errorData = await setRes.json().catch(() => ({ error: 'Unknown error' }));
-            console.error("Failed to set facture in session:", setRes.status, errorData.error);
+            const errorData = await setRes
+              .json()
+              .catch(() => ({ error: "Unknown error" }));
+            console.error(
+              "Failed to set facture in session:",
+              setRes.status,
+              errorData.error,
+            );
             setLoading(false);
-            
+
             // Generic error message based on status code
             if (setRes.status === 401) {
-              setError(lang === "fr" ? "Veuillez vous connecter pour accéder à cette facture." : "Please login to access this invoice.");
+              setError(
+                lang === "fr"
+                  ? "Veuillez vous connecter pour accéder à cette facture."
+                  : "Please login to access this invoice.",
+              );
             } else if (setRes.status === 403) {
-              setError(lang === "fr" ? "Vous n'avez pas accès à cette facture." : "You don't have access to this invoice.");
+              setError(
+                lang === "fr"
+                  ? "Vous n'avez pas accès à cette facture."
+                  : "You don't have access to this invoice.",
+              );
             } else if (setRes.status === 404) {
-              setError(lang === "fr" ? "Facture introuvable." : "Invoice not found.");
+              setError(
+                lang === "fr" ? "Facture introuvable." : "Invoice not found.",
+              );
             } else {
-              setError(lang === "fr" ? "Impossible d'accéder à la facture. Veuillez réessayer." : "Unable to access invoice. Please try again.");
+              setError(
+                lang === "fr"
+                  ? "Impossible d'accéder à la facture. Veuillez réessayer."
+                  : "Unable to access invoice. Please try again.",
+              );
             }
             return;
           }
@@ -83,24 +103,43 @@ export default function PreviewPage() {
           const data = await res.json();
           if (data) setFacture(data);
         } else {
-          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          const errorData = await res
+            .json()
+            .catch(() => ({ error: "Unknown error" }));
           console.error("Previsualisation error:", res.status, errorData.error);
-          
+
           // Generic error message based on status code
           if (res.status === 401) {
-            throw new Error(lang === "fr" ? "Veuillez vous connecter pour accéder à cette facture." : "Please login to access this invoice.");
+            throw new Error(
+              lang === "fr"
+                ? "Veuillez vous connecter pour accéder à cette facture."
+                : "Please login to access this invoice.",
+            );
           } else if (res.status === 403) {
-            throw new Error(lang === "fr" ? "Vous n'avez pas accès à cette facture." : "You don't have access to this invoice.");
+            throw new Error(
+              lang === "fr"
+                ? "Vous n'avez pas accès à cette facture."
+                : "You don't have access to this invoice.",
+            );
           } else if (res.status === 404) {
-            throw new Error(lang === "fr" ? "Facture introuvable." : "Invoice not found.");
+            throw new Error(
+              lang === "fr" ? "Facture introuvable." : "Invoice not found.",
+            );
           } else {
-            throw new Error(lang === "fr" ? "Échec du chargement des données de la facture." : "Failed to load invoice data.");
+            throw new Error(
+              lang === "fr"
+                ? "Échec du chargement des données de la facture."
+                : "Failed to load invoice data.",
+            );
           }
         }
       } catch (err: any) {
         console.error("Erreur", err);
         setSession(null);
-        setError(err?.message || (lang === "fr" ? "Une erreur est survenue." : "An error occurred."));
+        setError(
+          err?.message ||
+            (lang === "fr" ? "Une erreur est survenue." : "An error occurred."),
+        );
       } finally {
         setLoading(false);
       }
@@ -116,7 +155,9 @@ export default function PreviewPage() {
             {lang === "fr" ? "Prévisualisation" : "Preview"}
           </h1>
           <p className="mt-4 text-slate-300/80">
-            {lang === "fr" ? "Prévisualiser vos informations avant de les imprimer." : "Preview your information before printing."}
+            {lang === "fr"
+              ? "Prévisualiser vos informations avant de les imprimer."
+              : "Preview your information before printing."}
           </p>
           <Image
             src="/Loading_Paperplane.gif"
@@ -142,12 +183,20 @@ export default function PreviewPage() {
       <div className="flex items-center justify-center min-h-[60vh] px-6">
         <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center text-slate-200 shadow">
           <h2 className="text-2xl font-semibold">
-            {error ? (lang === "fr" ? "Erreur" : "Error") : (lang === "fr" ? "Aucune donnée" : "No data")}
+            {error
+              ? lang === "fr"
+                ? "Erreur"
+                : "Error"
+              : lang === "fr"
+                ? "Aucune donnée"
+                : "No data"}
           </h2>
           <p className="mt-2 text-slate-300/80">
             {error
               ? error
-              : lang === "fr" ? "Impossible d'afficher la prévisualisation pour le moment." : "Unable to display preview at this time."}
+              : lang === "fr"
+                ? "Impossible d'afficher la prévisualisation pour le moment."
+                : "Unable to display preview at this time."}
           </p>
           <div className="mt-6 flex gap-3 justify-center flex-wrap">
             <Link href={`/${lang}/dashboard`}>
@@ -191,7 +240,9 @@ export default function PreviewPage() {
                 {lang === "fr" ? "Prévisualisation" : "Preview"}
               </h1>
               <p className="mt-2 text-slate-300/80">
-                {lang === "fr" ? "Prévisualiser vos informations avant de les imprimer." : "Preview your information before printing."}
+                {lang === "fr"
+                  ? "Prévisualiser vos informations avant de les imprimer."
+                  : "Preview your information before printing."}
               </p>
 
               {userComponent(facture.user, lang)}
@@ -244,11 +295,15 @@ function userComponent(infoArrayUser: any, lang: string) {
       </h2>
       <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-lg shadow-md text-slate-100">
         <p className="mb-2">
-          <span className="text-slate-300/80 mr-2">{lang === "fr" ? "Nom:" : "Name:"}</span>{" "}
+          <span className="text-slate-300/80 mr-2">
+            {lang === "fr" ? "Nom:" : "Name:"}
+          </span>{" "}
           {infoArrayUser["name"]}
         </p>
         <div className="flex flex-row gap-4 mb-2">
-          <p className="mb-2 text-slate-300/80 font-medium">{lang === "fr" ? "Addresse:" : "Address:"}</p>
+          <p className="mb-2 text-slate-300/80 font-medium">
+            {lang === "fr" ? "Addresse:" : "Address:"}
+          </p>
           <div>
             <p>{infoArrayUser["address"]}</p>
             <p>{`${infoArrayUser["city"]}`}</p>
@@ -277,11 +332,15 @@ function clientComponent(infoArrayClient: any, lang: string) {
       </h2>
       <div className="bg-white/5 border border-white/10 backdrop-blur p-6 rounded-lg shadow-md text-slate-100">
         <p className="mb-2">
-          <span className="text-slate-300/80 mr-2">{lang === "fr" ? "Nom:" : "Name:"}</span>{" "}
+          <span className="text-slate-300/80 mr-2">
+            {lang === "fr" ? "Nom:" : "Name:"}
+          </span>{" "}
           {infoArrayClient["name"]}
         </p>
         <div className="flex flex-row gap-4 mb-2">
-          <p className="mb-2 text-slate-300/80 font-medium">{lang === "fr" ? "Addresse:" : "Address:"}</p>
+          <p className="mb-2 text-slate-300/80 font-medium">
+            {lang === "fr" ? "Addresse:" : "Address:"}
+          </p>
           <div>
             <p>{infoArrayClient["address"]}</p>
             <p>{`${infoArrayClient["city"]}`}</p>
@@ -303,7 +362,9 @@ function invoiceComponent(infoArray: any, lang: string) {
         <div className="mb-4">
           <div>
             <p className="mb-2">
-              <span className="text-slate-300/80 mr-2">{lang === "fr" ? "Numero de facture:" : "Invoice number:"}</span>{" "}
+              <span className="text-slate-300/80 mr-2">
+                {lang === "fr" ? "Numero de facture:" : "Invoice number:"}
+              </span>{" "}
               {infoArray["factureNumber"]}
             </p>
             <p className="mb-2">
@@ -313,7 +374,9 @@ function invoiceComponent(infoArray: any, lang: string) {
           </div>
 
           <div>
-            <p className="mb-2 font-semibold">{lang === "fr" ? "Numéros de taxes:" : "Tax numbers:"}</p>
+            <p className="mb-2 font-semibold">
+              {lang === "fr" ? "Numéros de taxes:" : "Tax numbers:"}
+            </p>
             {infoArray["taxesNumbers"] != undefined &&
             infoArray["taxesNumbers"].length > 0
               ? infoArray["taxesNumbers"].map((taxNum: any, index: number) => (
@@ -392,7 +455,7 @@ function invoiceComponent(infoArray: any, lang: string) {
                           {fmtMoney(item.total)}
                         </td>
                       </tr>
-                    )
+                    ),
                   )}
                 </tbody>
               </table>
@@ -452,7 +515,7 @@ function invoiceComponent(infoArray: any, lang: string) {
                           {fmtMoney(item.total)}
                         </td>
                       </tr>
-                    )
+                    ),
                   )}
                 </tbody>
               </table>
@@ -461,9 +524,13 @@ function invoiceComponent(infoArray: any, lang: string) {
         ) : null}
 
         <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h3 className="text-lg font-bold mb-2">{lang === "fr" ? "Résumé" : "Summary"}</h3>
+          <h3 className="text-lg font-bold mb-2">
+            {lang === "fr" ? "Résumé" : "Summary"}
+          </h3>
           <p className="mb-2">
-            <span className="text-slate-300/80 mr-2">{lang === "fr" ? "Sous-total:" : "Subtotal:"}</span>
+            <span className="text-slate-300/80 mr-2">
+              {lang === "fr" ? "Sous-total:" : "Subtotal:"}
+            </span>
             <span className="font-semibold">
               {fmtMoney(infoArray["sousTotal"])}
             </span>

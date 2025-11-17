@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Client, UserData } from "@/app/lib/definitions";
+import { Client, UserData } from "@/app/_lib/types/definitions";
 import { useUser } from "@/app/context/UserContext";
 import "../css/adminAcceuil.css";
 
@@ -70,12 +70,12 @@ export default function AdminAcceuil() {
     let filter;
     if (showData.users) {
       filter = (data as UserData[]).filter((i) =>
-        i?.lastName?.toLowerCase().includes(searche.toLowerCase())
+        i?.lastName?.toLowerCase().includes(searche.toLowerCase()),
       );
     }
     if (showData.clients) {
       filter = (data as Client[])?.filter((i) =>
-        i?.nomClient?.toLowerCase().includes(searche.toLowerCase())
+        i?.nomClient?.toLowerCase().includes(searche.toLowerCase()),
       );
     }
     setDataOutput(filter ?? []);

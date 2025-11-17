@@ -1,9 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import {
-  getAllFacturesUsers,
-  getLastFacture
-} from "@/app/lib/data";
-import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
+import { getAllFacturesUsers, getLastFacture } from "@/app/_lib/database/queries";
+import { COOKIE_NAME, decrypt } from "@/app/_lib/session/session-crypto";
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,7 +24,9 @@ export async function GET(req: NextRequest) {
 
     // Calcul des métadonnées pour le cache
     const totalFactures = factures?.length ?? 0;
-    const lastFactureDate = factures?.[totalFactures - 1]?.dateFacture?.toISOString() || new Date().toISOString();
+    const lastFactureDate =
+      factures?.[totalFactures - 1]?.dateFacture?.toISOString() ||
+      new Date().toISOString();
 
     //Application des filtres ou tris selon les paramètres
     if (isLastFacturesRequested) {
@@ -57,7 +56,7 @@ export async function GET(req: NextRequest) {
     console.error("Erreur API getAllFacturesUsers:", error);
     return NextResponse.json(
       { success: false, message: "Erreur serveur" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

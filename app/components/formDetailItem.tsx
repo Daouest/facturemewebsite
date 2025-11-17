@@ -9,7 +9,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator, formatIntoDecimal } from "@/app/lib/utils";
+import { createTranslator, formatIntoDecimal } from "@/app/_lib/utils/format";
 import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "@/app/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -69,7 +69,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
           })
-          .replace(/\u00A0/g, " ")
+          .replace(/\u00A0/g, " "),
       );
     }
   }, [data, idObjet, setFormData]);
@@ -180,7 +180,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
       numereicPrice = parseFloat(
         price
           .replace(/\s/g, "") // retire les espaces
-          .replace(",", ".")
+          .replace(",", "."),
       );
       dataToSend = {
         ...formData,
@@ -379,7 +379,7 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
                   placeholder={formatIntoDecimal(
                     formData?.prix,
                     "fr-CA",
-                    "CAD"
+                    "CAD",
                   )}
                   value={price}
                   onChange={handleChange}

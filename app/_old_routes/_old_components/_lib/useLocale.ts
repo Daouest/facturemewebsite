@@ -1,0 +1,1 @@
+"use client";import { useParams } from "next/navigation";export function useLocale() {  const params = useParams();  const lang = params?.lang as "fr" | "en" | undefined;  return lang || "fr"; // Default to French}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Form from "@/app/ui/invoices/InvoiceCreationForm";
+import Form from "@/app/_components/invoices/InvoiceCreationForm";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Sidebar from "@/app/components/Sidebar";
@@ -12,7 +12,7 @@ import type {
   CustomerField,
   BusinessField,
   ItemFieldWithPrice,
-} from "@/app/lib/definitions";
+} from "@/app/_lib/types/definitions";
 
 export default function Page() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function Page() {
           (client: any) => ({
             id: client.idClient,
             name: client.nomClient,
-          })
+          }),
         );
 
         // Transform business data - API returns single object, not array
@@ -93,7 +93,7 @@ export default function Page() {
             name: rate.workPosition || "Unknown Position",
             type: "hourly" as const,
             hourlyRate: rate.hourlyRate || 0,
-          })
+          }),
         );
 
         // Combine both arrays

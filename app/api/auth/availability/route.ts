@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/app/lib/db/mongodb";
-import { DbUsers } from "@/app/lib/models";
+import { connectToDatabase } from "@/app/_lib/database/mongodb";
+import { DbUsers } from "@/app/_lib/database/models";
 import mongoose from "mongoose";
 
 export const runtime = "nodejs";
@@ -14,7 +14,10 @@ export async function GET(req: Request) {
   const username = searchParams.get("username")?.trim();
 
   if (!email && !username) {
-    return NextResponse.json({ message: "email or username required" }, { status: 400 });
+    return NextResponse.json(
+      { message: "email or username required" },
+      { status: 400 },
+    );
   }
 
   const query: any[] = [];
@@ -26,10 +29,14 @@ export async function GET(req: Request) {
 
   if (exists) {
     // Find which one(s) are taken (cheap second query; still fast)
-    const hits = await DbUsers.find({ $or: query }).select("email username").lean();
+    const hits = await DbUsers.find({ $or: query })
+      .select("email username")
+      .lean();
     for (const h of hits) {
-      if (email && h.email?.toLowerCase() === email.toLowerCase()) taken.email = true;
-      if (username && h.username?.toLowerCase() === username.toLowerCase()) taken.username = true;
+      if (email && h.email?.toLowerCase() === email.toLowerCase())
+        taken.email = true;
+      if (username && h.username?.toLowerCase() === username.toLowerCase())
+        taken.username = true;
     }
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { setCookieBlock } from "@/app/lib/session/session-node";
+import { setCookieBlock } from "@/app/_lib/session/session-node";
 
 export async function POST(req: NextRequest) {
   const { blockUser } = await req.json();
@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
   //on handle si jamais le res est null
   //sans ca Vercel badtrip
   if (!result) {
-    return NextResponse.json({ success: false, error: "Invalid session" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: "Invalid session" },
+      { status: 401 },
+    );
   }
 
   return result;

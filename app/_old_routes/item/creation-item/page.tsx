@@ -5,7 +5,7 @@ import Sidebar from "@/app/components/Sidebar";
 import FormCreationItem from "@/app/components/formCreationItem";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { useLangageContext } from "../../context/langageContext";
 
 export default function CreationPage() {

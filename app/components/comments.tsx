@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { CommentsData } from "@/app/lib/constante";
+import { CommentsData } from "@/app/_lib/utils/constants";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
@@ -11,7 +11,7 @@ const Comments: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((lastIndex) =>
-        lastIndex === CommentsData.length - 1 ? 0 : lastIndex + 1
+        lastIndex === CommentsData.length - 1 ? 0 : lastIndex + 1,
       );
     }, 5000);
 

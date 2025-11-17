@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 import { useLangageContext } from "../context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import TextType from "./TextType";
 import { Button } from "@/components/ui/button";
 import { useSidebarContext } from "@/app/context/SidebarContext";

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserFromCookies } from "@/app/lib/session/session-node";
-import { connectToDatabase } from "@/app/lib/db/mongodb";
-import { DbUsers, DbAddress } from "@/app/lib/models";
-import { AddressSchema } from "@/app/lib/schemas/auth";
-import { getNextSeq } from "@/app/lib/db/getNextSeq";
-import type { CounterDoc } from "@/app/lib/db/getNextSeq";
+import { getUserFromCookies } from "@/app/_lib/session/session-node";
+import { connectToDatabase } from "@/app/_lib/database/mongodb";
+import { DbUsers, DbAddress } from "@/app/_lib/database/models";
+import { AddressSchema } from "@/app/_lib/schemas/auth";
+import { getNextSeq } from "@/app/_lib/database/sequence-generator";
+import type { CounterDoc } from "@/app/_lib/database/sequence-generator";
 import mongoose from "mongoose";
 import type { Db, Collection } from "mongodb";
 
@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest) {
         zipCode: "",
         country: "CA",
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -50,7 +50,7 @@ export async function GET(_req: NextRequest) {
       zipCode: (address as any).zipCode ?? "",
       country: (address as any).country ?? "CA",
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
 
@@ -72,7 +72,7 @@ export async function PUT(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { message: "Validation error", errors: parsed.error.issues },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -98,13 +98,13 @@ export async function PUT(req: NextRequest) {
             country: parsed.data.country,
           },
         },
-        { new: true }
+        { new: true },
       );
 
       if (!updated) {
         return NextResponse.json(
           { message: "Address not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -119,12 +119,13 @@ export async function PUT(req: NextRequest) {
             country: updated.country,
           },
         },
-        { status: 200 }
+        { status: 200 },
       );
     } else {
       // Create new address
       const db = mongoose.connection.db as unknown as Db;
-      const counters: Collection<CounterDoc> = db.collection<CounterDoc>("counters");
+      const counters: Collection<CounterDoc> =
+        db.collection<CounterDoc>("counters");
       const newAddressId = await getNextSeq(counters, "addresses");
 
       const newAddress = await DbAddress.create({
@@ -151,14 +152,14 @@ export async function PUT(req: NextRequest) {
             country: newAddress.country,
           },
         },
-        { status: 201 }
+        { status: 201 },
       );
     }
   } catch (error) {
     console.error("Error saving address:", error);
     return NextResponse.json(
       { message: "Error saving address" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

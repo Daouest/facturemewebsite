@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
   getAllFacturesUsers,
-  getFacturesUsersByDate,
-  getFacturesUsersByFactureNumber,
-  getFacturesUsersPaidInvoice
-} from "@/app/lib/data";
-import { COOKIE_NAME, decrypt } from "@/app/lib/session/session-crypto";
+  // TODO: These functions need to be implemented in queries.ts
+  // getFacturesUsersByDate,
+  // getFacturesUsersByFactureNumber,
+  // getFacturesUsersPaidInvoice,
+} from "@/app/_lib/database/queries";
+import { COOKIE_NAME, decrypt } from "@/app/_lib/session/session-crypto";
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,31 +36,41 @@ export async function GET(req: NextRequest) {
           return d >= start && d <= end;
         });
       } catch (err) {
-        console.warn("Invalid start/end params provided to histories-invoices API", err);
+        console.warn(
+          "Invalid start/end params provided to histories-invoices API",
+          err,
+        );
       }
     }
 
     // Calcul des métadonnées pour le cache
 
     //Application des filtres ou tris selon les paramètres
+    // TODO: Implement these sorting functions in queries.ts
     if (sortBy === "factureNumber") {
-      historiqueFactures = await getFacturesUsersByFactureNumber(userId, true);
+      // historiqueFactures = await getFacturesUsersByFactureNumber(userId, true);
+      historiqueFactures = (historiqueFactures || []).sort((a: any, b: any) => 
+        (a.factureNumber || 0) - (b.factureNumber || 0)
+      );
     } else if (sortBy === "date") {
-      historiqueFactures = await getFacturesUsersByDate(userId, true);
+      // historiqueFactures = await getFacturesUsersByDate(userId, true);
+      historiqueFactures = (historiqueFactures || []).sort((a: any, b: any) => 
+        new Date(b.dateFacture).getTime() - new Date(a.dateFacture).getTime()
+      );
     } else if (filterByPaid === "false") {
-      historiqueFactures = await getFacturesUsersPaidInvoice(userId, true);
+      // historiqueFactures = await getFacturesUsersPaidInvoice(userId, true);
+      historiqueFactures = (historiqueFactures || []).filter((f: any) => !f.isPaid);
     }
 
     // Réponse avec les données et les headers de cache
     const response = NextResponse.json(historiqueFactures);
-
 
     return response;
   } catch (error) {
     console.error("Erreur API getAllFacturesUsers:", error);
     return NextResponse.json(
       { success: false, message: "Erreur serveur" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

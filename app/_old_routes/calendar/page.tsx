@@ -33,10 +33,10 @@ export default function CalendarPage() {
 
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState<Date>(
-    new Date(today.getFullYear(), today.getMonth(), 1)
+    new Date(today.getFullYear(), today.getMonth(), 1),
   );
   const [invoices, setInvoices] = useState<Record<string, InvoiceSummary[]>>(
-    {}
+    {},
   );
   const [loading, setLoading] = useState(false);
 
@@ -59,29 +59,33 @@ export default function CalendarPage() {
       const generateSubscriptionUrl = async () => {
         setLoadingSubscription(true);
         setSubscriptionError("");
-        
+
         try {
-          const response = await fetch('/api/calendar/token', {
-            credentials: 'include',
+          const response = await fetch("/api/calendar/token", {
+            credentials: "include",
           });
-          
+
           if (!response.ok) {
-            throw new Error('Failed to generate subscription token');
+            throw new Error("Failed to generate subscription token");
           }
-          
+
           const { token } = await response.json();
           const baseUrl = window.location.origin;
           // No longer need userId in URL - it's encoded in the token
           const url = `${baseUrl}/api/calendar/export?token=${token}`;
           setSubscriptionUrl(url);
         } catch (error) {
-          console.error('Error generating subscription URL:', error);
-          setSubscriptionError(langage === 'fr' ? 'Erreur lors de la génération du lien d\'abonnement' : 'Error generating subscription link');
+          console.error("Error generating subscription URL:", error);
+          setSubscriptionError(
+            langage === "fr"
+              ? "Erreur lors de la génération du lien d'abonnement"
+              : "Error generating subscription link",
+          );
         } finally {
           setLoadingSubscription(false);
         }
       };
-      
+
       generateSubscriptionUrl();
     }
   }, [user?.id, langage]); // Remove 't' from dependencies, use langage instead
@@ -92,14 +96,14 @@ export default function CalendarPage() {
       try {
         const res = await fetch(
           `/api/histories-invoices?start=${monthStartKey}&end=${monthEndKey}`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
-        
+
         if (!res.ok) {
           setInvoices({});
           return;
         }
-        
+
         const data = await res.json();
 
         const map: Record<string, InvoiceSummary[]> = {};
@@ -136,7 +140,7 @@ export default function CalendarPage() {
       cells.push(
         dayNumber < 1 || dayNumber > daysInMonth
           ? { date: null }
-          : { date: new Date(year, monthIndex, dayNumber) }
+          : { date: new Date(year, monthIndex, dayNumber) },
       );
     }
     return cells;
@@ -154,7 +158,7 @@ export default function CalendarPage() {
         setCopiedSubscription(true);
         setTimeout(() => setCopiedSubscription(false), 2000);
       } catch (error) {
-        console.error('Error copying to clipboard:', error);
+        console.error("Error copying to clipboard:", error);
       }
     }
   };
@@ -173,7 +177,7 @@ export default function CalendarPage() {
 
   const monthLabel = currentMonth.toLocaleString(
     langage === "fr" ? "fr-FR" : "en-US",
-    { month: "long", year: "numeric" }
+    { month: "long", year: "numeric" },
   );
 
   return (
@@ -203,26 +207,43 @@ export default function CalendarPage() {
                 </h2>
 
                 <div className="flex items-center justify-center gap-2 flex-wrap">
-                                    {/* Calendar Subscription Toggle Button */}
+                  {/* Calendar Subscription Toggle Button */}
                   <button
                     onClick={() => setShowSubscription(!showSubscription)}
                     className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-3 sm:px-4 py-2 text-violet-200 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm sm:text-base flex items-center gap-2"
                     title={t("calendarSubscription")}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="hidden sm:inline">{t("calendarSubscription")}</span>
-                    <svg 
-                      className={`w-3 h-3 transition-transform duration-200 ${showSubscription ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">
+                      {t("calendarSubscription")}
+                    </span>
+                    <svg
+                      className={`w-3 h-3 transition-transform duration-200 ${showSubscription ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
-                  
+
                   <button
                     onClick={goPrev}
                     className="rounded-xl border border-white/10 bg-white/5 backdrop-blur px-3 sm:px-4 py-2 text-slate-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors"
@@ -251,21 +272,50 @@ export default function CalendarPage() {
                 <div className="mb-4 rounded-xl border border-violet-400/20 bg-violet-500/5 backdrop-blur p-4 sm:p-5 animate-in slide-in-from-top-2 duration-200">
                   {loadingSubscription && (
                     <div className="flex items-center justify-center gap-3 text-violet-200 py-4">
-                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
-                      <span className="text-sm">{t("loadingSubscription")}</span>
+                      <span className="text-sm">
+                        {t("loadingSubscription")}
+                      </span>
                     </div>
                   )}
 
                   {subscriptionError && (
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-400/20">
-                      <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       <div className="flex-1">
-                        <p className="text-red-200 text-sm">{subscriptionError}</p>
+                        <p className="text-red-200 text-sm">
+                          {subscriptionError}
+                        </p>
                         <button
                           onClick={() => window.location.reload()}
                           className="mt-2 text-xs text-red-300 hover:text-red-100 underline"
@@ -276,64 +326,96 @@ export default function CalendarPage() {
                     </div>
                   )}
 
-                  {subscriptionUrl && !loadingSubscription && !subscriptionError && (
-                    <>
-                      <p className="text-sm text-slate-300 mb-3">
-                        {t("calendarSubscriptionDescription")}
-                      </p>
-
-                      {/* Expiration notice */}
-                      <div className="flex items-center gap-2 text-xs text-violet-300/70 mb-3">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {t("tokenExpiresIn")}
-                      </div>
-
-                      {/* Single Subscription URL for all platforms */}
-                      <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                        <input
-                          type="text"
-                          value={subscriptionUrl}
-                          readOnly
-                          className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 font-mono"
-                          onClick={(e) => e.currentTarget.select()}
-                        />
-                        <button
-                          onClick={handleCopySubscriptionUrl}
-                          className="px-4 py-2 rounded-lg border border-violet-400/40 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-colors text-sm flex items-center justify-center gap-2 whitespace-nowrap"
-                        >
-                          {copiedSubscription ? (
-                            <>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                              {t("copied")}
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              {t("copyLink")}
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      {/* Instructions */}
-                      <div className="text-xs text-slate-400 bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold text-slate-300 mb-2">
-                          {t("howToSubscribe")}
+                  {subscriptionUrl &&
+                    !loadingSubscription &&
+                    !subscriptionError && (
+                      <>
+                        <p className="text-sm text-slate-300 mb-3">
+                          {t("calendarSubscriptionDescription")}
                         </p>
-                        <ul className="space-y-1 list-disc list-inside">
-                          <li>{t("subscriptionInstructionsCopy")}</li>
-                          <li>{t("subscriptionInstructionsCalendarApp")}</li>
-                          <li>{t("subscriptionInstructionsAutoUpdate")}</li>
-                        </ul>
-                      </div>
-                    </>
-                  )}
+
+                        {/* Expiration notice */}
+                        <div className="flex items-center gap-2 text-xs text-violet-300/70 mb-3">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {t("tokenExpiresIn")}
+                        </div>
+
+                        {/* Single Subscription URL for all platforms */}
+                        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                          <input
+                            type="text"
+                            value={subscriptionUrl}
+                            readOnly
+                            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <button
+                            onClick={handleCopySubscriptionUrl}
+                            className="px-4 py-2 rounded-lg border border-violet-400/40 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-colors text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                          >
+                            {copiedSubscription ? (
+                              <>
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                {t("copied")}
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                {t("copyLink")}
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Instructions */}
+                        <div className="text-xs text-slate-400 bg-white/5 rounded-lg p-3">
+                          <p className="font-semibold text-slate-300 mb-2">
+                            {t("howToSubscribe")}
+                          </p>
+                          <ul className="space-y-1 list-disc list-inside">
+                            <li>{t("subscriptionInstructionsCopy")}</li>
+                            <li>{t("subscriptionInstructionsCalendarApp")}</li>
+                            <li>{t("subscriptionInstructionsAutoUpdate")}</li>
+                          </ul>
+                        </div>
+                      </>
+                    )}
                 </div>
               )}
 

@@ -6,8 +6,17 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "À Propos - FactureMe | About - FactureMe",
-  description: "Découvrez l'équipe derrière FactureMe, votre solution de gestion de factures simplifiée. | Discover the team behind FactureMe, your simplified invoice management solution.",
-  keywords: ["FactureMe", "équipe", "à propos", "facturation", "team", "about", "invoicing"],
+  description:
+    "Découvrez l'équipe derrière FactureMe, votre solution de gestion de factures simplifiée. | Discover the team behind FactureMe, your simplified invoice management solution.",
+  keywords: [
+    "FactureMe",
+    "équipe",
+    "à propos",
+    "facturation",
+    "team",
+    "about",
+    "invoicing",
+  ],
 };
 
 type CreatorProps = {
@@ -40,7 +49,7 @@ function CreatorCard({
         "creator-card rounded-2xl border shadow-lg",
         "bg-white/90 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800",
         "p-6 sm:p-8 text-center",
-        extraMargin && "mt-24"
+        extraMargin && "mt-24",
       )}
     >
       <div className="flex justify-center mb-4">

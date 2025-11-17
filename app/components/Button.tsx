@@ -27,14 +27,14 @@ export default function Button({
         ? // Light-mode focus state
           "focus:border-teal-500 focus:ring-teal-500"
         : // Dark-mode focus state
-          "dark:focus:border-teal-400 dark:focus:ring-teal-400"
+          "dark:focus:border-teal-400 dark:focus:ring-teal-400",
     ),
     secondary: twMerge(
       isSelected
         ? // Selected / hover states
           "border-teal-500 bg-teal-500 text-white hover:bg-teal-600"
         : // Unselected / hover state
-          "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+          "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50",
     ),
   };
 
@@ -45,7 +45,7 @@ export default function Button({
         variantStyles[variant],
         fullWidth && "w-full",
         className,
-        className
+        className,
       )}
       {...props}
     />

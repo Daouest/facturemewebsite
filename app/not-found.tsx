@@ -2,7 +2,7 @@
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { FileQuestion } from "lucide-react";
 import Link from "next/link";
 

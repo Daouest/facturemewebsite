@@ -1,7 +1,7 @@
 "use client";
 
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 
 export default function DashboardLoading() {
   const { langage } = useLangageContext();

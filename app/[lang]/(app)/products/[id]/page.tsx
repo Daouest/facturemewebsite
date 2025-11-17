@@ -7,7 +7,7 @@ export default async function ProductDetailPage({
 }) {
   const { id, lang } = await params;
   let idObjet: number | null = null;
-  
+
   try {
     // Step 1: URL decode in case Next.js encoded the base64 string
     const urlDecoded = decodeURIComponent(id);

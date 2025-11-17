@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AddressAutocomplete, { AddressData } from "../components/AddressAutocomplete";
+import AddressAutocomplete, {
+  AddressData,
+} from "../components/AddressAutocomplete";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator } from "@/app/_lib/utils/format";
 import { AddressSchema } from "../lib/schemas/auth";
 
 export default function EditAddressForm() {
@@ -78,7 +80,9 @@ export default function EditAddressForm() {
 
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
-        throw new Error(j?.message || "Erreur lors de la sauvegarde de l'adresse");
+        throw new Error(
+          j?.message || "Erreur lors de la sauvegarde de l'adresse",
+        );
       }
 
       setSaved("ok");
@@ -115,10 +119,14 @@ export default function EditAddressForm() {
             {saving ? t("saving") : t("saveAddress")}
           </button>
           {saved === "ok" && (
-            <span className="text-green-300 text-sm font-medium">{t("saved")}</span>
+            <span className="text-green-300 text-sm font-medium">
+              {t("saved")}
+            </span>
           )}
           {saved === "err" && (
-            <span className="text-red-300 text-sm font-medium">{t("saveError")}</span>
+            <span className="text-red-300 text-sm font-medium">
+              {t("saveError")}
+            </span>
           )}
         </div>
       </form>

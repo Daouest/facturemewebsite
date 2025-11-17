@@ -76,10 +76,16 @@ export default function Previsualisation() {
           });
 
           if (!setRes.ok) {
-            const errorData = await setRes.json().catch(() => ({ error: 'Unknown error' }));
-            console.error("Failed to set facture in session:", setRes.status, errorData.error);
+            const errorData = await setRes
+              .json()
+              .catch(() => ({ error: "Unknown error" }));
+            console.error(
+              "Failed to set facture in session:",
+              setRes.status,
+              errorData.error,
+            );
             setLoading(false);
-            
+
             // Generic error message based on status code
             if (setRes.status === 401) {
               setError("Veuillez vous connecter pour accéder à cette facture.");
@@ -88,7 +94,9 @@ export default function Previsualisation() {
             } else if (setRes.status === 404) {
               setError("Facture introuvable.");
             } else {
-              setError("Impossible d'accéder à la facture. Veuillez réessayer.");
+              setError(
+                "Impossible d'accéder à la facture. Veuillez réessayer.",
+              );
             }
             return;
           }
@@ -103,12 +111,16 @@ export default function Previsualisation() {
           const data = await res.json();
           if (data) setFacture(data);
         } else {
-          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          const errorData = await res
+            .json()
+            .catch(() => ({ error: "Unknown error" }));
           console.error("Previsualisation error:", res.status, errorData.error);
-          
+
           // Generic error message based on status code
           if (res.status === 401) {
-            throw new Error("Veuillez vous connecter pour accéder à cette facture.");
+            throw new Error(
+              "Veuillez vous connecter pour accéder à cette facture.",
+            );
           } else if (res.status === 403) {
             throw new Error("Vous n'avez pas accès à cette facture.");
           } else if (res.status === 404) {
@@ -446,7 +458,7 @@ function invoiceComponent(infoArray: any) {
                           {fmtMoney(item.total)}
                         </td>
                       </tr>
-                    )
+                    ),
                   )}
                 </tbody>
               </table>
@@ -506,7 +518,7 @@ function invoiceComponent(infoArray: any) {
                           {fmtMoney(item.total)}
                         </td>
                       </tr>
-                    )
+                    ),
                   )}
                 </tbody>
               </table>

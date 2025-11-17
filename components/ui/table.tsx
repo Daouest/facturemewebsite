@@ -18,7 +18,7 @@ import {
   createTranslator,
   showLongText,
   isTableTicket,
-} from "@/app/lib/utils";
+} from "@/app/_lib/utils/format";
 import ImageFromBd from "@/components/ui/images";
 import { useLangageContext } from "@/app/context/langageContext";
 // @ts-ignore

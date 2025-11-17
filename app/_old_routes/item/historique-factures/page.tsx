@@ -8,16 +8,16 @@ import MobileSidebarWrapper from "@/app/components/MobileSidebarWrapper";
 import { Table } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
-import { Facture } from "@/app/lib/definitions";
+import { Facture } from "@/app/_lib/types/definitions";
 import {
   createTranslator,
   getFacturesUsersByDate,
   getFacturesUsersByFactureNumber,
   getFacturesUsersPaidInvoice,
-} from "@/app/lib/utils";
+} from "@/app/_lib/utils/format";
 import { Switch } from "@/components/ui/switch";
 import { useLangageContext } from "../../context/langageContext";
-import { refreshSeconds } from "@/app/lib/constante";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
 
 export default function HistoricInvoices() {
   const [sorterByFactureNumber, setSorterByFactureNumber] = useState(false);

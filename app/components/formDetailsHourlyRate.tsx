@@ -9,14 +9,18 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator, formatIntoDecimal } from "@/app/lib/utils";
+import { createTranslator, formatIntoDecimal } from "@/app/_lib/utils/format";
 import { useFormData } from "@/app/context/HourlyRateFormContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { set } from "mongoose";
 
-export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) {
+export default function FormDetailsHourlyRate({
+  idObjet,
+}: {
+  idObjet: number;
+}) {
   //traduction
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
@@ -44,7 +48,8 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
       return res.json();
     },
     enabled: !!idObjet,
-    select: (data) => data.find((hourlyRate: any) => hourlyRate.idObjet === idObjet), //retourne l'objet dont le idObjet equivaut
+    select: (data) =>
+      data.find((hourlyRate: any) => hourlyRate.idObjet === idObjet), //retourne l'objet dont le idObjet equivaut
   });
 
   //On met les infos dans le form
@@ -63,7 +68,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
           })
-          .replace(/\u00A0/g, " ")
+          .replace(/\u00A0/g, " "),
       );
     }
   }, [data, idObjet, setFormData]);
@@ -121,13 +126,12 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        formData: idObjet ?? formData.idObjet
+        formData: idObjet ?? formData.idObjet,
       }),
     });
     if (!res.ok) throw Error("Erreur lors de la suppression");
     return true;
   };
-
 
   const mutation = useMutation({
     mutationFn: updateRequest,
@@ -240,9 +244,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                 {t("hourlyRateDetails")}
               </h1>
               <div className="my-4 border-t border-white/10" />
-              <p className="text-lg text-slate-300">
-                {t("hourlyRateError")}
-              </p>
+              <p className="text-lg text-slate-300">{t("hourlyRateError")}</p>
             </div>
           </div>
         </main>
@@ -253,7 +255,6 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
   // ---------- FORM ----------
   return (
     <div className="min-h-dvh flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 pb-8">
-
       {/* Back arrow */}
       <Link
         href="/hourlyRates"
@@ -277,8 +278,9 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
               <Alert className="bg-white/5 border border-white/10 text-slate-100 mt-2 w-full sm:w-[80%] md:w-[70%] mx-auto rounded-xl">
                 <div className="flex items-start gap-3 p-4">
                   <AiOutlineAlert
-                    className={`h-5 w-5 ${Errormessage.error ? "text-rose-300" : "text-emerald-300"
-                      }`}
+                    className={`h-5 w-5 ${
+                      Errormessage.error ? "text-rose-300" : "text-emerald-300"
+                    }`}
                   />
                   <div className="flex-1">
                     <AlertTitle className="text-slate-100">Message</AlertTitle>
@@ -354,7 +356,7 @@ export default function FormDetailsHourlyRate({ idObjet }: { idObjet: number }) 
                       placeholder={formatIntoDecimal(
                         formData?.hourlyRate,
                         "fr-CA",
-                        "CAD"
+                        "CAD",
                       )}
                       value={rate}
                       onChange={handleChange}

@@ -9,15 +9,15 @@ import ActionsCard from "@/app/components/ActionsCard";
 import { Table } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
-import { Facture } from "@/app/lib/definitions";
+import { Facture } from "@/app/_lib/types/definitions";
 import {
   createTranslator,
   getFacturesUsersByDate,
   getFacturesUsersByFactureNumber,
   getFacturesUsersPaidInvoice,
-} from "@/app/lib/utils";
+} from "@/app/_lib/utils/format";
 import { Switch } from "@/components/ui/switch";
-import { refreshSeconds } from "@/app/lib/constante";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
 import { useLangageContext } from "../../context/langageContext";
 
 export default function ItemCatalogue() {
@@ -100,7 +100,12 @@ export default function ItemCatalogue() {
       return getFacturesUsersByDate(archivedFactures ?? []);
     }
     return archivedFactures;
-  }, [archivedFactures, sorterByFactureNumber, sortByPaidInvoice, sorterByDate]);
+  }, [
+    archivedFactures,
+    sorterByFactureNumber,
+    sortByPaidInvoice,
+    sorterByDate,
+  ]);
 
   return (
     <>
@@ -211,7 +216,9 @@ export default function ItemCatalogue() {
               {/* Mobile switches - below the table */}
               <div
                 className={`${
-                  archivedFactures && archivedFactures?.length > 0 ? "flex" : "hidden"
+                  archivedFactures && archivedFactures?.length > 0
+                    ? "flex"
+                    : "hidden"
                 } md:hidden flex-col gap-4 mt-6 px-6`}
               >
                 <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 backdrop-blur px-4 py-3">

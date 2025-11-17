@@ -2,11 +2,11 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { getDateNow, createTranslator } from "@/app/lib/utils";
+import { getDateNow, createTranslator } from "@/app/_lib/utils/format";
 import { LastFactures } from "@/app/components/lastFactures";
-import { TableFactureType } from "@/app/lib/definitions";
+import { TableFactureType } from "@/app/_lib/types/definitions";
 import { useLangageContext } from "@/app/context/langageContext";
-import { refreshSeconds } from "@/app/lib/constante";
+import { refreshSeconds } from "@/app/_lib/utils/constants";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {

@@ -51,7 +51,10 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
   // Live availability checking
   const [availability, setAvailability] = useState<Availability>({});
   const [checking, setChecking] = useState(false);
-  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>("errorCount", 4);
+  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>(
+    "errorCount",
+    4,
+  );
   const [isUserIsFind, setIsUserIsFind] = useState(true);
   const [stopTimeout, setStopTimeout] = useState<boolean>(false);
 
@@ -71,10 +74,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
     if (storedErrorCount !== 0) return;
 
-
     const interval = setInterval(() => {
       expiredBlockUser(); // appel initial
-      console.log("stopTimeout", stopTimeout)
+      console.log("stopTimeout", stopTimeout);
       if (stopTimeout) {
         clearInterval(interval);
         return;
@@ -92,17 +94,16 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ blockUser: true }),
-      })
+      });
       if (!res.ok) {
         console.error("Erreur lors de la création du cookie");
         return;
       }
       console.log("Cookie de blocage défini avec succès !");
-
     } catch (err) {
-      console.error("Erreur dans le blockage de cookie", err)
+      console.error("Erreur dans le blockage de cookie", err);
     }
-  }
+  };
 
   const expiredBlockUser = async () => {
     let falseCount = 0;
@@ -114,13 +115,12 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       if (data.blockUser === false) {
         falseCount++;
         if (falseCount >= 1) {
-          console.log("dans if flaseCount", falseCount)
+          console.log("dans if flaseCount", falseCount);
           setIsBlocked(false);
           setStoredErrorCount(5);
           setStopTimeout(false);
           return;
         }
-
       } else {
         falseCount = 0;
         setIsBlocked(true);
@@ -128,13 +128,10 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     } catch (err) {
       console.error("Erreur lors de la vérification du cookie", err);
     }
-
-
   };
   useEffect(() => {
-    console.log("isUserIsFind ", isUserIsFind)
-
-  }, [isUserIsFind])
+    console.log("isUserIsFind ", isUserIsFind);
+  }, [isUserIsFind]);
   const checkAvailability = useMemo(
     () =>
       debounce(async (emailVal: string, usernameVal: string) => {
@@ -153,7 +150,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             `/api/auth/availability?${params.toString()}`,
             {
               cache: "no-store",
-            }
+            },
           );
           if (res.ok) {
             const data = (await res.json()) as { taken: Availability };
@@ -167,7 +164,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           setChecking(false);
         }
       }, 400),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -193,7 +190,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
         if (!res.ok) {
           setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
-          setStoredErrorCount(prev => (prev > 1 ? prev - 1 : 0));
+          setStoredErrorCount((prev) => (prev > 1 ? prev - 1 : 0));
           setIsUserIsFind(false);
           return;
         }
@@ -208,7 +205,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           firstName: data.user.firstName,
           lastName: data.user.lastName,
           isAdmin: data.user.isAdmin,
-
         });
 
         // Redirect to new dashboard structure
@@ -231,7 +227,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       validationErrors.confirmEmail = "Emails do not match";
     if (password !== confirmPassword)
       validationErrors.confirmPassword = "Passwords do not match";
-    
+
     // Address validation
     if (!addressData.address.trim())
       validationErrors["address.address"] = "L'adresse est requise";
@@ -274,7 +270,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
       if (!res.ok) {
         // Handles both 400 (validation) and 409 (duplicate E11000)
         setErrors(
-          data?.errors ?? { form: data?.message ?? "Erreur signup au form" }
+          data?.errors ?? { form: data?.message ?? "Erreur signup au form" },
         );
         return;
       }
@@ -303,13 +299,16 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
             {mode === "login" ? "Connexion" : "Inscription"}
           </h2>
-              <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
-            {errors.form !== ""  && !isUserIsFind ? `Il vous reste ${storedErrorCount } ${storedErrorCount <= 1 ? "tentavive" : "tentavives"} ` : ""}
+          <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
+            {errors.form !== "" && !isUserIsFind
+              ? `Il vous reste ${storedErrorCount} ${storedErrorCount <= 1 ? "tentavive" : "tentavives"} `
+              : ""}
           </p>
           <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
-            {storedErrorCount === 0 ? `Vous avez étét bloqué revenez dans 1 minute` : ""}
+            {storedErrorCount === 0
+              ? `Vous avez étét bloqué revenez dans 1 minute`
+              : ""}
           </p>
-
 
           {/* SIGNUP fields */}
           {mode === "signup" && (
@@ -538,7 +537,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
+              className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               disabled={isBlocked ? true : false}
               required
             />
@@ -549,10 +548,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             <Button
               type="submit"
               className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors ${isBlocked || isSubmitting ? "" : "cursor cursor-pointer"}`}
-              disabled={ isBlocked ? true : false||
-                isSubmitting ||
-                (mode === "signup" &&
-                  (availability.email || availability.username || checking))
+              disabled={
+                isBlocked
+                  ? true
+                  : false ||
+                    isSubmitting ||
+                    (mode === "signup" &&
+                      (availability.email || availability.username || checking))
               }
             >
               {isSubmitting

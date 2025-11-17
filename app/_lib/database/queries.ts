@@ -1,0 +1,849 @@
+import {
+ connectToDatabase 
+}
+ from "@/app/_lib/database/mongodb";
+import {
+DbObjet, DbBusiness, DbTauxHoraire, DbClient, DbFacture, DbObjetFacture, DbFactureHoraire, DbUsers, DbAddress, DbTicket 
+}
+ from "@/app/_lib/database/models";
+import {
+ CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnitaire, FactureHoraire, Business, ItemField, ItemFieldWithPrice, TauxHoraire 
+}
+ from "@/app/_lib/types/definitions";
+import {
+ ItemData, UserData, Address, Client, ClientAffichage 
+}
+ from "@/app/_lib/types/definitions";
+import {
+ calculateTotalByWorkedHours, calculateTaxes 
+}
+ from "@/app/_lib/utils/format";
+import {
+ getUserFromCookies 
+}
+ from "@/app/_lib/session/session-node";
+import {
+ getNextId 
+}
+ from "@/app/_lib/database/sequence-generator";
+import {
+ fetchByIds 
+}
+ from "@/app/_lib/database/fetch-helpers";
+
+export const runtime = "nodejs"export async function fetchCustomers() {
+    try {
+        const user = await getUserFromCookies();        if (!user) return [] as CustomerField[];        const clients = await DbClient.find(            {
+ idUser: user.idUser 
+}
+,            {
+ idClient: 1, nomClient: 1, _id: 0 
+}
+        ).sort({
+ nomClient: 1 
+}
+).lean();        return clients.map((client) => ({
+            id: client.idClient,            name: client.nomClient,        
+}
+)) as CustomerField[];    
+}
+ catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch all customers.');    
+}
+
+}
+export async function fetchClientByUserId(idUser: number) {
+    try {
+        const clients = await DbClient.find({
+ idUser 
+}
+).lean<Client[]>();        //Clients affichage (addresse jointe)        const clientsAffichage: ClientAffichage[] = [];        for (const client of clients) {
+            const addressResponse = await getAddressInfo(client.idAddress);            let address: Address = addressResponse.success && addressResponse.addressData ? addressResponse.addressData : {
+
+}
+ as Address;            clientsAffichage.push({
+                idClient: client.idClient,                nomClient: client.nomClient,                address: address            
+}
+);        
+}
+        if (!clientsAffichage) return {
+ success: false, message: "Client non trouvé" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération du client", clients: clientsAffichage 
+}
+;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getClientByUserId", err);        return {
+ success: false, message: "Erreur dans la récupération du client" 
+}
+;    
+}
+
+}
+export async function fetchBusinesses() {
+    try {
+        const user = await getUserFromCookies();        if (!user) return [] as BusinessField[];        const businesses = await DbBusiness.find(            {
+ idUser: user.idUser 
+}
+,            {
+ idBusiness: 1, businessName: 1, _id: 0 
+}
+        ).sort({
+ businessName: 1 
+}
+).lean();        return businesses.map((business) => ({
+            id: business.idBusiness,            name: business.businessName,        
+}
+)) as BusinessField[];    
+}
+ catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch all businesses.');    
+}
+
+}
+export async function fetchBusinessInfo(idBusiness: number) {
+    try {
+        const business = await DbBusiness.findOne({
+ idBusiness 
+}
+).lean<Business | null>();        if (!business) return {
+ success: false, message: "Business non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de la business", businessInfo: business 
+}
+;    
+}
+    catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch business.');    
+}
+
+}
+export async function fetchBusinessInfoByUserId(idUser: number) {
+    try {
+        const user = await getUserInfo(idUser);        if (!user.success || !user.userData) {
+            return {
+ success: false, message: "Utilisateur non trouvé" 
+}
+;        
+}
+        if (user.userData.idBusiness == null) {
+            return {
+ success: false, message: "L'utilisateur n'est pas associé à une entreprise" 
+}
+;        
+}
+        const business = await DbBusiness.findOne({
+ idBusiness: user.userData.idBusiness 
+}
+).lean<Business | null>();        if (!business) return {
+ success: false, message: "Business non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de la business", businessInfo: business 
+}
+;    
+}
+    catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch business.');    
+}
+
+}
+export async function fetchCustomerInfo(idClient: number) {
+    try {
+        const client = await DbClient.findOne({
+ idClient 
+}
+).lean<Client | null>();        if (!client) return {
+ success: false, message: "Client non trouvé" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération du client", customerInfo: client 
+}
+;    
+}
+    catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch customer.');    
+}
+
+}
+export async function fetchObjects() {
+    try {
+        const user = await getUserFromCookies();        if (!user) return [] as ObjectField[];        const objects = await DbObjet.find(            {
+ idUser: user.idUser 
+}
+,            {
+ idObjet: 1, productName: 1, _id: 0 
+}
+        ).sort({
+ productName: 1 
+}
+).lean();        return objects.map((object) => ({
+            id: object.idObjet,            name: object.productName,        
+}
+)) as ObjectField[];    
+}
+ catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch all objects.');    
+}
+
+}
+export async function fetchNextFactureId() {
+    return getNextId(DbFacture, 'idFacture');
+}
+export async function fetchNextAddressId() {
+    return getNextId(DbAddress, 'idAddress');
+}
+export async function fetchNextClientId() {
+    return getNextId(DbClient, 'idClient');
+}
+export async function fetchNextBusinessId() {
+    return getNextId(DbBusiness, 'idBusiness');
+}
+export async function fetchNextObjetId() {
+    return getNextId(DbObjet, 'idObjet');
+}
+export async function fetchNextHourlyRateId() {
+    return getNextId(DbTauxHoraire, 'idObjet');
+}
+export async function fetchObjectById(id: number) {
+    const obj = await DbObjet.findOne({
+ idObjet: id 
+}
+).lean<Objet | null>();    return obj;
+}
+export async function validateInvoiceNumber(invoiceNumber: number) {
+    const user = await getUserFromCookies();    if (!user) return false;    const existing = await DbFacture.findOne({
+        factureNumber: invoiceNumber,        idUser: user.idUser    
+}
+).lean();    return !!existing;
+}
+export async function fetchObjectsByIds(ids: number[]) {
+    return fetchByIds(DbObjet, ids, 'idObjet');
+}
+export async function getFactureData(idFacture: number) {
+    try {
+        const factureData = await DbFacture.findOne({
+ idFacture 
+}
+).lean<Facture | null>();        if (!factureData) return {
+ success: false, message: "Facture non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de la facture", facture: factureData 
+}
+;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getFactureData", err);        return {
+ success: false, message: "Erreur dans la récupération de la facture" 
+}
+;    
+}
+
+}
+export async function getFactureDetails(idFacture: number) {
+    try {
+        const factureResponse = await getFactureData(idFacture);        const typeFacture = factureResponse.facture?.typeFacture;        let factureDetails;        const factureU = await DbObjetFacture.find({
+ idFacture 
+}
+).lean<FactureUnitaire | null>();        const factureH = await DbFactureHoraire.find({
+ idFacture 
+}
+).lean<FactureHoraire | null>();        factureDetails = {
+ factureU, factureH 
+}
+;        if (!factureDetails) return {
+ success: false, message: "Facture non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de la facture", factureDetails: factureDetails 
+}
+;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getFactureData", err);        return {
+ success: false, message: "Erreur dans la récupération des details de la facture" 
+}
+;    
+}
+
+}
+export async function getUserInfo(idUser: number) {
+    try {
+        const userData = await DbUsers.findOne({
+ idUser 
+}
+).lean<UserData | null>();        if (!userData) return {
+ success: false, message: "Utilisateur non trouvé" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de l'utilisateur", userData: userData 
+}
+;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getUserInfo", err);        return {
+ success: false, message: "Erreur dans la récupération de l'utilisateur" 
+}
+;    
+}
+
+}
+export async function getUserInfoByEmail(_email: string) {
+    try {
+        const userData = await DbUsers.findOne({
+ email: _email 
+}
+).lean();        if (!userData) return null        return userData.idUser;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getUserInfo", err);        return {
+ success: false, message: "Erreur dans la récupération de l'utilisateur" 
+}
+;    
+}
+
+}
+export async function getAddressInfo(idAddress: number) {
+    try {
+        const addressData = await DbAddress.findOne({
+ idAddress 
+}
+).lean<Address | null>();        if (!addressData) return {
+ success: false, message: "Addresse non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération de l'adresse", addressData: addressData 
+}
+;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getAddressInfo", err);        return {
+ success: false, message: "Erreur dans la récupération de l'addresse" 
+}
+;    
+}
+
+}
+export async function fetchObjectsAndRates() {
+    try {
+        const user = await getUserFromCookies();        if (!user) return [] as ItemFieldWithPrice[];        const objects = await DbObjet.find(            {
+ idUser: user.idUser 
+}
+,            {
+ idObjet: 1, productName: 1, price: 1, _id: 0 
+}
+        ).sort({
+ productName: 1 
+}
+).lean();        const rates = await DbTauxHoraire.find(            {
+ idUser: user.idUser 
+}
+,            {
+ idObjet: 1, workPosition: 1, hourlyRate: 1, _id: 0 
+}
+        ).sort({
+ workPosition: 1 
+}
+).lean();        const productObjects: ItemFieldWithPrice[] = objects.map((object) => ({
+            id: object.idObjet,            name: object.productName,            type: 'product' as const,            price: object.price,        
+}
+));        const hourlyObjects: ItemFieldWithPrice[] = rates.map((rate) => ({
+            id: rate.idObjet,            name: rate.workPosition,            type: 'hourly' as const,            hourlyRate: rate.hourlyRate,        
+}
+));        return [...productObjects, ...hourlyObjects];    
+}
+ catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch all objects.');    
+}
+
+}
+export async function fetchItemsByIds(ids: number[]): Promise<(Objet | null)[]> {
+    return fetchByIds(DbObjet, ids, 'idObjet');
+}
+export async function fetchHourlyRatesByIds(ids: number[]): Promise<(TauxHoraire | null)[]> {
+    return fetchByIds(DbTauxHoraire, ids, 'idObjet');
+}
+export async function getImageItem(idItem: number) {
+    try {
+        const itemData = await DbObjet.findOne({
+ idObjet: idItem 
+}
+).lean<any>();        if (itemData?.productPhoto) {
+            return itemData.productPhoto        
+}
+        return null    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getOneItems", err)        return {
+ success: false, message: "Erreur dans la récupération de l'item" 
+}
+    
+}
+
+}
+export async function getOneItem(idItem: number) {
+    try {
+        const itemData = await DbObjet.findOne({
+ idItem 
+}
+).lean();        return {
+ success: true, message: "Succès dans la récupération de l'item", item: itemData 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getOneItems", err)        return {
+ success: false, message: "Erreur dans la récupération de l'item" 
+}
+    
+}
+
+}
+export async function getAllItemUser() {
+    try {
+        const itemData = await DbObjet.aggregate([            {
+                $lookup: {
+                    from: "users",          // nom de la collection Users en DB                    localField: "idUser",   // champ dans objetsUnitaires                    foreignField: "idUser", // champ correspondant dans Users                    as: "userInfo"                
+}
+            
+}
+,            {
+                $unwind: "$userInfo" // "déplie" le tableau userInfo → chaque item a son user unique            
+}
+,            {
+                $project: {
+ // choisir les champs à garder                    productName: 1,                    description: 1,                    price: 1,                    "userInfo.username": 1,                    "userInfo.email": 1                
+}
+            
+}
+        ]);        return {
+ success: true, message: "Succès dans la récupération de l'item", items: itemData 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getOneItems", err)        return {
+ success: false, message: "Erreur dans la récupération de l'item" 
+}
+    
+}
+
+}
+export async function getAllFacturesUsers(_idUser: number, _isActive = true) {
+    try {
+        const factureData = await DbFacture.aggregate([            {
+                $match: {
+ idUser: _idUser, isActive: _isActive 
+}
+ // Filtrer par idUser            
+}
+,            {
+                $lookup: {
+                    from: "clients",          // nom de la collection clients en DB                    localField: "idClient",   // champ dans facture_user                    foreignField: "idClient", // champ correspondant dans clients                    as: "clientInfo"                
+}
+            
+}
+,            {
+                $unwind: "$clientInfo" // "déplie" le tableau userInfo → chaque facture a son idClient unique            
+}
+,            {
+                $project: {
+ // choisir les champs à garder                    idFacture: 1,                    idUser: 1,                    dateFacture: 1,                    typeFacture: 1,                    factureNumber: 1,                    isPaid: 1,                    isActive: 1,                    "clientInfo.idClient": 1,                    "clientInfo.nomClient": 1                
+}
+            
+}
+        ]);        return factureData;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getFactureUsersDatas", err)    
+}
+
+}
+export async function deleteItemsById(idItem: number, _idUser: number) {
+    try {
+        await DbObjet.deleteOne({
+ idObjet: idItem, idUser: _idUser 
+}
+);        const item = await DbObjet.findOne({
+ idObjet: idItem, idUser: _idUser 
+}
+).lean();        console.log("item", item);        if (!item) return {
+ success: true 
+}
+        return {
+ success: false 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la supprimé deleteItemsById", err)        return {
+ success: false, message: "Erreur item  n'a pas été supprimé" 
+}
+    
+}
+
+}
+export async function getAllItems(id: number = 0) {
+    try {
+        const itemsData = await DbObjet.find({
+ idUser: id 
+}
+).lean();        // console.log("itemsData", itemsData);        return {
+ success: true, message: "Succès dans la récupération des produits", items: itemsData 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getAllItems", err)        return {
+ success: false, message: "Erreur dans la récupération des produits" 
+}
+    
+}
+
+}
+export async function getAllHourlyRates() {
+    try {
+        const user = await getUserFromCookies();        const idUser = user?.idUser;        const data = await DbTauxHoraire.find({
+ idUser: idUser 
+}
+).lean();        return {
+ success: true, message: "Succès dans la récupération des taux horaire", hourlyRates: data 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getAllHourlyRates", err)        return {
+ success: false, message: "Erreur dans la récupération des taux horaire" 
+}
+    
+}
+
+}
+export async function insertItem(userData: UserData, itemData: ItemData) {
+    try {
+        await connectToDatabase();        const count = await fetchNextObjetId();        console.log("idUser.id: ", userData.id);        const Today: Date = new Date();        const newItem = new DbObjet({
+            idUser: userData.id,            idObjet: count,            productName: itemData.itemNom,            description: itemData.description,            price: itemData.prix,            productPhoto: itemData?.image ? itemData.image : "",            enforcementDate: Today,            idParent: -1        
+}
+);        const saveItem = await newItem.save();        console.log("nouvelle objet", saveItem);        return {
+            success: true,            message: "Item créé avec succès",            item: itemData,        
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans le controller create item: lors de la cration d'un iem", err)        return {
+            success: false,            message: "Item non créé ",        
+}
+    
+}
+
+}
+export async function insertHourlyRate(data: TauxHoraire) {
+    try {
+        await connectToDatabase();        const count = await fetchNextHourlyRateId();        const newItem = new DbTauxHoraire({
+            idUser: data.idUser,            idObjet: count,            clientName: data.clientName,            workPosition: data.workPosition,            hourlyRate: data.hourlyRate,            enforcementDate: data.enforcementDate,            idParent: -1        
+}
+);        console.log("new Item: ", newItem);        await newItem.save();        console.log("Nouveau taux horaire: ", data);        return {
+            success: true,            message: "Item créé avec succès",            hourlyRate: newItem,        
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans le controller insert hourly rate", err)        return {
+            success: false,            message: "Taux Horaire non créé",        
+}
+    
+}
+
+}
+export async function updateHourlyRate(data: TauxHoraire) {
+    try {
+        //Chercher l'item dans la BD        await connectToDatabase();        const user = await getUserFromCookies();        const idUser = user?.idUser;        const existingItem = await DbTauxHoraire.findOne({
+ idObjet: data.idObjet, idUser: idUser 
+}
+);        //Si l'item n'existe pas, on lance une erreur        if (!existingItem) {
+            console.error("Taux Horaire non trouvé ou vous n'avez pas la permission de le modifier");            return {
+                success: false,                message: "Taux Horaire non modifié ",            
+}
+        
+}
+        //M.A.J. du taux horaire        const Today: Date = new Date();        await DbTauxHoraire.findByIdAndUpdate(            existingItem._id,            {
+                $set: {
+                    clientName: data.clientName,                    workPosition: data.workPosition,                    hourlyRate: data.hourlyRate,                    enforcementDate: Today                
+}
+            
+}
+, {
+ new: true 
+}
+ // renvoie l'item mis à jour        );        //Envoi du succes        return {
+            success: true,            message: "Taux Horaire modifié avec succès",            hourlyRate: data,        
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans le controller update taux horaire", err)        return {
+            success: false,            message: "Taux horaire non modifié",        
+}
+    
+}
+
+}
+export async function deleteHourlyRateById(id: number){
+    try {
+        //GET USER ID        const user = await getUserFromCookies();        const idUser = user?.idUser;        //DELETE        console.log("id: ", id);        console.log("idUser: ", idUser);        await DbTauxHoraire.deleteOne({
+ idObjet: id, idUser: idUser 
+}
+);        //TEST        const item = await DbTauxHoraire.findOne({
+ idObjet: id, idUser: idUser 
+}
+).lean();        console.log("Item: ", item);        if (!item) return {
+ success: true 
+}
+        return {
+ success: false 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la suppression deleteHourlyRateById", err)        return {
+ success: false, message: "Erreur le taux horaire n'a pas été supprimé" 
+}
+    
+}
+
+}
+export async function updateItem(userData: UserData, itemData: any) {
+    try {
+        await connectToDatabase();        console.log("Nom de l'item: ", itemData.itemNom);        const Today: Date = new Date();        const existingItem = await DbObjet.findOne({
+ idObjet: itemData.idObjet, idUser: userData.id 
+}
+);        if (!existingItem) {
+            console.error("Item non trouvé ou vous n'avez pas la permission de le modifier");            return {
+                success: false,                message: "Item non modifié ",            
+}
+        
+}
+        console.log("existingItem", existingItem.prix, existingItem.productName);        const updateData = await DbObjet.findByIdAndUpdate(            existingItem._id,            {
+                $set: {
+                    price: itemData.prix,                    productPhoto: itemData?.image ? itemData.image : "",                    enforcementDate: Today,                
+}
+            
+}
+, {
+ new: true 
+}
+// renvoie l'item mis à jour        );        console.log("objet modifier", updateData);        return {
+            success: true,            message: "Item  modifié succès",            item: itemData,        
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans le controller create item: lors de la modification d'un item", err)        return {
+            success: false,            message: "Item non modifié ",        
+}
+    
+}
+
+}
+export async function getLastFacture(idUser: number) {
+    try {
+        const result = await getAllFacturesUsers(idUser);        const sorted = result?.sort((a, b) => {
+            return new Date(b.dateFacture).getTime() - new Date(a.dateFacture).getTime()        
+}
+)        const last3Factures = sorted?.slice(0, 3)        return last3Factures;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonction getLastFacture", err)    
+}
+
+}
+export async function getTaxesArrayForFacture(idFacture: number) {
+    // should return an array of taxes with name, rate and amount    // "taxes": [{
+"name": "TPS", "rate": 5, "amount": 40.25
+}
+,    //           {
+"name": "TVQ", "rate": 9.975, "amount": 80.36
+}
+],    try {
+        //validations...........................................................................................................        //facture        const infoFacture = await getFactureData(idFacture);        if (!infoFacture.success) return;        if (infoFacture.facture?.isBusinessInvoice === false) return; //this only applies to business invoices        if (infoFacture.facture?.includesTaxes === false) return;        //business        let idUser = infoFacture.facture?.idUser;        if (idUser == null) return;        const infoBusiness = await fetchBusinessInfoByUserId(idUser);        //address        if (!infoBusiness.success) return;        if (infoBusiness.businessInfo?.idAddress == null) return;        const infoAddress = await getAddressInfo(infoBusiness.businessInfo.idAddress);        if (!infoAddress.success) return;        if (infoAddress.addressData?.province == null) return;        //facture details        const factureResponse = await getFactureDetails(idFacture);        if (!factureResponse.success) return;        const factureData = factureResponse.factureDetails;        if (!factureData) return;        // Calculate subtotal.....................................................................................................        let totalFacture = 0;        const colHoraire = factureData?.factureH;        const colUnitaires = factureData?.factureU;        if (colHoraire && Array.isArray(colHoraire)) {
+            colHoraire.forEach(item => {
+                // Calcul cout total                const total = calculateTotalByWorkedHours(item.hourlyRate, item.startTime, item.endTime, item.lunchTimeInMinutes);                totalFacture += total;            
+}
+);        
+}
+        if (colUnitaires && Array.isArray(colUnitaires)) {
+            colUnitaires.forEach(item => {
+                const quantity = Number(item.quantity) || 0;                const pricePerUnit = Number(item.pricePerUnit) || 0;                const total = Math.round(quantity * pricePerUnit * 100) / 100;                totalFacture += total;            
+}
+);        
+}
+        // Fetch facture to get province and taxes..............................................................................        let arrayTaxes: {
+ name: string; rate: number; amount: number 
+}
+[] = [];        let province = infoAddress.addressData?.province;        if (infoBusiness.businessInfo?.TVHnumber) {
+            const TVH = calculateTaxes(totalFacture, "TVH", province);            if (TVH) arrayTaxes.push(TVH);        
+}
+        if (infoBusiness.businessInfo?.TVPnumber) {
+            const TVP = calculateTaxes(totalFacture, "TVP", province);            if (TVP) arrayTaxes.push(TVP);        
+}
+        if (infoBusiness.businessInfo?.TVQnumber) {
+            const TVQ = calculateTaxes(totalFacture, "TVQ", province);            if (TVQ) arrayTaxes.push(TVQ);        
+}
+        if (infoBusiness.businessInfo?.TVSnumber) {
+            const TVS = calculateTaxes(totalFacture, "TVS", province);            if (TVS) arrayTaxes.push(TVS);        
+}
+        return arrayTaxes;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonction getTaxesArrayForFacture", err)    
+}
+    return null;
+}
+export async function getAllTaxesNumbers(businessId: number) {
+    try {
+        const business = await DbBusiness.findOne({
+ idBusiness: businessId 
+}
+).lean<Business | null>();        if (!business) return {
+ success: false, message: "Business non trouvée" 
+}
+;        return {
+ success: true, message: "Succès dans la récupération des numéros de taxes", taxesNumbers: {
+ TVHnumber: business.TVHnumber, TVPnumber: business.TVPnumber, TVQnumber: business.TVQnumber, TVSnumber: business.TVSnumber 
+}
+ 
+}
+;    
+}
+    catch (error) {
+        console.error('Database Error:', error);        throw new Error('Failed to fetch business.');    
+}
+
+}
+export async function getClients(){
+      const clients = await DbClient.find().lean();        if (!clients) {
+            console.error("Les clients n'ont pas été  trouvé");            return null        
+}
+        //console.log("Client trouvé", clients);        return clients;
+}
+export async function getClientById(idClient:number){
+      const existingClient = await DbClient.findOne({
+ idClient: idClient 
+}
+).lean<any>();        if (!existingClient) {
+            console.error("Client non trouvé ou vous n'avez pas la permission de le modifier");            return {
+success:false
+}
+;        
+}
+        console.log("Client trouvé", existingClient.nomClient);        return existingClient.nomClient;
+}
+export async function updateTicket(idClient: number, idTicket: number, status: boolean) {
+  try {
+    console.log("status", status);    await connectToDatabase();    const Today: Date = new Date();    const existingTicket = await DbTicket.findOne({
+ idClient, idTicket 
+}
+);    if (!existingTicket) {
+      console.error("Ticket non trouvé ou vous n'avez pas la permission de le modifier");      return {
+ success: false 
+}
+;    
+}
+    const client = await getClientById(idClient);    if (!client) {
+      console.error("Client non trouvé");      return {
+ success: false 
+}
+;    
+}
+    const updateData = await DbTicket.findOneAndUpdate(      {
+ idTicket 
+}
+,      {
+        $set: {
+          isCompleted: status,          date: Today,          nomClient: client,         
+}
+,      
+}
+,      {
+ new: true 
+}
+ // renvoie le ticket mis à jour    );    console.log("objet modifié", updateData);    return {
+ success: true, ticket: updateData 
+}
+;  
+}
+ catch (err) {
+    console.error("Erreur dans le controller updateTicket:", err);    return {
+ success: false 
+}
+;  
+}
+
+}
+export async function getAllTickets() {
+    try {
+        // const tickets = await DbTicket.aggregate([        //     {
+        //         $lookup: {
+        //             from: "clients",          //             localField: "idClient",           //             foreignField: "idClient", // champ correspondant dans Client        //             as: "clientInfo"        //         
+}
+        //     
+}
+,        //     {
+        //         $unwind: "$clientInfo" // "déplie" le tableau userInfo → chaque item a son client unique        //     
+}
+,        //     {
+        //         $project: {
+ // choisir les champs à garder        //             _id:1,        //             idTicket:1,        //             idClient: 1,        //             message: 1,        //             isCompleted: 1,        //             date:1,        //             "clientInfo.nomClient": 1,        //         
+}
+        //     
+}
+        // ]);         const tickets = await DbTicket.find();        return {
+ success: true, message: "Succès dans la récupération des tickets", ticket: tickets 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getAllTicket", err)        return {
+ success: false, message: "Erreur dans la récupération des tickets" 
+}
+    
+}
+
+}
+export async function deleteTicket(id: number) {
+    try {
+        await DbTicket.deleteOne({
+ _id: id
+}
+);        const item = await DbTicket.findOne({
+ _id: id 
+}
+).lean();        if (!item) return {
+ success: true 
+}
+        return {
+ success: false 
+}
+    
+}
+ catch (err) {
+        console.error("Erreur dans la supprimé deleteItemsById", err)        return {
+ success: false, message: "Erreur item  n'a pas été supprimé" 
+}
+    
+}
+
+}
+export async function getAllUsers() {
+    try {
+        const userData = await DbUsers.find().lean();        if (!userData) return null        return userData;    
+}
+ catch (err) {
+        console.error("Erreur dans la fonctions getUserInfo", err);        return null;    
+}
+
+}
