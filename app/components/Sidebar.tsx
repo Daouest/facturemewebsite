@@ -56,10 +56,10 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
    const getImageCached = async () => {
       let cachedImage = await getCacheImage("userProfileImage");
       if (!cachedImage) {
-          setCacheImage("userProfileImage", urlImage[0]);
-          cachedImage = await getCacheImage("userProfileImage");
+           await setCacheImage("userProfileImage", urlImage[0]);
+          cachedImage = urlImage[0];
       }
-      setSrcImage(cachedImage ?? urlImage[0]);
+      setSrcImage(cachedImage);
     }
     if (user) {
       fetchBusinessLogo();
@@ -73,7 +73,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
       <div className="flex flex-col items-center">
         <Image
-          src={businessLogo || businessLogo ||srcImage ||urlImage[0]}
+          src={businessLogo ?? srcImage ?? urlImage[0]}
           alt="profile"
           width={96}
           height={96}

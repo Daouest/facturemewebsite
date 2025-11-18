@@ -30,6 +30,9 @@ export async function GET(req: NextRequest) {
     const totalFactures = factures?.length ?? 0;
     const lastFactureDate = factures?.[totalFactures - 1]?.dateFacture?.toISOString() || new Date().toISOString();
 
+
+    factures =  factures?.filter(f =>f.isPaid === false);
+
     //Application des filtres ou tris selon les paramètres
     if (isLastFacturesRequested) {
       factures = await getLastFacture(userId);
@@ -69,9 +72,12 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const idFacture = parseInt(body.idFacture);
-    const isPaid =  body.isPaid;
-    const status = body.status;
+    let isPaid =  body.isPaid;
+    let status = body.status;
 
+    console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
+    if(isPaid === false) isPaid =  true;
+    if(status === true) status = false
 
     const result = await updateFactureUser(idFacture,status,isPaid);
 

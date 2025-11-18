@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const filterByPaid = searchParams.get("isPaid");
 
     // Récupération initiale des factures (true = active invoices)
-    let historiqueFactures = await getAllFacturesUsers(userId, true);
+    let historiqueFactures = await getAllFacturesUsers(userId, false);
 
     // Support filtering by date range to avoid returning a huge pool of invoices.
     // Expected query params: start=YYYY-MM-DD and end=YYYY-MM-DD
@@ -42,11 +42,11 @@ export async function GET(req: NextRequest) {
 
     //Application des filtres ou tris selon les paramètres
     if (sortBy === "factureNumber") {
-      historiqueFactures = await getFacturesUsersByFactureNumber(userId, true);
+      historiqueFactures = await getFacturesUsersByFactureNumber(userId, false);
     } else if (sortBy === "date") {
-      historiqueFactures = await getFacturesUsersByDate(userId, true);
+      historiqueFactures = await getFacturesUsersByDate(userId, false);
     } else if (filterByPaid === "false") {
-      historiqueFactures = await getFacturesUsersPaidInvoice(userId, true);
+      historiqueFactures = await getFacturesUsersPaidInvoice(userId, false);
     }
 
     // Réponse avec les données et les headers de cache

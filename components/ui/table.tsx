@@ -40,6 +40,7 @@ export function Table<
     facture: false,
     ticketMessage: false,
     ticketStatus: false,
+    updateFacture:false
   });
   const [messageTicket, setMessageTicket] = useState({
     client: "",
@@ -53,7 +54,7 @@ export function Table<
   const etagRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return; // regarde si on est côté client ou serveur
     const rootEl = document.getElementById("__next") ?? document.body;
     Modal.setAppElement(rootEl);
   }, []);
@@ -137,7 +138,7 @@ export function Table<
   };
 
 
-  const mutationTicket = useMutation({
+  const mutationTicket =    useMutation({
     mutationFn: handleChangeStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
@@ -147,10 +148,14 @@ export function Table<
     },
   });
 
-  const mutationFacture = useMutation({
+  const mutationFacture  =  useMutation({
     mutationFn: handleUpdateFacture,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["archivedFactures"] });
+    onSuccess: async () => {
+      await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["archivedFactures"] }),
+      queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] })
+      ])
+
     },
     onError: (error) => {
       console.error("Erreur de la modification d'une Facture :", error);
@@ -384,16 +389,9 @@ export function Table<
     return (
       <div className={["grid gap-3", className ?? ""].join(" ")}>
         {factureRows.map((row) => (
-          <button
+          <div
             key={row.idFacture}
-            onClick={() => {
-              setIsClick({
-                facture: true,
-                ticketMessage: false,
-                ticketStatus: false,
-              });
-              setId(row.idFacture);
-            }}
+          
             className={[
               "w-full text-left rounded-xl px-4 py-4",
               "border border-white/10 bg-white/5 backdrop-blur",
@@ -405,7 +403,16 @@ export function Table<
           >
             <div className="flex items-center justify-between gap-4">
               {/* Left: invoice number */}
-              <div className="min-w-0">
+              <div  onClick={()=>{
+              setIsClick({
+                facture: true,
+                ticketMessage: false,
+                ticketStatus: false,
+                updateFacture:false
+              });
+              setId(row.idFacture);
+            }}
+               className="min-w-0 cursor cursor-pointer">
                 <h4 className="text-base font-semibold text-slate-100 truncate">
                   {t("invoice")} #{row.factureNumber}
                 </h4>
@@ -423,11 +430,19 @@ export function Table<
                 </div>
                 <Button
                   className={[
-                    "text-sm font-semibold whitespace-nowrap",
+                    "text-sm font-semibold whitespace-nowrap cursor cursor-pointer",
                     row.isPaid ? "text-emerald-300" : "text-rose-300",
                   ].join(" ")}
 
-                  onClick={()=>{updateFactutre(row.idFacture,!row.isActive,!row.isPaid)}}// change the status and put them directly to invoice history
+                  onClick={()=>{
+                     setIsClick({
+                facture: false,
+                ticketMessage: false,
+                ticketStatus: false,
+                updateFacture:true
+              });
+                    updateFactutre(row.idFacture,row.isActive,row.isPaid)}
+                  }// change the status and put them directly to invoice history
                 >
                   {row.isPaid
                     ? langage === "fr"
@@ -439,7 +454,7 @@ export function Table<
                 </Button>
               </div>
             </div>
-          </button>
+          </div>
         ))}
       </div>
     );

@@ -349,7 +349,7 @@ export function showLongText(message: string) {
 }
 
 
-export function setCacheImage(key:string,url:string){
+export async function setCacheImage(key:string,url:string){
     try{
         localStorage.setItem(key,url);
     }catch(err){

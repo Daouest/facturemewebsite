@@ -940,7 +940,7 @@ export async function getAllUsers() {
 
 export async function updateFactureUser(idFacture: number, status:boolean,isPaid:boolean) {
   try {
-    // console.log("status", status);
+    console.log(["updateFactureUser","idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
 
     await connectToDatabase();
 
@@ -948,21 +948,24 @@ export async function updateFactureUser(idFacture: number, status:boolean,isPaid
     if (!existingFacture) {
       console.error("Facture non trouvé ou vous n'avez pas la permission de le modifier");
       return { success: false };
+
     }
 
-    const facture = await getFactureData(idFacture);
-    if (!facture) {
-      console.error("Facture non trouvé");
-      return { success: false };
-    }
+    console.log("existingFacture",existingFacture)
 
-    const updateData = await DbTicket.findOneAndUpdate(
+    // const facture = await getFactureData(idFacture);
+    // if (!facture) {
+    //   console.error("Facture non trouvé");
+    //   return { success: false };
+    // }
+
+    const updateData = await DbFacture.findOneAndUpdate(
       { idFacture },
       {
         $set: {
           isActive: status,
           isPaid: isPaid
-        },
+        }
       },
       { new: true } // renvoie le ticket mis à jour
     );
