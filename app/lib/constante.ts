@@ -541,8 +541,10 @@ export const translations: Record<"fr" | "en", Record<TranslationKey, string>> =
 
 
 export const refreshSeconds = {
-  seconds: 9000,
-  staleTime: 8000
+  // Reduced from 9s to 30s for better performance
+  // Most users don't need real-time updates every 9 seconds
+  seconds: 30000, // 30 seconds
+  staleTime: 25000 // 25 seconds - data is fresh for this duration
 }
 
 export const CommentsData = [
