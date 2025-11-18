@@ -407,7 +407,9 @@ export function Table<
           >
             <div className="flex items-center justify-between gap-4">
               {/* Left: invoice number */}
-              <div onClick={() => {
+              <div 
+              title={t("goToPrevisualisation")}
+              onClick={() => {
                 setIsClick({
                   facture: true,
                   ticketMessage: false,
@@ -416,7 +418,7 @@ export function Table<
                 });
                 setId(row.idFacture);
               }}
-                className="min-w-0 cursor cursor-pointer">
+                className="min-w-0 cursor cursor-pointer ">
                 <h4 className="text-base font-semibold text-slate-100 truncate">
                   {t("invoice")} #{row.factureNumber}
                 </h4>
@@ -433,6 +435,7 @@ export function Table<
                   {dateToSting(row.dateFacture)}
                 </div>
                 <Button
+                title={t("updateToPaidInvoice")}
                   className={[
                     "text-sm font-semibold whitespace-nowrap cursor cursor-pointer",
                     row.isPaid ? "text-emerald-300" : "text-rose-300",

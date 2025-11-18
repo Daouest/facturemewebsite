@@ -1,5 +1,8 @@
 
 const fr = {
+  updateToPaidInvoice: "Modifier à payé",
+  goToPrevisualisation: "Aller à la page prévisualisation",
+
   ticket: "Tickets",
   hello: "Bonjour",
   home: "Accueil",
@@ -266,6 +269,8 @@ const fr = {
 
 
 const en = {
+  updateToPaidInvoice: "Update to paid",
+  goToPrevisualisation: "Go to preview page ",
   ticket: "Tickets",
   users: "Users",
 
