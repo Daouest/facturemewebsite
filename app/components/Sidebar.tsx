@@ -72,13 +72,16 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
   return (
     <aside className="w-full lg:w-64 lg:flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)]">
       <div className="flex flex-col items-center">
-        <Image
-          src={businessLogo ?? srcImage ?? urlImage[0]}
+      { srcImage && srcImage.length>0 &&(
+          <Image
+          src={srcImage}
           alt="profile"
           width={96}
           height={96}
           className="rounded-full w-24 h-24 mb-4 ring-2 ring-white/10 object-cover"
         />
+      )
+      }
         <h2 className="text-lg font-semibold text-slate-100 text-center">
           {t("hello") + " "}
           <TextType

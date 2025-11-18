@@ -40,7 +40,7 @@ export function Table<
     facture: false,
     ticketMessage: false,
     ticketStatus: false,
-    updateFacture:false
+    updateFacture: false
   });
   const [messageTicket, setMessageTicket] = useState({
     client: "",
@@ -52,7 +52,7 @@ export function Table<
   const [modalIsOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const etagRef = useRef<string | null>(null);
-
+  const [isFetching,setIsFetching] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return; // regarde si on est côté client ou serveur
     const rootEl = document.getElementById("__next") ?? document.body;
@@ -118,7 +118,7 @@ export function Table<
     return res.json();
   };
 
-  
+
   const handleUpdateFacture = async ({
     idFacture,
     status,
@@ -128,17 +128,21 @@ export function Table<
     status: boolean;
     isPaid: boolean;
   }) => {
+          setIsFetching(true);
+
     const res = await fetch("/api/items-archives", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idFacture, status, isPaid }),
     });
     if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+    setIsFetching(false);
+
     return res.json();
   };
 
 
-  const mutationTicket =    useMutation({
+  const mutationTicket = useMutation({
     mutationFn: handleChangeStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
@@ -148,12 +152,12 @@ export function Table<
     },
   });
 
-  const mutationFacture  =  useMutation({
+  const mutationFacture = useMutation({
     mutationFn: handleUpdateFacture,
     onSuccess: async () => {
       await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["archivedFactures"] }),
-      queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] })
+        queryClient.invalidateQueries({ queryKey: ["archivedFactures"] }),
+        queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] })
       ])
 
     },
@@ -162,12 +166,12 @@ export function Table<
     },
   });
 
-  const updateTicket =(idClient: number, idTicket: number, status: boolean) => {
+  const updateTicket = (idClient: number, idTicket: number, status: boolean) => {
     mutationTicket.mutate({ idClient, idTicket, status });
   };
-  
-  const updateFactutre =(idFacture: number, status: boolean,isPaid:boolean) => {
-    mutationFacture.mutate({ idFacture, status,isPaid });
+
+  const updateFactutre = (idFacture: number, status: boolean, isPaid: boolean) => {
+    mutationFacture.mutate({ idFacture, status, isPaid });
   };
 
   if (!rows || rows.length === 0) return null;
@@ -391,7 +395,7 @@ export function Table<
         {factureRows.map((row) => (
           <div
             key={row.idFacture}
-          
+
             className={[
               "w-full text-left rounded-xl px-4 py-4",
               "border border-white/10 bg-white/5 backdrop-blur",
@@ -403,16 +407,16 @@ export function Table<
           >
             <div className="flex items-center justify-between gap-4">
               {/* Left: invoice number */}
-              <div  onClick={()=>{
-              setIsClick({
-                facture: true,
-                ticketMessage: false,
-                ticketStatus: false,
-                updateFacture:false
-              });
-              setId(row.idFacture);
-            }}
-               className="min-w-0 cursor cursor-pointer">
+              <div onClick={() => {
+                setIsClick({
+                  facture: true,
+                  ticketMessage: false,
+                  ticketStatus: false,
+                  updateFacture: false
+                });
+                setId(row.idFacture);
+              }}
+                className="min-w-0 cursor cursor-pointer">
                 <h4 className="text-base font-semibold text-slate-100 truncate">
                   {t("invoice")} #{row.factureNumber}
                 </h4>
@@ -432,25 +436,32 @@ export function Table<
                   className={[
                     "text-sm font-semibold whitespace-nowrap cursor cursor-pointer",
                     row.isPaid ? "text-emerald-300" : "text-rose-300",
+                    isFetching ?? "animate-pulse text-white"
                   ].join(" ")}
 
-                  onClick={()=>{
-                     setIsClick({
-                facture: false,
-                ticketMessage: false,
-                ticketStatus: false,
-                updateFacture:true
-              });
-                    updateFactutre(row.idFacture,row.isActive,row.isPaid)}
+                  onClick={() => {
+                    setIsClick({
+                      facture: false,
+                      ticketMessage: false,
+                      ticketStatus: false,
+                      updateFacture: true
+                    });
+                    updateFactutre(row.idFacture, row.isActive, row.isPaid)
+                  }
                   }// change the status and put them directly to invoice history
                 >
-                  {row.isPaid
-                    ? langage === "fr"
-                      ? "PAYÉE"
-                      : "PAID"
-                    : langage === "fr"
-                      ? "NON PAYÉE"
-                      : "UNPAID"}
+                  {!isFetching && (
+                    row.isPaid
+                      ? langage === "fr"
+                        ? "PAYÉE"
+                        : "PAID"
+                      : langage === "fr"
+                        ? "NON PAYÉE"
+                        : "UNPAID"
+                  )
+                }
+
+                {isFetching && (langage === "fr" ? "Rechargement": "Loaging")}
                 </Button>
               </div>
             </div>

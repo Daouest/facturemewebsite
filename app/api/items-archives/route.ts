@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
     let isPaid =  body.isPaid;
     let status = body.status;
 
-    console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
+    // console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
     if(isPaid === false) isPaid =  true;
     if(status === true) status = false
 

@@ -940,7 +940,7 @@ export async function getAllUsers() {
 
 export async function updateFactureUser(idFacture: number, status:boolean,isPaid:boolean) {
   try {
-    console.log(["updateFactureUser","idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
+    // console.log(["updateFactureUser","idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
 
     await connectToDatabase();
 
@@ -951,7 +951,7 @@ export async function updateFactureUser(idFacture: number, status:boolean,isPaid
 
     }
 
-    console.log("existingFacture",existingFacture)
+    // console.log("existingFacture",existingFacture)
 
     // const facture = await getFactureData(idFacture);
     // if (!facture) {
@@ -970,7 +970,7 @@ export async function updateFactureUser(idFacture: number, status:boolean,isPaid
       { new: true } // renvoie le ticket mis à jour
     );
 
-    console.log("Facture modifiée", updateData);
+    // console.log("Facture modifiée", updateData);
     return { success: true, facture: updateData };
 
   } catch (err) {
