@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   AiOutlineAlert,
   AiOutlineDelete,
-  AiOutlineArrowLeft,
 } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -14,16 +13,18 @@ import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "@/app/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
+
 export default function FormDetailItem({ idObjet }: { idObjet: number }) {
+
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
   const { formData, setFormData } = useFormData();
   const [price, setPrice] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const queryClient = useQueryClient();
 
+  const queryClient = useQueryClient();
   const router = useRouter();
+
   const [lastPrice, setLastPrice] = useState(0);
   const [fileChanged, setFileChanged] = useState(false);
   const [Errormessage, setErrorMessage] = useState({
@@ -38,8 +39,8 @@ export default function FormDetailItem({ idObjet }: { idObjet: number }) {
     queryFn: async () => {
       const res = await fetch(`/api/item-catalogue?id=${idObjet}`);
       if (!res.ok) throw new Error("Erreur lors de la récupération");
-      const items = await res.json();
-      return items;
+      const item = await res.json();
+      return item;
     },
     enabled: !!idObjet && idObjet > 0,
     select: (data) => {

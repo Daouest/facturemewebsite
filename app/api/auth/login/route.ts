@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     }
 
     const { email, password } = parsed.data
-    const user = await DbUsers.findOne({ email })
+    const user = await DbUsers.findOne({ email: email, isActive:true })
 
     if (!user || !user.password) {
         return NextResponse.json(

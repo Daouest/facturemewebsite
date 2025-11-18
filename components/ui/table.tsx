@@ -464,7 +464,7 @@ export function Table<
                   )
                 }
 
-                {isFetching && (langage === "fr" ? "Rechargement": "Loaging")}
+                {isFetching && (langage === "fr" ? "Rechargement": "Loading")}
                 </Button>
               </div>
             </div>

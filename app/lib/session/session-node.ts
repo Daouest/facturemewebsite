@@ -67,14 +67,23 @@ export async function setFacture(factureId: number) {
     return setSessionCookieOnResponse(res, newToken, ACCESS_TTL_MS)
 }
 
-export async function setCookieBlock(blockUser: boolean) {
-    const session = await getSession()
-    const idUser = session?.idUser
+// export async function setCookieBlock(blockUser: boolean) {
+//     const session = await getSession()
+//     // const idUser = session?.idUser
 
-    if (typeof idUser !== "number" || !Number.isFinite(idUser)) return null
+//     // if (typeof idUser !== "number" || !Number.isFinite(idUser)) return null
 
-    const ttlMs = 60000;// 1 min
-    const newToken = await encrypt({ idUser, blockUser: blockUser as any }, ttlMs);
+//     const ttlMs = 60000;// 1 min
+//     const newToken = await encrypt({ blockUser: blockUser as any }, ttlMs);
+
+//     const res = NextResponse.json({ success: true });
+//     setSessionCookieOnResponse(res, newToken, ttlMs);
+//     return res;
+// }
+
+export  async function setCookieBlock(blockUser:boolean){
+    const ttlMs  = 60000;// 1 min
+    const newToken = await encrypt({blockUser},ttlMs);
 
     const res = NextResponse.json({ success: true });
     setSessionCookieOnResponse(res, newToken, ttlMs);
