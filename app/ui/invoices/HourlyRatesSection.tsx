@@ -12,7 +12,7 @@ type Props = {
   handleHourlyBreakChange: (index: number, breakTime: number) => void;
   handleHourlyStartTimeChange: (index: number, startTime: string) => void;
   handleHourlyEndTimeChange: (index: number, endTime: string) => void;
-  handleRemoveItem: (id: number, type: "product" | "hourly") => void;
+  handleRemoveItem: (index: number) => void;
   objects: ItemFieldWithPrice[];
   errors?: {
     customerId?: string[];
@@ -138,13 +138,8 @@ export default function HourlyRatesSection({
         onBreakChange={handleHourlyBreakChange}
         onStartTimeChange={handleHourlyStartTimeChange}
         onEndTimeChange={handleHourlyEndTimeChange}
-        onRemove={(index) => {
-          const hourlyItem = form.items.filter(
-            (item) => item.type === "hourly"
-          )[index];
-          if (hourlyItem) {
-            handleRemoveItem(hourlyItem.id, "hourly");
-          }
+        onRemove={(originalIndex) => {
+          handleRemoveItem(originalIndex);
         }}
         errors={errors}
         originalIndices={form.items
