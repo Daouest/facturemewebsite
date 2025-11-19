@@ -64,7 +64,7 @@ export default function PublicitePage() {
                 </h1>
                 <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg border border-white/10">
                   <video
-                    src="/facture_video.mp4"
+                    src="/FactureMe_Promo.mov"
                     controls
                     className="w-full h-full object-cover"
                   />
