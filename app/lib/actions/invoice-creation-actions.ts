@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { InvoiceForm } from "@/app/lib/definitions";
 import { DbFacture, DbObjetFacture, DbTauxHoraireFacture } from "@/app/lib/models";
-import { fetchNextFactureId, validateInvoiceNumber, fetchObjectsByIds, fetchHourlyRatesByIds } from "@/app/lib/data";
+import { fetchNextFactureId, validateInvoiceNumber, fetchObjectsByIds, fetchHourlyRatesByIds, getFactureData } from "@/app/lib/data";
 import { getUserFromCookies } from "../session/session-node";
 import { validateFormData, createInvoiceDocuments, validateDocuments, convertToItemTable } from '@/app/lib/invoice-helpers';
 
@@ -56,7 +56,7 @@ export async function createInvoice(prevState: InvoiceCreationFormState, formDat
     const hourlyIds = invoiceForm.items.filter(item => item.type === 'hourly').map(item => item.id);
 
     // Single batch of database calls - all parallel
-    const [products, hourlyRates, nextId, isNumberUsed] = await Promise.all([
+    const [products, hourlyRates, nextId, numberUsed] = await Promise.all([
         productIds.length > 0 ? fetchObjectsByIds(productIds) : Promise.resolve([]),
         hourlyIds.length > 0 ? fetchHourlyRatesByIds(hourlyIds) : Promise.resolve([]),
         fetchNextFactureId(),
@@ -64,6 +64,11 @@ export async function createInvoice(prevState: InvoiceCreationFormState, formDat
             ? validateInvoiceNumber(Number(invoiceForm.number))
             : Promise.resolve(false)
     ]);
+
+    //Return error if invoice number is already used
+    if (numberUsed){
+        return errorResponse("Invoice number already used", invoiceForm, { number: ["Number already used"] });
+    }
 
     // Convert to ItemTable using the utility function
     const itemTable = await convertToItemTable(invoiceForm.items, products, hourlyRates);
