@@ -50,10 +50,6 @@ export default function PublicitePage() {
 
         <main className="flex-1 pt-20 pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Sidebar with Toggle */}
-            <MobileSidebarWrapper>
-              <Sidebar />
-            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1 flex flex-col items-center">
@@ -64,7 +60,7 @@ export default function PublicitePage() {
                 </h1>
                 <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg border border-white/10">
                   <video
-                    src="/facture_video.mp4"
+                    src="/FactureMe_Promo.mov"
                     controls
                     className="w-full h-full object-cover"
                   />

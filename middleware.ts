@@ -13,7 +13,8 @@ const PUBLIC_PREFIXES = [
     "/api/google", 
     "/api/calendar/export",  // Calendar subscription endpoint (token-authenticated)
     "/images", 
-    "/fonts"
+    "/fonts",
+    "/pub", // Public advertisement page
 ];
 
 function isPublic(pathname: string) {

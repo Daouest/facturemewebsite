@@ -15,7 +15,7 @@ import {
   FileText,
   Sparkles,
   FileDown,
-  CreditCard,
+  BriefcaseBusiness,
   Users,
   Calendar,
 } from "lucide-react";
@@ -133,14 +133,20 @@ export default function HomePage() {
                   <Sparkles className="w-5 h-5 text-sky-300" /> {t("news")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
+                  <Link
+                    href="/item/items-archives"
+                    className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
+                  >
                     <FileDown className="w-5 h-5 text-sky-300 mx-auto mb-2" />
                     {t("exportPDF")}
-                  </div>
-                  <div className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10">
-                    <CreditCard className="w-5 h-5 text-sky-300 mx-auto mb-2" />
-                    {t("onlinePayment")}
-                  </div>
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"
+                  >
+                    <BriefcaseBusiness className="w-5 h-5 text-sky-300 mx-auto mb-2" />
+                    {t("addBusiness")}
+                  </Link>
                   <Link
                     href="/clients-catalogue"
                     className="rounded-lg p-4 text-center font-medium text-slate-200 border border-white/10 bg-white/5 transition-transform hover:-translate-y-1 hover:bg-white/10"

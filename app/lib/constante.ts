@@ -70,7 +70,7 @@ const fr = {
   // Nouveautés
   news: "Nouveautés",
   exportPDF: "Exporter en PDF",
-  onlinePayment: "Paiement en ligne",
+  addBusiness: "Ajouter une entreprise",
   clientManagement: "Mes clients",
   calendar: "Calendrier",
 
@@ -340,7 +340,7 @@ const en = {
   // News
   news: "News",
   exportPDF: "Export to PDF",
-  onlinePayment: "Online payment",
+  addBusiness: "Add a company",
   clientManagement: "My clients",
   calendar: "Calendar",
 

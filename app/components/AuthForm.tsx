@@ -7,7 +7,6 @@ import { useUser as useUserContext } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import useLocalStorage from "@/app/lib/hooks/useLocalStorage";
 import AddressAutocomplete, { type AddressData } from "./AddressAutocomplete";
 
 type AuthMode = "login" | "signup";
@@ -46,16 +45,15 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBlocked, setIsBlocked] = useState<boolean | null>(false);
 
   // Live availability checking
   const [availability, setAvailability] = useState<Availability>({});
   const [checking, setChecking] = useState(false);
-  const [storedErrorCount, setStoredErrorCount] = useLocalStorage<number>("errorCount", 4);
   const [isUserIsFind, setIsUserIsFind] = useState(true);
-  const [stopTimeout, setStopTimeout] = useState<boolean>(false);
 
+  
   useEffect(() => {
+<<<<<<< HEAD
     console.log("storedErrorCount", storedErrorCount);
 
     if (storedErrorCount !== 0) return;
@@ -136,6 +134,12 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
 
   };
+=======
+    setIsUserIsFind(true);
+  }, []);
+
+  
+>>>>>>> 657e8ea91caf7d6f837ebd5dd4f58de7f2cc52ae
   useEffect(() => {
     console.log("isUserIsFind ", isUserIsFind)
 
@@ -198,7 +202,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
         if (!res.ok) {
           setErrors(data?.errors ?? { form: data?.message ?? "Login failed" });
-          setStoredErrorCount(prev => (prev > 1 ? prev - 1 : 0));
           setIsUserIsFind(false);
           return;
         }
@@ -306,12 +309,16 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
             {mode === "login" ? "Connexion" : "Inscription"}
           </h2>
+<<<<<<< HEAD
           <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
             {errors.form !== "" && !isUserIsFind ? `Il vous reste ${storedErrorCount} ${storedErrorCount <= 1 ? "tentavive" : "tentavives"} ` : ""}
           </p>
           <p className="text-[12px] font-bold mb-6  text-red-600 dark:text-gray-100 text-center">
             {storedErrorCount === 0 ? `Vous avez étét bloqué revenez dans 1 minute` : ""}
           </p>
+=======
+       
+>>>>>>> 657e8ea91caf7d6f837ebd5dd4f58de7f2cc52ae
 
 
           {/* SIGNUP fields */}
@@ -492,7 +499,6 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               onChange={(e) => setEmail(e.target.value)}
               className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               autoComplete="email"
-              disabled={isBlocked ? true : false}
               required
             />
           )}
@@ -541,8 +547,12 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+<<<<<<< HEAD
               className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
               disabled={isBlocked ? true : false}
+=======
+              className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
+>>>>>>> 657e8ea91caf7d6f837ebd5dd4f58de7f2cc52ae
               required
             />
           )}
@@ -551,8 +561,13 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           <div className="flex justify-center mt-4">
             <Button
               type="submit"
+<<<<<<< HEAD
               className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors ${isBlocked || isSubmitting ? "" : "cursor cursor-pointer"}`}
               disabled={isBlocked ? true : false ||
+=======
+              className={`px-10 py-2 font semibold rounded-md border-gray-800 hover:bg-gray-800 hover:text-white transition-colors`}
+              disabled={
+>>>>>>> 657e8ea91caf7d6f837ebd5dd4f58de7f2cc52ae
                 isSubmitting ||
                 (mode === "signup" &&
                   (availability.email || availability.username || checking))

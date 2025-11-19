@@ -10,7 +10,7 @@ type Props = {
   setSelectedProduct: (val: number) => void;
   handleAddItem: () => void;
   handleProductQuantityChange: (index: number, quantity: number) => void;
-  handleRemoveItem: (id: number, type: "product" | "hourly") => void;
+  handleRemoveItem: (index: number) => void;
   objects: ItemFieldWithPrice[];
   errors?: {
     customerId?: string[];
@@ -135,13 +135,8 @@ export default function ProductsSection({
         items={form.items.filter((item) => item.type === "product")}
         objects={objects}
         onQuantityChange={handleProductQuantityChange}
-        onRemove={(index) => {
-          const productItem = form.items.filter(
-            (item) => item.type === "product"
-          )[index];
-          if (productItem) {
-            handleRemoveItem(productItem.id, "product");
-          }
+        onRemove={(originalIndex) => {
+          handleRemoveItem(originalIndex);
         }}
         errors={errors}
         originalIndices={form.items

@@ -108,10 +108,6 @@ export default function AboutPage() {
 
         <main className="flex-1 pt-20 pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Sidebar with Toggle */}
-            <MobileSidebarWrapper>
-              <Sidebar />
-            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1">
@@ -131,8 +127,9 @@ export default function AboutPage() {
                   name="Isaac Bernard Vital"
                   role="Développeur"
                   imageUrl="/profile-isaac.png"
-                  linkedinUrl="https://www.linkedin.com/in/sabri-bouzid-4b724b231/"
-                  description="Passionné par le développement web, Sabri a apporté son expertise en React et Next.js pour créer une interface utilisateur fluide et attrayante."
+                  linkedinUrl="https://www.linkedin.com/in/isaac-bernard-vital-1a508b238/"
+                  githubUrl="https://github.com/IBV1234"
+                  description="Amoureux du code depuis le secondaire, Isaac pense qu'être un programmeur est une façon de développer sa créativité de manière réelle et concrète. "
                   extraMargin
                 />
                 <CreatorCard
@@ -140,18 +137,18 @@ export default function AboutPage() {
                   name="Emerik Couture"
                   role="Développeur"
                   imageUrl="/profile-emerik.png"
-                  linkedinUrl="https://www.linkedin.com/in/sabri-bouzid-4b724b231/"
-                  githubUrl="https://github.com/SabriBouzid"
-                  description="Passionné par le développement web, Sabri a apporté son expertise en React et Next.js pour créer une interface utilisateur fluide et attrayante."
+                  linkedinUrl="https://www.linkedin.com/in/emerik-couture-755054387/"
+                  githubUrl="https://github.com/EmerikC"
+                  description="Passionné par la technologie et la programmation depuis son enfance, Emerik est un programmeur hors pair qui ne recule jamais devant un défi."
                 />
                 <CreatorCard
                   id="lucianoContainer"
                   name="Luciano Gomez"
                   role="Développeur"
                   imageUrl="/profile-luciano.png"
-                  linkedinUrl="https://www.linkedin.com/in/sabri-bouzid-4b724b231/"
-                  githubUrl="https://github.com/SabriBouzid"
-                  description="Passionné par le développement web, Sabri a apporté son expertise en React et Next.js pour créer une interface utilisateur fluide et attrayante."
+                  linkedinUrl="https://www.linkedin.com/in/lucianogh/"
+                  githubUrl="https://github.com/Daouest"
+                  description="Intéressé par les nouvelles technologies et la mécanique, Luciano a toujours aimé tout ce qui se rapporte aux ordinateurs dès son plus jeune âge."
                   extraMargin
                 />
                 <CreatorCard
@@ -159,8 +156,9 @@ export default function AboutPage() {
                   name="Sabrina Huot-Milliard"
                   role="Développeuse"
                   imageUrl="/profile-sabrina.png"
-                  githubUrl="https://github.com/SabriBouzid"
-                  description="Passionné par le développement web, Sabri a apporté son expertise en React et Next.js pour créer une interface utilisateur fluide et attrayante."
+                  linkedinUrl="https://www.linkedin.com/in/sabrina-huot-milliard/"
+                  githubUrl="https://github.com/sabrinahuotmilliard"
+                  description="Femme de lettres reconvertie en femme d'informatique, Sabrina adore s'amuser avec des problèmes complexes."
                 />
               </div>
             </section>
