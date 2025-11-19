@@ -108,10 +108,6 @@ export default function AboutPage() {
 
         <main className="flex-1 pt-20 pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 flex flex-col lg:flex-row gap-6 lg:items-start">
-            {/* Mobile Sidebar with Toggle */}
-            <MobileSidebarWrapper>
-              <Sidebar />
-            </MobileSidebarWrapper>
 
             {/* Main Content */}
             <section className="flex-1">
