@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo ,useEffect} from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -15,11 +15,11 @@ import {
   createTranslator,
   getFacturesUsersByDate,
   getFacturesUsersByFactureNumber,
-  getFacturesUsersPaidInvoice,
 } from "@/app/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { refreshSeconds } from "@/app/lib/constante";
 import { useLangageContext } from "../../context/langageContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ItemCatalogue() {
   const [sorterByFactureNumber, setSorterByFactureNumber] = useState(false);
@@ -28,6 +28,8 @@ export default function ItemCatalogue() {
   const [expandedClients, setExpandedClients] = useState<Set<string>>(
     new Set()
   );
+      const [isLoadingPage, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const etagRef = useRef<string | null>(null);
   const countRef = useRef<string | null>(null);
@@ -93,13 +95,19 @@ export default function ItemCatalogue() {
     staleTime: refreshSeconds.staleTime, //  les données son considérées comme bonne après 8 secondes
   });
 
+
+   useEffect(() => {
+  
+      if (!sorterByDate || !sorterByFactureNumber) {
+        reloadPage();
+      }
+  
+    }, [sorterByDate, sorterByFactureNumber])
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
     if (!archivedFactures) return [];
     if (sorterByFactureNumber) {
       return getFacturesUsersByFactureNumber(archivedFactures ?? []);
-    } else if (sortByPaidInvoice) {
-      return getFacturesUsersPaidInvoice(archivedFactures ?? []);
     } else if (sorterByDate) {
       return getFacturesUsersByDate(archivedFactures ?? []);
     }
@@ -107,10 +115,20 @@ export default function ItemCatalogue() {
   }, [
     archivedFactures,
     sorterByFactureNumber,
-    sortByPaidInvoice,
     sorterByDate,
   ]);
-
+ const reloadPage = async () => {
+    setIsLoading(true);
+    try {
+      await fetchData();
+      await queryClient.invalidateQueries({ queryKey: ["archivedFactures"] });
+    } catch (err) {
+      setIsLoading(false);
+      console.error("Erreur lors du reaload", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Group invoices by client
   const groupedByClient = useMemo(() => {
     if (!sortedFactures || sortedFactures.length === 0) return {};
@@ -267,16 +285,7 @@ export default function ItemCatalogue() {
                               onCheckedChange={setSorterByDate}
                             />
                           </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-slate-300">
-                              {t("sortByPaidInvoice")}
-                            </p>
-                            <Switch
-                              className="data-[state=checked]:bg-sky-400 transition-colors cursor-pointer"
-                              checked={sortByPaidInvoice}
-                              onCheckedChange={setSortByPaidInvoice}
-                            />
-                          </div>
+                    
                         </div>
                       </div>
                     )}

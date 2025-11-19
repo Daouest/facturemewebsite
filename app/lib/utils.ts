@@ -311,25 +311,20 @@ export function calculateTaxes(taxableAmount: number, taxType: string, province:
 }
 
 
-export function getFacturesUsersByFactureNumber(data: Facture[], _isActive = true) {
+export function getFacturesUsersByFactureNumber(data: Facture[], ) {
     if (!data) return [];
 
-    const sorted = data?.filter(facture => facture.isActive === _isActive).sort((a, b) => a.factureNumber - b.factureNumber)
+    const sorted = data?.sort((a, b) => a.factureNumber - b.factureNumber)
 
     return sorted;
 }
 
-export function getFacturesUsersByDate(data: Facture[], _isActive = true) {
-    const sorted = data?.filter(facture => facture.isActive === _isActive).sort((a, b) => new Date(a.dateFacture).getTime() - new Date(b.dateFacture).getTime())// plus ancie et plus récents
+export function getFacturesUsersByDate(data: Facture[]) {
+    const sorted = data?.sort((a, b) => new Date(b.dateFacture).getTime() - new Date(a.dateFacture).getTime())// plus ancienne à plus récentes
     return sorted;
 }
 
-export function getFacturesUsersPaidInvoice(data: Facture[], _isActive = true) {
 
-    const sorted = data?.filter(facture => facture.isActive === _isActive).sort((a, b) => Number(a.isPaid) - Number(b.isPaid))
-    return sorted;
-
-}
 export function isTableTicket(row: TableItemType | Facture | Ticket | undefined): row is Ticket {
 
     if (typeof row === "object" && "idTicket" in row) {

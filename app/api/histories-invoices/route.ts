@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
     // Calcul des métadonnées pour le cache
 
     //Application des filtres ou tris selon les paramètres
+    console.log("sortBy",sortBy)
     if (sortBy === "factureNumber") {
       historiqueFactures = await getFacturesUsersByFactureNumber(userId, false);
     } else if (sortBy === "date") {

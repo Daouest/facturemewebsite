@@ -156,7 +156,6 @@ export function Table<T extends TableItemType | HourlyRateType | Facture | Ticke
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["archivedFactures"] }),
         queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] }),
-        queryClient.invalidateQueries({queryKey:["historiqueFactures"]})
       ])
 
     },
