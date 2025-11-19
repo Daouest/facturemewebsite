@@ -441,7 +441,6 @@ export function Table<
                     row.isPaid ? "text-emerald-300" : "text-rose-300",
                     isFetching ?? "animate-pulse text-white"
                   ].join(" ")}
-
                   onClick={() => {
                     setIsClick({
                       facture: false,
