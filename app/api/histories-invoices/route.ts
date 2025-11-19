@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
 
     // Récupération initiale des factures (true = active invoices)
     let historiqueFactures = await getAllFacturesUsers(userId, false);
+    historiqueFactures =  historiqueFactures?.filter(f =>f.isPaid === true && f.isActive ===false);
 
     // Support filtering by date range to avoid returning a huge pool of invoices.
     // Expected query params: start=YYYY-MM-DD and end=YYYY-MM-DD

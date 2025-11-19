@@ -29,12 +29,10 @@ import { Badge } from "@/components/ui/badge";
 type TableProps<T extends TableItemType | HourlyRateType | Facture | Ticket> = {
   rows: T[];
   className?: string;
-  type?: "items" | "factures";
+  type?: "items" | "factures"|"invoicesHistories"|"archivedInvoices";
 };
 
-export function Table<
-  T extends TableItemType | HourlyRateType | Facture | Ticket
->({ rows, className, type }: TableProps<T>) {
+export function Table<T extends TableItemType | HourlyRateType | Facture | Ticket>({ rows, className, type }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
   const [isClick, setIsClick] = useState({
     facture: false,
@@ -157,7 +155,8 @@ export function Table<
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["archivedFactures"] }),
-        queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] })
+        queryClient.invalidateQueries({ queryKey: ["historiqueFactures"] }),
+        queryClient.invalidateQueries({queryKey:["historiqueFactures"]})
       ])
 
     },
@@ -434,37 +433,32 @@ export function Table<
                 <div className="text-xs text-slate-300/80 whitespace-nowrap">
                   {dateToSting(row.dateFacture)}
                 </div>
-                <Button
-                title={t("updateToPaidInvoice")}
-                  className={[
-                    "text-sm font-semibold whitespace-nowrap cursor cursor-pointer",
-                    row.isPaid ? "text-emerald-300" : "text-rose-300",
-                    isFetching ?? "animate-pulse text-white"
-                  ].join(" ")}
-                  onClick={() => {
-                    setIsClick({
-                      facture: false,
-                      ticketMessage: false,
-                      ticketStatus: false,
-                      updateFacture: true
-                    });
-                    updateFactutre(row.idFacture, row.isActive, row.isPaid)
-                  }
-                  }// change the status and put them directly to invoice history
-                >
-                  {!isFetching && (
-                    row.isPaid
-                      ? langage === "fr"
-                        ? "PAYÉE"
-                        : "PAID"
-                      : langage === "fr"
-                        ? "NON PAYÉE"
-                        : "UNPAID"
-                  )
+              <Button
+              title={t("updateToPaidInvoice")}
+                className={[
+                  "text-sm font-semibold whitespace-nowrap cursor cursor-pointer",
+                  row.isPaid ? "text-emerald-300" : "text-rose-300",
+                  isFetching && row.idFacture === id&& "animate-pulse text-white" 
+                ].join(" ")}
+                onClick={() => {
+                  setIsClick({
+                    facture: false,
+                    ticketMessage: false,
+                    ticketStatus: false,
+                    updateFacture: true
+                  });
+                  setId(row.idFacture)
+                  updateFactutre(row.idFacture, row.isActive, row.isPaid)
                 }
-
-                {isFetching && (langage === "fr" ? "Rechargement": "Loading")}
-                </Button>
+                }// change the status and put them directly to invoice history
+              >
+                {
+                  // Show a loading label when updating this invoice, otherwise show paid/unpaid based on row.isPaid
+                  isFetching && row.idFacture === id
+                    ? (langage === "fr" ? "Rechargement" : "Loading")
+                    : (row.isPaid ? (langage === "fr" ? "PAYÉE" : "PAID") : (langage === "fr" ? "NON PAYÉE" : "UNPAID"))
+                }
+              </Button>
               </div>
             </div>
           </div>

@@ -204,7 +204,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
               <>
                 <Button
                   variant={"ghost"}
-                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10  hover:cursor-pointer"
                   onClick={() => {
                     setShowPage((prev) => ({
                       ...prev,
@@ -217,7 +217,7 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
                 </Button>
                 <Button
                   variant={"ghost"}
-                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10 hover:cursor-pointer"
                   onClick={() => {
                     setShowPage((prev) => ({
                       ...prev,
@@ -229,19 +229,6 @@ export default function Sidebar({ showPageInAdmin }: SidebarProps) {
                   🧾{t("ticket")}
                 </Button>
 
-                <Button
-                  variant={"ghost"}
-                  className="flex items-center justify-center lg:justify-start gap-2 px-4 py-2 rounded-lg font-medium text-slate-200 transition-all duration-200 bg-white/0 hover:bg-white/10 border border-transparent hover:border-white/10"
-                  onClick={() => {
-                    setShowPage((prev) => ({
-                      ...prev,
-                      tickePage: false,
-                      stats: true,
-                    }));
-                  }}
-                >
-                  statistiques
-                </Button>
               </>
             )}
           </>

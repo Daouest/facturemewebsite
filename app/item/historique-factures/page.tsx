@@ -165,7 +165,7 @@ export default function HistoricInvoices() {
                   </div>
                 ) : (
                   <div className="mt-2 w-full max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    <Table rows={sortedData} />
+                    <Table rows={sortedData} type={"invoicesHistories"} />
                   </div>
                 )}
               </div>

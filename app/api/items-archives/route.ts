@@ -75,9 +75,12 @@ export async function PUT(request: NextRequest) {
     let isPaid =  body.isPaid;
     let status = body.status;
 
-    // console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
-    if(isPaid === false) isPaid =  true;
-    if(status === true) status = false
+    console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
+    isPaid =  isPaid === true ?  false :  true;
+    status =  status === true ?  false :  true;
+
+    console.log(["idFacture:",idFacture, "isPaid:",isPaid,"status:",status])
+
 
     const result = await updateFactureUser(idFacture,status,isPaid);
 

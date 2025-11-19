@@ -211,7 +211,7 @@ export default function ItemCatalogue() {
                                       }`}
                                     />
                                   </button>
-                                  {isExpanded && <Table rows={invoices} />}
+                                  {isExpanded && <Table rows={invoices} type={"archivedInvoices"} />}
                                 </div>
                               );
                             })

@@ -22,7 +22,7 @@ export default function AdminPage() {
     useEffect(() => {
         if (user?.isAdmin == false) router.push("/homePage");
     }, [])
- 
+
     return (
         <>
             <Header />
@@ -55,16 +55,12 @@ export default function AdminPage() {
                                     <TickePage />
                                 </Suspense>
                             )}
-
-                            {showPage.stats && (
-                                <Suspense fallback={<div className="self-center animate-pulse text-white"> Loading...</div>}>
-                                    <StatsFactureMe />
-                                </Suspense>
-                            )}
+               
                             {
-                                !showPage.stats && !showPage.tickePage && (
-                                    <AdminAcceuil />
-
+                                !showPage.tickePage && (
+                                    <Suspense fallback={<div className="self-center animate-pulse text-white"> Loading...</div>}>
+                                        <AdminAcceuil />
+                                    </Suspense>
                                 )
                             }
 
