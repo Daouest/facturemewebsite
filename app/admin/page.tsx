@@ -6,7 +6,6 @@ import Header from "@/app/components/Header";
 import Link from "next/link";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import AdminAcceuil from "@/app/components/adminAcceuil";
-import StatsFactureMe from "@/app/components/stats";
 import Sidebar from "../components/Sidebar";
 import { useSidebarContext } from "@/app/context/SidebarContext";
 import { useUser } from "@/app/context/UserContext";

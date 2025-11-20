@@ -1,10 +1,8 @@
 "use client"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { useLangageContext } from "@/app/context/langageContext";
 import { createTranslator } from "@/app/lib/utils";
-import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { Table } from "@/components/ui/table";
 import { refreshSeconds } from "@/app/lib/constante";
 import { Ticket } from "@/app/lib/definitions";
@@ -12,14 +10,28 @@ import { Ticket } from "@/app/lib/definitions";
 
 export default function TickePage() {
     const etagRef = useRef<string | null>(null);
+    const [isPageFocused, setIsPageFocused] = useState(true);
+
     const { langage } = useLangageContext();
     const t = createTranslator(langage);
+    useEffect(() => {
+        const handleFocus = () => setIsPageFocused(true);
+        const handleBlur = () => setIsPageFocused(false);
 
+        window.addEventListener("focus", handleFocus);
+        window.addEventListener("blur", handleBlur);
+
+        return () => {
+            window.removeEventListener("focus", handleFocus);
+            window.removeEventListener("blur", handleBlur);
+        };
+    }, []);
     const fetchData = async () => {
         const res = await fetch("/api/ticket", {
             cache: "no-cache",
             headers: {
-                "if-None-Match": etagRef.current ?? ""},
+                "if-None-Match": etagRef.current ?? ""
+            },
         });
         const newEtag = res.headers.get("Etag");
 
@@ -28,17 +40,17 @@ export default function TickePage() {
         if (res.status == 304) {
             throw new Error("Pas modifié");
         }
-         console.log("data ticket page",data)
+        console.log("data ticket page", data)
 
         const listeTickets: Ticket[] = data.map((ticket: any) => ({
             idClient: ticket.idClient,
             message: ticket.message,
-            idTicket :ticket.idTicket,
+            idTicket: ticket.idTicket,
             date: ticket.date,
             isCompleted: ticket.isCompleted,
             nomClient: ticket.nomClient,
         }));
-        console.log("listeTickets",listeTickets)
+        console.log("listeTickets", listeTickets)
 
         return listeTickets ?? [];
     };
@@ -60,7 +72,7 @@ export default function TickePage() {
                 throw err;
             }
         }),
-        refetchInterval: 5000,//10 sec
+        refetchInterval: isPageFocused ? refreshSeconds.seconds : false,//10 sec
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
         staleTime: 8000 //  les données son considérées comme bonne après 8 secondes

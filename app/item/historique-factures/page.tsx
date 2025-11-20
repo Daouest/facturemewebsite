@@ -28,6 +28,7 @@ export default function HistoricInvoices() {
   const { langage } = useLangageContext();
   const t = createTranslator(langage);
   const queryClient = useQueryClient();
+  const [isPageFocused, setIsPageFocused] = useState(true);
 
 
   const fetchData = async () => {
@@ -76,12 +77,25 @@ export default function HistoricInvoices() {
         throw err;
       }
     },
-    refetchInterval: refreshSeconds.seconds, //10 sec
+    refetchInterval: isPageFocused? refreshSeconds.seconds: false, //10 sec
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     staleTime: 8000, //  les données son considérées comme bonne après 8 secondes
   });
 
+
+   useEffect(() => {
+    const handleFocus = () => setIsPageFocused(true);
+    const handleBlur = () => setIsPageFocused(false);
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
   useEffect(() => {
 
     if (!sorterByDate || !sorterByFactureNumber) {

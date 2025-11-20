@@ -30,6 +30,7 @@ export default function ItemCatalogue() {
   );
       const [isLoadingPage, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+  const [isPageFocused, setIsPageFocused] = useState(true);
 
   const etagRef = useRef<string | null>(null);
   const countRef = useRef<string | null>(null);
@@ -89,7 +90,7 @@ export default function ItemCatalogue() {
         throw err;
       }
     },
-    refetchInterval: refreshSeconds.seconds, //10 sec
+    refetchInterval: isPageFocused? refreshSeconds.seconds : false, //10 sec
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     staleTime: refreshSeconds.staleTime, //  les données son considérées comme bonne après 8 secondes
@@ -103,6 +104,19 @@ export default function ItemCatalogue() {
       }
   
     }, [sorterByDate, sorterByFactureNumber])
+
+     useEffect(() => {
+    const handleFocus = () => setIsPageFocused(true);
+    const handleBlur = () => setIsPageFocused(false);
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
     if (!archivedFactures) return [];
@@ -130,7 +144,7 @@ export default function ItemCatalogue() {
     }
   };
   // Group invoices by client
-  const groupedByClient = useMemo(() => {
+  const groupedByClient = useMemo(() => { // to fixe to unique user name
     if (!sortedFactures || sortedFactures.length === 0) return {};
 
     const groups: { [key: string]: Facture[] } = {};
@@ -147,6 +161,8 @@ export default function ItemCatalogue() {
 
     return groups;
   }, [sortedFactures, langage]);
+
+ 
 
   const toggleClient = (clientName: string) => {
     setExpandedClients((prev) => {

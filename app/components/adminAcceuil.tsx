@@ -13,11 +13,27 @@ export default function AdminAcceuil() {
   const [searche, setSearche] = useState("");
   const [showData, setShowData] = useState({ clients: true, users: false });
   const [dataOutput, setDataOutput] = useState<Client[] | UserData[]>([]);
+  const [isPageFocused, setIsPageFocused] = useState(true);
 
-  const { user } = useUser();
-  // useEffect(() => {
-  //     if (!user?.isAdmin) router.push("/homePage");
-  // }, []);
+  // const { user } = useUser();
+  // // useEffect(() => {
+  // //     if (!user?.isAdmin) router.push("/homePage");
+  // // }, []);
+
+
+  useEffect(() => {
+    const handleFocus = () => setIsPageFocused(true);
+    const handleBlur = () => setIsPageFocused(false);
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
+
   const handleClients = async () => {
     let resquestString = "";
     if (showData.clients) {
@@ -54,10 +70,10 @@ export default function AdminAcceuil() {
         throw err;
       }
     },
-    refetchInterval: 5000, //10 sec
+    refetchInterval:  isPageFocused ? 5000: false, //10 sec
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    staleTime: 8000, //  les données son considérées comme bonne après 8 secondes
+    staleTime: 8000  //  les données son considérées comme bonne après 8 secondes
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
