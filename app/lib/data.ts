@@ -4,6 +4,8 @@ import { CustomerField, BusinessField, ObjectField, Facture, Objet, FactureUnita
 import { ItemData, UserData, Address, Client, ClientAffichage } from "@/app/lib/definitions";
 import { calculateTotalByWorkedHours, calculateTaxes } from "@/app/lib/utils";
 import { getUserFromCookies } from "@/app/lib/session/session-node";
+
+import { useLangageContext } from "@/app/context/langageContext";
 export const runtime = "nodejs"
 
 export async function fetchCustomers() {
@@ -873,30 +875,7 @@ export async function updateTicket(idClient: number, idTicket: number, status: b
 
 export async function getAllTickets() {
     try {
-        // const tickets = await DbTicket.aggregate([
-        //     {
-        //         $lookup: {
-        //             from: "clients",  
-        //             localField: "idClient",   
-        //             foreignField: "idClient", // champ correspondant dans Client
-        //             as: "clientInfo"
-        //         }
-        //     },
-        //     {
-        //         $unwind: "$clientInfo" // "déplie" le tableau userInfo → chaque item a son client unique
-        //     },
-        //     {
-        //         $project: { // choisir les champs à garder
-        //             _id:1,
-        //             idTicket:1,
-        //             idClient: 1,
-        //             message: 1,
-        //             isCompleted: 1,
-        //             date:1,
-        //             "clientInfo.nomClient": 1,
-        //         }
-        //     }
-        // ]);
+        
          const tickets = await DbTicket.find();
 
         return { success: true, message: "Succès dans la récupération des tickets", ticket: tickets }

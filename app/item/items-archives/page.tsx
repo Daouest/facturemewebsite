@@ -117,6 +117,11 @@ export default function ItemCatalogue() {
       window.removeEventListener("blur", handleBlur);
     };
   }, []);
+
+  
+  useEffect(()=>{
+    console.log("isPageFocused",isPageFocused)
+  },[isPageFocused])
   const sortedFactures = useMemo(() => {
     // trier en mémoire, sans refaire de requête
     if (!archivedFactures) return [];

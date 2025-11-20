@@ -1,11 +1,12 @@
 "use client"
 import { useRef, useState, useEffect } from "react"
 import { useLangageContext } from "@/app/context/langageContext";
-import { createTranslator } from "@/app/lib/utils";
+import { createTranslator,liveTranslateMessage } from "@/app/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Table } from "@/components/ui/table";
 import { refreshSeconds } from "@/app/lib/constante";
 import { Ticket } from "@/app/lib/definitions";
+import { language } from "googleapis/build/src/apis/language";
 
 
 export default function TickePage() {
@@ -26,6 +27,14 @@ export default function TickePage() {
             window.removeEventListener("blur", handleBlur);
         };
     }, []);
+
+
+    
+  useEffect(()=>{
+    console.log("isPageFocused",isPageFocused)
+  },[isPageFocused])
+
+  
     const fetchData = async () => {
         const res = await fetch("/api/ticket", {
             cache: "no-cache",
@@ -42,7 +51,7 @@ export default function TickePage() {
         }
         console.log("data ticket page", data)
 
-        const listeTickets: Ticket[] = data.map((ticket: any) => ({
+        let listeTickets: Ticket[] = data.map((ticket: any) => ({
             idClient: ticket.idClient,
             message: ticket.message,
             idTicket: ticket.idTicket,
@@ -51,13 +60,15 @@ export default function TickePage() {
             nomClient: ticket.nomClient,
         }));
         console.log("listeTickets", listeTickets)
-
+       listeTickets = await  getLiveTranslateMessage(listeTickets)
+       
         return listeTickets ?? [];
     };
     const {
         data: tickets,
         isLoading,
         status,
+        isFetching
 
     } = useQuery<Ticket[]>({
         queryKey: ["tickets"],
@@ -78,7 +89,15 @@ export default function TickePage() {
         staleTime: 8000 //  les données son considérées comme bonne après 8 secondes
 
     })
-
+    const getLiveTranslateMessage = async (listeTickets:Ticket[] )=>{
+       const data =  await Promise.all(
+         listeTickets.map( async (ticket,_)=>{
+            ticket.message =  await liveTranslateMessage(ticket.message,langage)
+            return ticket;
+        })
+       )
+        return data;
+    }
     return (
         <div className="min-h-dvh flex flex-col">
 
@@ -88,7 +107,7 @@ export default function TickePage() {
                     <div className="border-white/10 bg-gradient-to-br from-sky-500/10 to-indigo-500/10 backdrop-blur  shadow-lg rounded-2xl p-6 sm:p-8">
 
                         <div className="my-4 border-t border-gray-200" />
-                        {status !== "error" && isLoading ? (
+                        {status !== "error" && (isLoading || isFetching) ?  (
                             <div className="flex justify-center items-center py-10">
                                 <p className="text-[18px] font-semibold text-white"> Loading...</p>
                             </div>

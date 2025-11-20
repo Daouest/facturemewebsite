@@ -1,6 +1,8 @@
 "use client";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useLangageContext } from "@/app/context/langageContext";
+
 import Link from "next/link";
 import {
   TableItemType,
@@ -18,9 +20,9 @@ import {
   createTranslator,
   showLongText,
   isTableTicket,
+  liveTranslateMessage
 } from "@/app/lib/utils";
 import ImageFromBd from "@/components/ui/images";
-import { useLangageContext } from "@/app/context/langageContext";
 // @ts-ignore
 import Modal from "react-modal";
 import { Button } from "@/components/ui/button";
@@ -32,7 +34,7 @@ type TableProps<T extends TableItemType | HourlyRateType | Facture | Ticket> = {
   type?: "items" | "factures"|"invoicesHistories"|"archivedInvoices";
 };
 
-export function Table<T extends TableItemType | HourlyRateType | Facture | Ticket>({ rows, className, type }: TableProps<T>) {
+export   function Table<T extends TableItemType | HourlyRateType | Facture | Ticket>({ rows, className, type }: TableProps<T>) {
   const [id, setId] = useState<number | null>(null);
   const [isClick, setIsClick] = useState({
     facture: false,
@@ -80,23 +82,23 @@ export function Table<T extends TableItemType | HourlyRateType | Facture | Ticke
     }
   }, [id, isClick.facture, router]);
 
-  const { data: tickets } = useQuery<Ticket[]>({
-    queryKey: ["tickets"],
-    queryFn: async () => {
-      const res = await fetch("/api/ticket", {
-        cache: "no-store",
-        headers: { "if-None-Match": etagRef.current ?? "" },
-      });
-      const newEtag = res.headers.get("Etag");
-      if (newEtag) etagRef.current = newEtag;
-      if (!res.ok) throw new Error("Erreur lors de la récupération");
-      return res.json();
-    },
-    refetchInterval: 5000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    staleTime: 8000,
-  });
+  // const { data: tickets } = useQuery<Ticket[]>({
+  //   queryKey: ["tickets"],
+  //   queryFn: async () => {
+  //     const res = await fetch("/api/ticket", {
+  //       cache: "no-store",
+  //       headers: { "if-None-Match": etagRef.current ?? "" },
+  //     });
+  //     const newEtag = res.headers.get("Etag");
+  //     if (newEtag) etagRef.current = newEtag;
+  //     if (!res.ok) throw new Error("Erreur lors de la récupération");
+  //     return res.json();
+  //   },
+  //   refetchInterval: 5000,
+  //   refetchOnWindowFocus: true,
+  //   refetchOnReconnect: true,
+  //   staleTime: 8000,
+  // });
 
   const handleChangeStatus = async ({
     idClient,
@@ -465,7 +467,6 @@ export function Table<T extends TableItemType | HourlyRateType | Facture | Ticke
       </div>
     );
   }
-
   if (isTableTicket(rows[0])) {
     const ticketRows = rows as Ticket[];
     return (
@@ -507,7 +508,9 @@ export function Table<T extends TableItemType | HourlyRateType | Facture | Ticke
                     });
                   }}
                 >
-                  {showLongText(row.message)}
+                  {
+                    showLongText(text )
+                  }
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-200">
                   {dateToSting(row.date)}
@@ -524,10 +527,10 @@ export function Table<T extends TableItemType | HourlyRateType | Facture | Ticke
                 >
                   {row.isCompleted ? (
                     <Badge className="bg-emerald-500/80 text-white">
-                      Complété
+                     {isFetching ? (langage === "fr" ? "Rechargement": "Loading"): t("tikectCompleted")}
                     </Badge>
                   ) : (
-                    <Badge variant="destructive">Non complété</Badge>
+                    <Badge variant="destructive">{isFetching ? (langage === "fr" ? "Rechargement": "Loading"): t("tikectNotCompleted")}</Badge>
                   )}
                 </td>
               </tr>

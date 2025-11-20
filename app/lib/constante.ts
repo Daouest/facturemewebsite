@@ -264,7 +264,11 @@ const fr = {
 
   // Address management
   addressInformation: "Informations d'adresse",
-  saveAddress: "Enregistrer l'adresse"
+  saveAddress: "Enregistrer l'adresse",
+
+  //Tickes
+  tikectNotCompleted:"Not Completed",
+  tikectCompleted:"Complété",
 } as const;
 
 
@@ -535,7 +539,15 @@ const en = {
 
   // Address management
   addressInformation: "Address Information",
-  saveAddress: "Save Address"
+  saveAddress: "Save Address",
+
+   //Tickes
+  tikectCompleted:"Completed",
+  tikectNotCompleted:"Non complété",
+  
+
+
+
 }
 
 type TranslationKey = keyof typeof fr;

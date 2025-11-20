@@ -34,6 +34,11 @@ export default function AdminAcceuil() {
     };
   }, []);
 
+
+  useEffect(()=>{
+    console.log("isPageFocused",isPageFocused)
+  },[isPageFocused])
+
   const handleClients = async () => {
     let resquestString = "";
     if (showData.clients) {
@@ -96,7 +101,7 @@ export default function AdminAcceuil() {
   }, [searche]);
 
   useEffect(() => {
-    console.log("clients", data);
+    // console.log("clients", data);
     setDataOutput(data ?? []);
   }, [data]);
 

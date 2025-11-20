@@ -311,7 +311,7 @@ export function calculateTaxes(taxableAmount: number, taxType: string, province:
 }
 
 
-export function getFacturesUsersByFactureNumber(data: Facture[], ) {
+export function getFacturesUsersByFactureNumber(data: Facture[],) {
     if (!data) return [];
 
     const sorted = data?.sort((a, b) => a.factureNumber - b.factureNumber)
@@ -332,7 +332,7 @@ export function isTableTicket(row: TableItemType | Facture | Ticket | undefined)
     }
     return false
 }
-export function showLongText(message: string) {
+export async function showLongText(message: string) {
     let udpdateMessage = message;
     if (message.length > 20) {
         message = message.slice(0, 20);
@@ -344,14 +344,69 @@ export function showLongText(message: string) {
 }
 
 
-export async function setCacheImage(key:string,url:string){
-    try{
-        localStorage.setItem(key,url);
-    }catch(err){
-        console.error("Erreur in settin the cache for image",err)
+export async function setCacheImage(key: string, url: string) {
+    try {
+        localStorage.setItem(key, url);
+    } catch (err) {
+        console.error("Erreur in settin the cache for image", err)
     }
 }
 
-export async function getCacheImage(key:string){
-    return  localStorage.getItem(key) ?? null;
+export async function getCacheImage(key: string) {
+    return localStorage.getItem(key) ?? null;
 }
+
+
+export async function liveTranslateMessage(message: string, targetLang: string) {
+    // Function to translate text using LibreTranslate API
+    try {
+        // Validate inputs
+        if (typeof message !== "string" || message.trim() === "") {
+            throw new Error("Text must be a non-empty string.");
+        }
+        if (!["en", "fr"].includes(targetLang)) {
+            throw new Error("Target language must be 'en' (English) or 'fr' (French).");
+        }
+
+        const response = await fetch("https://translate.argosopentech.com/translate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                q: message,
+                source: "auto", // Detect source language automatically
+                target: targetLang,
+                format: "text"
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Server response:", errorText);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.translatedText;
+    } catch (error) {
+        console.error("Translation error:", error);
+        return null;
+    }
+}
+
+// Example usage
+// (async () => {
+//     const message = "Bonjour tout le monde"; // French text
+//     const translatedToEnglish = await translateText(message, "en");
+//     console.log("Original:", message);
+//     console.log("Translated to English:", translatedToEnglish);
+
+//     const message2 = "Hello world"; // English text
+//     const translatedToFrench = await translateText(message2, "fr");
+//     console.log("Original:", message2);
+//     console.log("Translated to French:", translatedToFrench);
+// })();
+
+

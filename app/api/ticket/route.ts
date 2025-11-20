@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
             return new NextResponse(null, { status: 304 });
         }
 
-
+    
         const response = NextResponse.json(result.ticket ?? [], { status: 200 });
 
         response.headers.set("Etag", lastTicketDate);
