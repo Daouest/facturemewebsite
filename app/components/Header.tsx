@@ -9,6 +9,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { LogOut, LogIn } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Header() {
   const { user, setUser } = useUser();
@@ -17,6 +18,7 @@ export default function Header() {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { langage, setLangage } = useLangageContext();
+  const t = createTranslator(langage);
 
   const isLoggedIn = !!(user?.id || user?.username || user?.email);
   const onAboutPage = pathname === "/about";
@@ -108,8 +110,8 @@ export default function Header() {
             (onAboutPage ? (
               <a
                 href="/auth/signup"
-                title="Se connecter"
-                aria-label="Se connecter"
+                title={t("signin")}
+                aria-label={t("signin")}
                 className="inline-flex items-center justify-center rounded-md border border-white/20 p-2 text-white hover:bg-white/10 transition"
               >
                 <LogIn className="h-5 w-5" />
@@ -119,7 +121,7 @@ export default function Header() {
                 href="/about"
                 className="text-white hover:text-gray-300 dark:text-gray-300 dark:hover:text-white"
               >
-                About
+                {t("aboutUs")}
               </a>
             ))}
 
@@ -127,8 +129,8 @@ export default function Header() {
             <button
               onClick={handleLogout}
               disabled={loading}
-              title="Se déconnecter"
-              aria-label="Se déconnecter"
+              title={t("signout")}
+              aria-label={t("signout")}
               className="inline-flex items-center justify-center rounded-md border border-white/20 p-2 text-white hover:bg-white/10 transition disabled:opacity-50"
               aria-busy={loading}
             >

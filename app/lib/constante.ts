@@ -8,7 +8,7 @@ const fr = {
   home: "Accueil",
   info: "FAQs",
   users: "Utilisateurs",
-  admin_section: "Séction admin",
+  admin_section: "Section admin",
   aboutUs: "À propos",
   faq: "FAQ",
   tagline: "Vite fait bien fait!",
@@ -38,6 +38,8 @@ const fr = {
 
   //Connection Page
   welcomeMessage: "Connectez-vous pour gérer vos factures facilement.",
+  signin: "Se connecter",
+  signout: "Se déconnecter",
 
   // Sidebar
   invoices: "Mes factures",
@@ -311,6 +313,8 @@ const en = {
 
   //Connection Page
   welcomeMessage: "Sign in to manage your invoices easily.",
+  signin: "Sign in",
+  signout: "Sign out",
 
   // Sidebar
   invoices: "My invoices",
