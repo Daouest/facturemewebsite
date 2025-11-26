@@ -717,7 +717,6 @@ export async function getTaxesArrayForFacture(idFacture: number) {
         const infoFacture = await getFactureData(idFacture);
         if (!infoFacture.success) return;
         if (infoFacture.facture?.isBusinessInvoice === false) return; //this only applies to business invoices
-        if (infoFacture.facture?.includesTaxes === false) return;
 
         //business
         let idUser = infoFacture.facture?.idUser;

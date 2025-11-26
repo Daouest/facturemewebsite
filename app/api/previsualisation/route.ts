@@ -47,7 +47,7 @@ export async function GET(request: Request) {
             const userInfoMessage = await getUserInfo(factureData.facture.idUser);
             const userInfo = userInfoMessage.userData;
 
-            if (isBusiness === true) { //TODO: verifier que ca retourne des trucs
+            if (isBusiness === true) {
                 //  chercher les infos de la business
                 //1.2   fetch infos business
                 if (userInfo && userInfo.idBusiness != null) {
@@ -176,8 +176,6 @@ export async function GET(request: Request) {
 
                 //1.2 Appliquer les taxes
                 const taxesArray = await getTaxesArrayForFacture(factureId);
-                console.log('taxesArray: ', taxesArray);
-                console.log('taxesnumbers: ', taxesnumbers);
 
                 invoiceInfos = {
                     "date": new Date(factureData.facture.dateFacture).toLocaleDateString(),
@@ -189,8 +187,6 @@ export async function GET(request: Request) {
                     "taxesNumbers": taxesnumbers,
                     "total": totalFacture
                 }
-
-                console.log('invoice infooos: ', invoiceInfos);
             }
 
             facture = {
