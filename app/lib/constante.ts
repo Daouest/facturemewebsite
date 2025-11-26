@@ -38,6 +38,8 @@ const fr = {
 
   //Connection Page
   welcomeMessage: "Connectez-vous pour gérer vos factures facilement.",
+  welcomeSignup: "Créez votre compte et commencez à gérer vos factures simplement.",
+  alreadyHaveAccount: "Vous avez déjà un compte?",
   signin: "Se connecter",
   signout: "Se déconnecter",
   signup: "S'inscrire",
@@ -334,6 +336,8 @@ const en = {
 
   //Connection Page
   welcomeMessage: "Sign in to manage your invoices easily.",
+  welcomeSignup: "Create your account and start managing your invoices easily.",
+  alreadyHaveAccount: "Already have an account?",
   signin: "Sign in",
   signout: "Sign out",
   signup:"Sign up",

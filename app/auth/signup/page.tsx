@@ -5,8 +5,13 @@ import Footer from "@/app/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import AuthForm from "@/app/components/AuthForm";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function SignupPage() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   return (
     <>
       <Header />
@@ -33,7 +38,7 @@ export default function SignupPage() {
                 FactureMe
               </h1>
               <p className="mt-4 text-lg text-blue-100 max-w-prose">
-                Créez votre compte et commencez à gérer vos factures simplement.
+                {t("welcomeSignup")}
               </p>
             </div>
 
@@ -41,9 +46,9 @@ export default function SignupPage() {
             <div className="w-full max-w-md ml-auto rounded-2xl border border-white/10 bg-white/90 shadow-xl backdrop-blur-md p-6 sm:p-8 text-zinc-900 dark:text-zinc-100">
               <AuthForm initialMode="signup" />
               <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-300 text-center">
-                Déjà un compte?{" "}
+                {t("alreadyHaveAccount")}{" "}
                 <Link href="/" className="underline underline-offset-4">
-                  Se connecter
+                  {t("signin")}
                 </Link>
               </p>
             </div>
