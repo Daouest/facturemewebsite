@@ -36,6 +36,9 @@ const fr = {
   update: "Modifier",
   formSentWithSucces: "Formulaire envoyé avec succès.",
 
+  //Connection Page
+  welcomeMessage: "Connectez-vous pour gérer vos factures facilement.",
+
   // Sidebar
   invoices: "Mes factures",
   createItem: "Créer un produit",
@@ -305,6 +308,9 @@ const en = {
 
   welcome: "Welcome",
   dashboard: "Nice and easy!",
+
+  //Connection Page
+  welcomeMessage: "Sign in to manage your invoices easily.",
 
   // Sidebar
   invoices: "My invoices",

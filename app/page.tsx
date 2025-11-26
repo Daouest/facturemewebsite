@@ -7,10 +7,15 @@ import AuthForm from "@/app/components/AuthForm";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { useUser } from "./context/UserContext";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 export default function Home() {
   const router = useRouter();
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
   const { user, ready } = useUser();
+
 
   useEffect(() => {
     // Wait for user context to be ready
@@ -42,7 +47,7 @@ export default function Home() {
                 FactureMe
               </h1>
               <p className="mt-3 text-blue-100">
-                Connectez-vous pour gérer vos factures facilement.
+                {t("welcomeMessage")}
               </p>
             </div>
 
