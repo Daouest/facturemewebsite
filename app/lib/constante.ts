@@ -40,6 +40,32 @@ const fr = {
   welcomeMessage: "Connectez-vous pour gérer vos factures facilement.",
   signin: "Se connecter",
   signout: "Se déconnecter",
+  signup: "S'inscrire",
+
+  //Connection Form
+
+  //Sign in form
+  firstName: "Prénom",
+  lastName: "Nom de famille",
+  username: "Nom d'utilisateur",
+  email: "Courriel",
+  confirmEmail: "Confirmer le courriel",
+  password: "Mot de passe",
+  confirmPassword: "Confirmer le mot de passe",
+
+  requiredName: "Le prénom est requis",
+  requiredLastName: "Le nom de famille est requis",
+  requiredUsername: "Le nom d'utilisateur est requis",
+  requiredEmail: "Le courriel est requis",
+  requiredPassword: "Le mot de passe est requis",
+
+  matchEmail: "Les courriels ne correspondent pas",
+  matchPassword: "Les mots de passe ne correspondent pas",
+
+  alreadyUsedEmail: "Le courriel est déjà pris",
+  alreadyUsedUsername: "Le nom d'utilisateur est déjà pris",
+  signupPage: "Page d'inscription",
+  verifying: "Vérification...",
 
   // Sidebar
   invoices: "Mes factures",
@@ -129,10 +155,6 @@ const fr = {
   // Profile Page
   profileInfo: "Profil Info",
   profileInformation: "Informations du profil",
-  firstName: "Prénom",
-  lastName: "Nom",
-  username: "Nom d'utilisateur",
-  email: "Courriel",
   save: "Sauvegarder",
   saving: "En traitement...",
   saved: "Sauvegardé!",
@@ -142,7 +164,6 @@ const fr = {
   passwordSection: "Mot de passe",
   currentPassword: "Mot de passe actuel",
   newPassword: "Nouveau mot de passe",
-  confirmPassword: "Confirmer le nouveau",
   changePassword: "Changer le mot de passe",
   passwordChanged: "Mot de passe modifié",
   passwordError: "Erreur dans la modification",
@@ -315,6 +336,30 @@ const en = {
   welcomeMessage: "Sign in to manage your invoices easily.",
   signin: "Sign in",
   signout: "Sign out",
+  signup:"Sign up",
+
+  //Sign in form
+  firstName: "First name",
+  lastName: "Last name",
+  username: "Username",
+  email: "Email",
+  confirmEmail: "Confirm your email",
+  password: "Password",
+  confirmPassword: "Confirm your password",
+
+  requiredName: "First name is required",
+  requiredLastName: "Last name is required",
+  requiredUsername: "Username is required",
+  requiredEmail: "Email is required",
+  requiredPassword: "Password is required",
+
+  matchEmail: "Emails do not match",
+  matchPassword: "Passwords do not match",
+
+  alreadyUsedEmail: "Email is already used",
+  alreadyUsedUsername: "Username is already used",
+  signupPage: "Sign up page",
+  verifying: "Verifying...",
 
   // Sidebar
   invoices: "My invoices",
@@ -405,10 +450,6 @@ const en = {
   // Profile Page
   profileInfo: "Profile Info",
   profileInformation: "Profile Information",
-  firstName: "First Name",
-  lastName: "Last Name",
-  username: "Username",
-  email: "Email",
   save: "Save",
   saving: "Processing...",
   saved: "Saved!",
@@ -418,7 +459,6 @@ const en = {
   passwordSection: "Password",
   currentPassword: "Current Password",
   newPassword: "New Password",
-  confirmPassword: "Confirm New Password",
   changePassword: "Change Password",
   passwordChanged: "Password Changed",
   passwordError: "Error changing password",

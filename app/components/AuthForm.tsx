@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import AddressAutocomplete, { type AddressData } from "./AddressAutocomplete";
+import { useLangageContext } from "@/app/context/langageContext";
+import { createTranslator } from "@/app/lib/utils";
 
 type AuthMode = "login" | "signup";
 type AuthFormProps = { initialMode?: AuthMode };
@@ -23,6 +25,9 @@ const debounce = <F extends (...a: any[]) => any>(fn: F, ms = 400) => {
 };
 
 export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
@@ -148,29 +153,29 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
     // SIGNUP validation
     const validationErrors: Record<string, string> = {};
     if (!firstName.trim())
-      validationErrors.firstName = "First name is required";
-    if (!lastName.trim()) validationErrors.lastName = "Last name is required";
+      validationErrors.firstName = t("requiredName");
+    if (!lastName.trim()) validationErrors.lastName = t("requiredLastName");
     if (email !== confirmEmail)
-      validationErrors.confirmEmail = "Emails do not match";
+      validationErrors.confirmEmail = t("matchEmail");
     if (password !== confirmPassword)
-      validationErrors.confirmPassword = "Passwords do not match";
+      validationErrors.confirmPassword = t("matchPassword");
 
     // Address validation
     if (!addressData.address.trim())
-      validationErrors["address.address"] = "L'adresse est requise";
+      validationErrors["address.address"] = t("addressRequired");
     if (!addressData.city.trim())
-      validationErrors["address.city"] = "La ville est requise";
+      validationErrors["address.city"] = t("cityRequired");
     if (!addressData.province.trim())
-      validationErrors["address.province"] = "La province est requise";
+      validationErrors["address.province"] = t("provinceRequired");
     if (!addressData.zipCode.trim())
-      validationErrors["address.zipCode"] = "Le code postal est requis";
+      validationErrors["address.zipCode"] = t("postalCodeRequired");
     if (!addressData.country.trim())
-      validationErrors["address.country"] = "Le pays est requis";
+      validationErrors["address.country"] = t("countryRequired");
 
     // If live availability says taken, reflect that before submit
     if (availability.username)
-      validationErrors.username = "Username déjà utilisé";
-    if (availability.email) validationErrors.email = "Email déjà utilisé";
+      validationErrors.username = t("alreadyUsedUsername");
+    if (availability.email) validationErrors.email = t("alreadyUsedEmail");
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -224,10 +229,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           className="flex flex-col w-full p-8 rounded-lg shadow-lg bg-white dark:bg-zinc-900 dark:border dark:border-zinc-700"
         >
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
-            {mode === "login" ? "Connexion" : "Inscription"}
+            {mode === "login" ? t("signin") : t("signup")}
           </h2>
-       
-
 
           {/* SIGNUP fields */}
           {mode === "signup" && (
@@ -235,9 +238,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 <div>
                   <Input
-                    label="Prenom"
+                    label={t("firstName")}
                     type="text"
-                    placeholder="Prenom"
+                    placeholder={t("firstName")}
                     value={firstName}
                     onChange={(e) => {
                       setErrors((p) => ({ ...p, firstName: "" }));
@@ -253,9 +256,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                 </div>
                 <div>
                   <Input
-                    label="Nom"
+                    label={t("lastName")}
                     type="text"
-                    placeholder="Nom"
+                    placeholder={t("lastName")}
                     value={lastName}
                     onChange={(e) => {
                       setErrors((p) => ({ ...p, lastName: "" }));
@@ -274,9 +277,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               {/* Username */}
               <div className="mb-5">
                 <Input
-                  label="Nom d'utilisateur"
+                  label={t("username")}
                   type="text"
-                  placeholder="Nom d'utilisateur"
+                  placeholder={t("username")}
                   value={username}
                   onChange={(e) => {
                     setErrors((p) => ({ ...p, username: "" }));
@@ -292,11 +295,11 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                   className="flex items-center gap-2 mt-1"
                 >
                   {checking && (
-                    <span className="text-xs text-zinc-500">Vérification…</span>
+                    <span className="text-xs text-zinc-500">{t("verifying")}</span>
                   )}
                   {usernameTaken && (
                     <span className="text-xs text-red-600">
-                      Username déjà utilisé
+                      {t("alreadyUsedUsername")}
                     </span>
                   )}
                   {errors.username && (
@@ -311,9 +314,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 <div>
                   <Input
-                    label="Courriel"
+                    label={t("email")}
                     type="email"
-                    placeholder="Courriel"
+                    placeholder={t("email")}
                     value={email}
                     onChange={(e) => {
                       setErrors((p) => ({ ...p, email: "" }));
@@ -328,12 +331,12 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
                   <div id="email-help" className="flex items-center gap-2 mt-1">
                     {checking && (
                       <span className="text-xs text-zinc-500">
-                        Vérification…
+                        {t("verifying")}
                       </span>
                     )}
                     {emailTaken && (
                       <span className="text-xs text-red-600">
-                        Email déjà utilisé
+                        {t("alreadyUsedEmail")}
                       </span>
                     )}
                     {errors.email && (
@@ -346,9 +349,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
 
                 <div>
                   <Input
-                    label="Confirmation"
+                    label={t("confirmEmail")}
                     type="email"
-                    placeholder="Confirmation courriel"
+                    placeholder={t("confirmEmail")}
                     value={confirmEmail}
                     onChange={(e) => {
                       setErrors((p) => ({ ...p, confirmEmail: "" }));
@@ -368,7 +371,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               {/* Address Section */}
               <div className="mb-5">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  Adresse
+                  {t("addressInformation")}
                 </h3>
                 <AddressAutocomplete
                   onAddressSelect={(address) => {
@@ -400,9 +403,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
           {/* LOGIN email */}
           {mode === "login" && (
             <Input
-              label="Courriel"
+              label={t("email")}
               type="email"
-              placeholder="Courriel"
+              placeholder={t("email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`mb-5 ${!isUserIsFind ? " border-2 border-red-600" : ""}`}
@@ -416,9 +419,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
               <div>
                 <Input
-                  label="Mot de passe"
+                  label={t("password")}
                   type="password"
-                  placeholder="Mot de passe"
+                  placeholder={t("password")}
                   value={password}
                   onChange={(e) => {
                     setErrors((p) => ({ ...p, password: "" }));
@@ -430,9 +433,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               </div>
               <div>
                 <Input
-                  label="Confirmation"
+                  label={t("confirmPassword")}
                   type="password"
-                  placeholder="Confirmez mot de passe"
+                  placeholder={t("confirmPassword")}
                   value={confirmPassword}
                   onChange={(e) => {
                     setErrors((p) => ({ ...p, confirmPassword: "" }));
@@ -450,9 +453,9 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             </div>
           ) : (
             <Input
-              label="Mot de passe"
+              label={t("password")}
               type="password"
-              placeholder="Mot de passe"
+              placeholder={t("password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={`mb-5 ${!isUserIsFind  ? " border-2 border-red-600" : ""}`}
@@ -474,8 +477,8 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
               {isSubmitting
                 ? "En traitement"
                 : mode === "login"
-                  ? "Connexion"
-                  : "Inscription"}
+                  ? t("signin")
+                  : t("signup")}
             </Button>
           </div>
 
@@ -494,7 +497,7 @@ export default function AuthForm({ initialMode = "login" }: AuthFormProps) {
             href="/auth/signup"
             className="mt-4 text-sm text-zinc-600 dark:text-zinc-300 text-center underline underline-offset-4"
           >
-            Page d'inscription
+            {t("signupPage")}
           </Link>
         </div>
       )}
