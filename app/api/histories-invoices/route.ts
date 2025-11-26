@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sorted");
     const filterByPaid = searchParams.get("isPaid");
 
+    const allInvoices = searchParams.get("allInvoices") ? true : false;
+    console.log(allInvoices);
+
     // Récupération initiale des factures (true = active invoices)
     let historiqueFactures = await getAllFacturesUsers(userId, false);
     historiqueFactures =  historiqueFactures?.filter(f =>f.isPaid === true && f.isActive ===false);
@@ -30,6 +33,7 @@ export async function GET(req: NextRequest) {
       try {
         const start = new Date(startParam + "T00:00:00");
         const end = new Date(endParam + "T23:59:59.999");
+        historiqueFactures = await getAllFacturesUsers(userId, true);
         historiqueFactures = (historiqueFactures || []).filter((f: any) => {
           const d = new Date(f.dateFacture);
           return d >= start && d <= end;
