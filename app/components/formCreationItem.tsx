@@ -7,8 +7,13 @@ import { useFormData } from "@/app/context/FormContext";
 import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { createTranslator } from "@/app/lib/utils";
+import { useLangageContext } from "@/app/context/langageContext";
 
 export default function FormCreationItem() {
+  const { langage } = useLangageContext();
+  const t = createTranslator(langage);
+
   const { formData, setFormData } = useFormData();
   const { user } = useUser();
   const router = useRouter();
@@ -65,7 +70,7 @@ export default function FormCreationItem() {
     if (!formVerified()) {
       setErrorMessage({
         error: true,
-        message: "Erreur dans le formulaire: remplissez tous les champs",
+        message: t("fillAllFields"),
       });
       setShowAlert(true);
       setTimeout(() => {
@@ -112,7 +117,7 @@ export default function FormCreationItem() {
       console.error("Erreur dans l'envoi des données [creation-item]", err);
       setErrorMessage({
         error: true,
-        message: "Erreur lors de la création de l'article",
+        message: t("creationError"),
       });
       setShowAlert(true);
       setTimeout(() => {
@@ -153,7 +158,7 @@ export default function FormCreationItem() {
             <AiOutlineAlert className="h-5 w-5 text-rose-300" />
             <div>
               <AlertTitle className="text-slate-100 text-sm font-semibold">
-                Erreur
+                {t("error")}
               </AlertTitle>
               <AlertDescription className="text-rose-300">
                 {Errormessage.message}
@@ -169,7 +174,7 @@ export default function FormCreationItem() {
           htmlFor="itemNom"
           className="text-slate-200 font-semibold sm:w-1/3"
         >
-          Nom item :
+          {t("productName")}
         </label>
         <input
           className={[
@@ -181,7 +186,7 @@ export default function FormCreationItem() {
           type="text"
           id="itemNom"
           name="itemNom"
-          placeholder="Votre item"
+          placeholder={t("productName")}
           value={formData.itemNom}
           onChange={handleChange}
           required
@@ -194,7 +199,7 @@ export default function FormCreationItem() {
           htmlFor="description"
           className="text-slate-200 font-semibold sm:w-1/3"
         >
-          Description :
+          {t("description")}
         </label>
         <input
           className={[
@@ -206,7 +211,7 @@ export default function FormCreationItem() {
           type="text"
           id="description"
           name="description"
-          placeholder="Description"
+          placeholder={t("description")}
           value={formData.description}
           onChange={handleChange}
           required
@@ -216,7 +221,7 @@ export default function FormCreationItem() {
       {/* Prix */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <label htmlFor="prix" className="text-slate-200 font-semibold sm:w-1/3">
-          Prix item :
+          {t("price")}
         </label>
         <input
           className={[
@@ -229,7 +234,7 @@ export default function FormCreationItem() {
           id="prix"
           autoComplete="on"
           name="prix"
-          placeholder="Le prix"
+          placeholder={t("price")}
           value={price}
           onChange={handleChange}
           required
@@ -242,7 +247,7 @@ export default function FormCreationItem() {
           htmlFor="imageUpload"
           className="text-slate-200 font-semibold sm:w-1/3"
         >
-          Ajouter une image :
+          {t("image")}
         </label>
         <input
           className={[
@@ -266,7 +271,7 @@ export default function FormCreationItem() {
             type="submit"
             className="w-full sm:w-2/3 h-12 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors border border-sky-400/40 shadow-sm"
           >
-            Créer item
+            {t("createProduct")}
           </Button>
         </div>
       </div>

@@ -44,8 +44,6 @@ const fr = {
   signout: "Se déconnecter",
   signup: "S'inscrire",
 
-  //Connection Form
-
   //Sign in form
   firstName: "Prénom",
   lastName: "Nom de famille",
@@ -220,15 +218,21 @@ const fr = {
   // Item Detail Page
   details: "Détails",
   loadingText: "Chargement...",
-  errorLoadingItem: "Erreur dans le chargement de l'item",
+  errorLoadingItem: "Erreur dans le chargement du produit",
   message: "Message",
   noFieldsModified: "Erreur dans le formulaire: aucun champs modifié",
-  itemName: "Nom de l'item",
+  itemName: "Nom du produit",
   modifyImage: "Modifier l'image",
   change: "Changer",
   modify: "Modifier",
   return: "Retour",
   deleteItem: "Supprimer",
+
+  //Item Catalogue Page
+  fillAllFields: "Erreur dans le formulaire: remplissez tous les champs.",
+  creationError: "Erreur lors de la création de l'article",
+  error: "Erreur",
+  createProduct: "Créer un produit",
 
   // Invoice Creation Validation
   pleaseCompleteFields: "Veuillez compléter les champs suivants :",
@@ -314,10 +318,10 @@ const en = {
   sortByNumber: "Sort by facture number",
   sortByPaidInvoice: "Sort by status",
   archivedInvoices: " Actives Invoices ",
-  creationItem: "Creation of item",
-  seeItems: "See my items",
+  creationItem: "Create a product",
+  seeItems: "See my products",
   noData: "No data available",
-  noItems: "You don't have any products yet!",
+  noItems: "You don't have any product yet!",
   clientName: "Client Name",
   factureNumber: "Facture Number",
   dateFacture: "Date of the facture",
@@ -517,15 +521,21 @@ const en = {
   // Item Detail Page
   details: "Details",
   loadingText: "Loading...",
-  errorLoadingItem: "Error loading item",
+  errorLoadingItem: "Error loading product",
   message: "Message",
   noFieldsModified: "Form error: no fields modified",
-  itemName: "Item name",
+  itemName: "Product name",
   modifyImage: "Modify image",
   change: "Change",
   modify: "Modify",
   return: "Return",
   deleteItem: "Delete",
+
+  //Item Catalogue Page
+  fillAllFields: "Form error: fill in all fields.",
+  creationError: "Error occured while creating product",
+  error: "Error",
+  createProduct: "Create a product",
 
   // Invoice Creation Validation
   pleaseCompleteFields: "Please complete the following fields:",
