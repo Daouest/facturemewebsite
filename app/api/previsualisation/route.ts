@@ -176,6 +176,14 @@ export async function GET(request: Request) {
 
                 //1.2 Appliquer les taxes
                 const taxesArray = await getTaxesArrayForFacture(factureId);
+                let totalTaxesAmount = 0;
+                if (taxesArray && Array.isArray(taxesArray)) {
+                    taxesArray.forEach(tax => {
+                        //calcul montant taxe
+                        const amount = Math.round((totalFacture * tax.rate / 100) * 100) / 100;
+                        totalTaxesAmount += amount;
+                    });
+                }
 
                 invoiceInfos = {
                     "date": new Date(factureData.facture.dateFacture).toLocaleDateString(),
@@ -185,7 +193,7 @@ export async function GET(request: Request) {
                     "sousTotal": totalFacture,
                     "taxes": taxesArray,
                     "taxesNumbers": taxesnumbers,
-                    "total": totalFacture
+                    "total": totalFacture + totalTaxesAmount
                 }
             }
 
