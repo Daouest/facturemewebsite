@@ -67,6 +67,8 @@ export default function AddressAutocomplete({
   const uniqueId = useId();
   const addressInputId = `address-input-${uniqueId}`;
   const provinceId = `province-${uniqueId}`;
+  const cityInputId = `city-input-${uniqueId}`;
+  const zipInputId = `zipcode-input-${uniqueId}`;
 
   // Update local state when initialAddress changes (e.g., when data loads from API)
   useEffect(() => {
@@ -400,8 +402,11 @@ export default function AddressAutocomplete({
       {/* Manual fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <Input
-            label="Ville"
+          <label htmlFor={cityInputId} className={styles.label}>
+            Ville
+          </label>
+          <input
+            id={cityInputId}
             type="text"
             placeholder="ex.: Montréal"
             value={city}
@@ -418,16 +423,17 @@ export default function AddressAutocomplete({
             }}
             required
             disabled={disabled}
-            className={styles.inputClass}
+            className={styles.input}
           />
-          {errors.city && (
-            <p className={styles.error}>{errors.city}</p>
-          )}
+          {errors.city && <p className={styles.error}>{errors.city}</p>}
         </div>
 
         <div>
-          <Input
-            label="Code postal"
+          <label htmlFor={zipInputId} className={styles.label}>
+            Code postal
+          </label>
+          <input
+            id={zipInputId}
             type="text"
             placeholder="A1B 2C3"
             value={zipCode}
@@ -446,19 +452,14 @@ export default function AddressAutocomplete({
             title="Format canadien: A1B 2C3"
             required
             disabled={disabled}
-            className={styles.inputClass}
+            className={styles.input}
           />
-          {errors.zipCode && (
-            <p className={styles.error}>{errors.zipCode}</p>
-          )}
+          {errors.zipCode && <p className={styles.error}>{errors.zipCode}</p>}
         </div>
       </div>
 
       <div>
-        <label
-          htmlFor={provinceId}
-          className={styles.label}
-        >
+        <label htmlFor={provinceId} className={styles.label}>
           Province
         </label>
         <select
@@ -486,9 +487,7 @@ export default function AddressAutocomplete({
             </option>
           ))}
         </select>
-        {errors.province && (
-          <p className={styles.error}>{errors.province}</p>
-        )}
+        {errors.province && <p className={styles.error}>{errors.province}</p>}
       </div>
     </div>
   );
