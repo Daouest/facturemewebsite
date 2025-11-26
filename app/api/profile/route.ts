@@ -12,7 +12,7 @@ function toPublic(u: any) {
         firstName: u.firstName,
         lastName: u.lastName,
         //utile pour garder en valeur dans le ETag
-        //si jamais le user est connécté dans plusieurs sessions en même temps
+        //si jamais le user est connecté dans plusieurs sessions en même temps
         __v: u.__v,
     };
 }
@@ -53,16 +53,16 @@ export async function PUT(req: NextRequest) {
     //source : https://developer.mozilla.org/en-US/docs/Web/API/Headers/get
     const ifMatch = req.headers.get("if-match") || undefined
 
-    if (!ifMatch) {
-        //erreur 412 c'est pour le etag
-        return NextResponse.json({ message: "Erreur dans le etag" }, { status: 412 })
-    }
+    // if (!ifMatch) {
+    //     //erreur 412 c'est pour le etag
+    //     return NextResponse.json({ message: "Erreur dans le etag" }, { status: 412 })
+    // }
 
-    const objVersion = Number(ifMatch?.replace(/"/g, "").trim())
+    // const objVersion = Number(ifMatch?.replace(/"/g, "").trim())
 
-    if (!Number.isFinite(objVersion)) {
-        return NextResponse.json({ message: "Invalid Etag" }, { status: 400 })
-    }
+    // if (!Number.isFinite(objVersion)) {
+    //     return NextResponse.json({ message: "Invalid Etag" }, { status: 400 })
+    // }
 
     let body: any;
     try {
@@ -105,7 +105,7 @@ export async function PUT(req: NextRequest) {
 
     //modification dans la db et on incremente aussi la __v
     const updated = await DbUsers.findOneAndUpdate(
-        { idUser: userFromCookie.idUser, __v: objVersion },
+        { idUser: userFromCookie.idUser},
         { $set: setFields, $inc: { __v: 1 } },
         { new: true }
     )
