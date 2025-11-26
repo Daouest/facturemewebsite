@@ -109,7 +109,7 @@ export default function Header() {
           {!isLoggedIn &&
             (onAboutPage ? (
               <a
-                href="/auth/signup"
+                href="/"
                 title={t("signin")}
                 aria-label={t("signin")}
                 className="inline-flex items-center justify-center rounded-md border border-white/20 p-2 text-white hover:bg-white/10 transition"
