@@ -97,7 +97,7 @@ export default function CalendarPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/histories-invoices?start=${monthStartKey}&end=${monthEndKey}`,
+          `/api/histories-invoices?start=${monthStartKey}&end=${monthEndKey}&allInvoices=true`,
           { credentials: "include" }
         );
 
